@@ -16,6 +16,7 @@ import com.creavispace.project.domain.common.dto.SuccessResponseDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackAnswerCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionModifyRequestDto;
+import com.creavispace.project.domain.feedback.dto.response.FeedbackAnalysisResponseDto;
 import com.creavispace.project.domain.feedback.dto.response.FeedbackAnswerCreateResponseDto;
 import com.creavispace.project.domain.feedback.dto.response.FeedbackQuestionResponseDto;
 import com.creavispace.project.domain.feedback.service.FeedbackService;
@@ -34,6 +35,7 @@ public class FeedbackController {
     private final static String MODIFY_FEEDBACK_QUESTION = "/question";
     private final static String READ_FEEDBACK_QUESTION = "/question";
     private final static String CREATE_FEEDBACK_ANSWER = "/answer";
+    private final static String ANALYSIS_FEEDBACK = "/analysis";
 
     @PostMapping(CREATE_FEEDBACK_QUESTION)
     @Operation(summary = "피드백 질문 생성")
@@ -71,5 +73,14 @@ public class FeedbackController {
         @RequestBody List<FeedbackAnswerCreateRequestDto> requestBody
     ){
         return ResponseEntity.ok().body(feedbackService.createFeedbackAnswer(memberId, projectId, requestBody));
+    }
+
+    @GetMapping(ANALYSIS_FEEDBACK)
+    @Operation(summary = "피드백 분석")
+    public ResponseEntity<SuccessResponseDto<List<FeedbackAnalysisResponseDto>>> analysisFeedback(
+        @AuthenticationPrincipal Long memberId,
+        @RequestParam("projectId") Long projectId
+    ){
+        return ResponseEntity.ok().body(feedbackService.analysisFeedback(memberId, projectId));
     }
 }

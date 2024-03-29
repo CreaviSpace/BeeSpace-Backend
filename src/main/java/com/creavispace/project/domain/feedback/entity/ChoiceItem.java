@@ -2,7 +2,9 @@ package com.creavispace.project.domain.feedback.entity;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,13 +29,14 @@ public class ChoiceItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(targetEntity = FeedbackQuestion.class, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feedback_question_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private FeedbackQuestion feedbackQuestion;
 
     @Column(nullable = false)
     private String item;
 
-    @OneToMany(mappedBy = "choiceItem", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "choiceItem", fetch = FetchType.LAZY)
     private List<SelectedItem> selectedItems;
 }
