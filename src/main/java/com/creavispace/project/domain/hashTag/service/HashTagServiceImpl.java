@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.hashTag.dto.response.PopularHashTagReadResponseDto;
 import com.creavispace.project.domain.hashTag.entity.CommunityHashTagResult;

@@ -1,4 +1,4 @@
-package com.creavispace.project.domain.common.dto;
+package com.creavispace.project.domain.common.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

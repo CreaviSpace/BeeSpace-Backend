@@ -18,7 +18,7 @@ import com.creavispace.project.config.auth.dto.NaverTokenResponseDto;
 import com.creavispace.project.config.auth.dto.NaverUserResponseDto;
 import com.creavispace.project.config.auth.dto.NaverUserResponseDto.NaverUserDetail;
 import com.creavispace.project.config.auth.utils.JwtUtil;
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;

@@ -11,7 +11,7 @@ import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
 import com.creavispace.project.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.creavispace.project.domain.bookmark.repository.ProjectBookmarkRepository;
 import com.creavispace.project.domain.bookmark.repository.RecruitBookmarkRepository;
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.member.entity.Member;

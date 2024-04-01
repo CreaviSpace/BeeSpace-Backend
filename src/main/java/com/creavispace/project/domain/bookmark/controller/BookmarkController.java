@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

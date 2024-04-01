@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
 import com.creavispace.project.domain.recruit.dto.response.DeadLineRecruitListReadResponseDto;
 import com.creavispace.project.domain.recruit.dto.response.RecruitDeleteResponseDto;

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.domain.project.dto.response.PopularProjectReadResponseDto;
 import com.creavispace.project.domain.project.dto.response.ProjectResponseDto;

@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.techStack.dto.response.TechStackListReadResponseDto;
 import com.creavispace.project.domain.techStack.entity.TechStack;
 import com.creavispace.project.domain.techStack.repository.TechStackRepository;

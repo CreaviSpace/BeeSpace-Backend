@@ -2,7 +2,7 @@ package com.creavispace.project.domain.report.service;
 
 import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.report.dto.request.ReportRequestDto;

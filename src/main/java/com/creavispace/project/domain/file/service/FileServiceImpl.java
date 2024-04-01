@@ -20,7 +20,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.file.dto.response.UploadFileResponseDto;
 import com.creavispace.project.domain.file.entity.CustomMultipartFile;
 import com.creavispace.project.global.exception.CreaviCodeException;

@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.creavispace.project.domain.common.dto.FailResponseDto;
+import com.creavispace.project.domain.common.dto.response.FailResponseDto;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

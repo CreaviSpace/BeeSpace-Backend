@@ -2,7 +2,7 @@ package com.creavispace.project.domain.like.service;
 
 import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.like.dto.response.LikeCountResponseDto;

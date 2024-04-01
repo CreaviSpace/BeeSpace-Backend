@@ -5,7 +5,7 @@ import java.util.List;
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
 import com.creavispace.project.domain.comment.dto.response.CommentDeleteResponseDto;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 
 public interface CommentService {
     public SuccessResponseDto<List<CommentResponseDto>> readCommentList(Long postId, String postType);

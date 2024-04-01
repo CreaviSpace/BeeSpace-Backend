@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
@@ -83,7 +83,7 @@ public class CommunityController {
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
         @RequestParam(value = "category", required = false) String category,
         @RequestParam(value = "hashTag", required = false) String hashTag,
-        @RequestParam(value = "orderby", required = false, defaultValue = "최신활동순") String orderby
+        @RequestParam(value = "orderby", required = false, defaultValue = "latest-activity") String orderby
 
     ){
         return ResponseEntity.ok().body(communityService.readCommunityList(size, page, category, hashTag, orderby));

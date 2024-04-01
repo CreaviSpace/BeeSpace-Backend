@@ -3,7 +3,7 @@ package com.creavispace.project.domain.file.controller;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.file.dto.response.UploadFileResponseDto;
 import com.creavispace.project.domain.file.service.FileService;
 

@@ -9,8 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.common.dto.PostType;
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.CommunityCategory;
+import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
@@ -23,6 +24,7 @@ import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.CustomValueOf;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -47,10 +49,12 @@ public class CommunityServiceImpl implements CommunityService{
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
+        CommunityCategory category = CustomValueOf.valueOf(CommunityCategory.class, dto.getCategory(), GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+
         // 커뮤니티 게시글 생성
         Community community = Community.builder()
             .member(member)
-            .category(dto.getCategory())
+            .category(category)
             .title(dto.getTitle())
             .content(dto.getContent())
             .viewCount(0)
@@ -98,7 +102,7 @@ public class CommunityServiceImpl implements CommunityService{
         CommunityResponseDto create = CommunityResponseDto.builder()
             .id(community.getId())
             .postType(PostType.COMMUNITY.getName())
-            .category(community.getCategory())
+            .category(community.getCategory().getName())
             .memberId(community.getMember().getId())
             .memberNickName(community.getMember().getMemberNickname())
             .memberProfile(community.getMember().getProfileUrl())
@@ -174,7 +178,7 @@ public class CommunityServiceImpl implements CommunityService{
         CommunityResponseDto modify = CommunityResponseDto.builder()
             .id(community.getId())
             .postType(PostType.COMMUNITY.getName())
-            .category(community.getCategory())
+            .category(community.getCategory().getName())
             .memberId(community.getMember().getId())
             .memberNickName(community.getMember().getMemberNickname())
             .memberProfile(community.getMember().getProfileUrl())
@@ -258,7 +262,7 @@ public class CommunityServiceImpl implements CommunityService{
         CommunityReadResponseDto read = CommunityReadResponseDto.builder()
             .id(community.getId())
             .postType(PostType.COMMUNITY.getName())
-            .category(community.getCategory())
+            .category(community.getCategory().getName())
             .memberId(community.getMember().getId())
             .memberNickName(community.getMember().getMemberNickname())
             .memberProfile(community.getMember().getProfileUrl())
@@ -284,14 +288,16 @@ public class CommunityServiceImpl implements CommunityService{
     public SuccessResponseDto<List<CommunityResponseDto>> readCommunityList(Integer size, Integer page, String category, String hashTag, String orderby) {
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<Community> pageable;
+        CommunityCategory communityCategory;
 
         // 정렬 조건
         switch (orderby) {
-            case "최신활동순":
+            case "latest-activity":
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
-                    Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category, hashTagId, pageRequest);
+                        communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+                        Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
+                        pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(communityCategory.getName(), hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -300,7 +306,8 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    pageable = communityRepository.findAllByStatusTrueAndCategory(category, pageRequest);
+                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+                    pageable = communityRepository.findAllByStatusTrueAndCategory(communityCategory.getName(), pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -308,11 +315,12 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 break;
         
-            case "추천순":
+            case "recommended":
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
+                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
                     Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(category, hashTagId, pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(communityCategory.getName(), hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -321,7 +329,8 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByLikeCountDesc(category, pageRequest);
+                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByLikeCountDesc(communityCategory.getName(), pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -329,11 +338,12 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 break;
         
-            case "조회수순":
+            case "most-viewed":
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
+                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
                     Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category, hashTagId, pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(communityCategory.getName(), hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -342,7 +352,8 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByViewCountDesc(category, pageRequest);
+                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByViewCountDesc(communityCategory.getName(), pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -363,7 +374,7 @@ public class CommunityServiceImpl implements CommunityService{
             .map(community -> CommunityResponseDto.builder()
                 .id(community.getId())
                 .postType(PostType.COMMUNITY.getName())
-                .category(community.getCategory())
+                .category(community.getCategory().getName())
                 .memberId(community.getMember().getId())
                 .viewCount(community.getViewCount())
                 .createdDate(community.getCreatedDate())

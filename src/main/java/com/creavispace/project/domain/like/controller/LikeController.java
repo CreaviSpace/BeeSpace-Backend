@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.like.dto.response.LikeCountResponseDto;
 import com.creavispace.project.domain.like.dto.response.LikeResponseDto;
 import com.creavispace.project.domain.like.service.LikeService;

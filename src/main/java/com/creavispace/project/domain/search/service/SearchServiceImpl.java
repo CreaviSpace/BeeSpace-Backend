@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.common.dto.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
@@ -111,7 +111,7 @@ public class SearchServiceImpl implements SearchService{
                         return CommunityResponseDto.builder()
                             .id(community.getId())
                             .postType("community")
-                            .category(community.getCategory())
+                            .category(community.getCategory().getName())
                             .memberId(community.getMember().getId())
                             .memberNickName(community.getMember().getMemberNickname())
                             .memberProfile(community.getMember().getProfileUrl())
@@ -130,7 +130,6 @@ public class SearchServiceImpl implements SearchService{
                     default:
                         throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
                 }
-                
             })
             .collect(Collectors.toList());
 
