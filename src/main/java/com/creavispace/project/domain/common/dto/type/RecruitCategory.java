@@ -6,9 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RecruitCategory {
-    PROJECT_RECRUIT("project-recruit","프로젝트 모집"),
-    STUDY("study","스터디");
+    PROJECT_RECRUIT("프로젝트 모집"),
+    STUDY("스터디");
 
-    private String name;
     private String subName;
 }

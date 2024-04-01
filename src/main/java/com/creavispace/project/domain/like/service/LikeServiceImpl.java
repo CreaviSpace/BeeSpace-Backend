@@ -43,8 +43,8 @@ public class LikeServiceImpl implements LikeService{
         // 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        switch (postType.getName()) {
-            case "project":
+        switch (postType.name()) {
+            case "PROJECT":
                 Project project = projectRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
                 
                 ProjectLike projectLike = projectLikeRepository.findByProjectIdAndMemberId(postId, memberId);
@@ -63,7 +63,7 @@ public class LikeServiceImpl implements LikeService{
                     data = new LikeResponseDto(false);
                 }
                 break;
-            case "community":
+            case "COMMUNITY":
                 Community community = communityRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
 
                 CommunityLike communityLike = communityLikeRepository.findByCommunityIdAndMemberId(postId, memberId);
@@ -98,14 +98,14 @@ public class LikeServiceImpl implements LikeService{
         // 회원이 존재하는지
         memberRepository.findById(memberId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        switch (postType.getName()) {
-            case "project":
+        switch (postType.name()) {
+            case "PROJECT":
                 projectRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
                 boolean isProjectLike = projectLikeRepository.existsByProjectIdAndMemberId(postId, memberId);
                 data = new LikeResponseDto(isProjectLike);
                 break;
         
-            case "community":
+            case "COMMUNITY":
                 communityRepository.findByIdAndStatusTrue(postId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
                 boolean isCommunityLike = communityLikeRepository.existsByCommunityIdAndMemberId(postId, memberId);
                 data = new LikeResponseDto(isCommunityLike);
@@ -125,12 +125,12 @@ public class LikeServiceImpl implements LikeService{
         LikeCountResponseDto data = null;
         int likeCount = 0;
 
-        switch (postType.getName()) {
-            case "project":
+        switch (postType.name()) {
+            case "PROJECT":
                 likeCount = projectLikeRepository.countByProjectId(postId);
                 break;
         
-            case "community":
+            case "COMMUNITY":
                 likeCount = communityLikeRepository.countByCommunityId(postId);
                 break;
         

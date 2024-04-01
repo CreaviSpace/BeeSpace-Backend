@@ -145,16 +145,16 @@ public class RecruitServiceImpl implements RecruitService {
         // 모집 게시글 생성 DTO
         data = RecruitResponseDto.builder()
             .id(recruit.getId())
-            .postType(PostType.RECRUIT.getName())
+            .postType(PostType.RECRUIT.name())
             .memberId(recruit.getMember().getId())
             .memberNickName(recruit.getMember().getMemberNickname())
             .memberProfile(recruit.getMember().getProfileUrl())
             .viewCount(recruit.getViewCount())
-            .category(recruit.getCategory().getName())
-            .contactWay(recruit.getContactWay().getName())
+            .category(recruit.getCategory().name())
+            .contactWay(recruit.getContactWay().name())
             .contact(recruit.getContact())
             .amount(recruit.getAmount())
-            .proceedWay(recruit.getProceedWay().getName())
+            .proceedWay(recruit.getProceedWay().name())
             .workDay(recruit.getWorkDay())
             .end(recruit.getEnd())
             .title(recruit.getTitle())
@@ -255,16 +255,16 @@ public class RecruitServiceImpl implements RecruitService {
         // 모집 게시글 수정 DTO
         data = RecruitResponseDto.builder()
             .id(recruit.getId())
-            .postType(PostType.RECRUIT.getName())
+            .postType(PostType.RECRUIT.name())
             .memberId(recruit.getMember().getId())
             .memberNickName(recruit.getMember().getMemberNickname())
             .memberProfile(recruit.getMember().getProfileUrl())
             .viewCount(recruit.getViewCount())
-            .category(recruit.getCategory().getName())
-            .contactWay(recruit.getContactWay().getName())
+            .category(recruit.getCategory().name())
+            .contactWay(recruit.getContactWay().name())
             .contact(recruit.getContact())
             .amount(recruit.getAmount())
-            .proceedWay(recruit.getProceedWay().getName())
+            .proceedWay(recruit.getProceedWay().name())
             .workDay(recruit.getWorkDay())
             .end(recruit.getEnd())
             .title(recruit.getTitle())
@@ -304,7 +304,7 @@ public class RecruitServiceImpl implements RecruitService {
         // 모집 게시글 삭제 DTO
         data = RecruitDeleteResponseDto.builder()
             .recruitId(recruit.getId())
-            .postType(PostType.RECRUIT.getName())
+            .postType(PostType.RECRUIT.name())
             .build();
         
         log.info("/recruit/service : deleteRecruit success data = {}", data);
@@ -320,7 +320,7 @@ public class RecruitServiceImpl implements RecruitService {
 
         // 카테고리가 존재한다면
         if(category != null){
-            pageable = recruitRepository.findAllByStatusTrueAndCategory(category.getName(), pageRequest);
+            pageable = recruitRepository.findAllByStatusTrueAndCategory(category.name(), pageRequest);
         }
         // 카테고리가 없다면
         else{
@@ -335,8 +335,8 @@ public class RecruitServiceImpl implements RecruitService {
         data = recruits.stream()
             .map(recruit -> RecruitListReadResponseDto.builder()
                     .id(recruit.getId())
-                    .postType(PostType.RECRUIT.getName())
-                    .category(recruit.getCategory().getName())
+                    .postType(PostType.RECRUIT.name())
+                    .category(recruit.getCategory().name())
                     .title(recruit.getTitle())
                     .content(recruit.getContent())
                     .amount(recruit.getAmount())
@@ -400,16 +400,16 @@ public class RecruitServiceImpl implements RecruitService {
         // 모집게시글 디테일 DTO
         data = RecruitReadResponseDto.builder()
             .id(recruit.getId())
-            .postType(PostType.RECRUIT.getName())
+            .postType(PostType.RECRUIT.name())
             .memberId(recruit.getMember().getId())
             .memberNickName(recruit.getMember().getMemberNickname())
             .memberProfile(recruit.getMember().getProfileUrl())
             .viewCount(recruit.getViewCount())
-            .category(recruit.getCategory().getName())
-            .contactWay(recruit.getContactWay().getName())
+            .category(recruit.getCategory().name())
+            .contactWay(recruit.getContactWay().name())
             .contact(recruit.getContact())
             .amount(recruit.getAmount())
-            .proceedWay(recruit.getProceedWay().getName())
+            .proceedWay(recruit.getProceedWay().name())
             .workDay(recruit.getWorkDay())
             .end(recruit.getEnd())
             .title(recruit.getTitle())
@@ -450,7 +450,7 @@ public class RecruitServiceImpl implements RecruitService {
         data = recruits.stream()
             .map(recruit -> DeadLineRecruitListReadResponseDto.builder()
                 .id(recruit.getId())
-                .postType(PostType.RECRUIT.getName())
+                .postType(PostType.RECRUIT.name())
                 .title(recruit.getTitle())
                 .content(recruit.getContent())
                 .end(recruit.getEnd())

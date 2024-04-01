@@ -6,10 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OrderBy {
-    LATEST_ACTIVITY("latest-activity","최신활동순"),
-    RECOMMENDED("recommended","추천순"),
-    MOST_VIEWED("most-viewed","조회수순");
+    LATEST_ACTIVITY("최신활동순"),
+    RECOMMENDED("추천순"),
+    MOST_VIEWED("조회수순");
 
-    private String name;
     private String subName;
 }

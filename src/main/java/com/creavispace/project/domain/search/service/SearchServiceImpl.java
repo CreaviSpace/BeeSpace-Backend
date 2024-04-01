@@ -49,16 +49,16 @@ public class SearchServiceImpl implements SearchService{
         if(postType == null){
             pageable = projectRepository.findIntegratedSearchData(text, pageRequest);
         }else{
-            switch (postType.getName()) {
-                case "project":
+            switch (postType.name()) {
+                case "PROJECT":
                     pageable = projectRepository.findProjectSearchData(text, pageRequest);
                     break;
             
-                case "recruit":
+                case "RECRUIT":
                     pageable = recruitRepository.findRecruitSearchData(text, pageRequest);
                     break;
             
-                case "community":
+                case "COMMUNITY":
                     pageable = communityRepository.findCommunitySearchData(text, pageRequest);
                     break;
             
@@ -74,12 +74,12 @@ public class SearchServiceImpl implements SearchService{
             .map(searchResult -> {
                 Long postId = searchResult.getPostId();
                 switch (searchResult.getPostType()) {
-                    case "project":
+                    case "PROJECT":
                         Project project = projectRepository.findByIdAndStatusTrue(postId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
                         return ProjectListReadResponseDto.builder()
                             .id(project.getId())
-                            .postType(PostType.PROJECT.getName())
-                            .category(project.getCategory().getName())
+                            .postType(PostType.PROJECT.name())
+                            .category(project.getCategory().name())
                             .title(project.getTitle())
                             .links(project.getLinks().stream()
                                 .map(link -> ProjectLinkResponseDto.builder()
@@ -90,12 +90,12 @@ public class SearchServiceImpl implements SearchService{
                             .thumbnail(project.getThumbnail())
                             .bannerContent(project.getBannerContent())
                             .build();
-                    case "recruit":
+                    case "RECRUIT":
                         Recruit recruit = recruitRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
                         return RecruitListReadResponseDto.builder()
                             .id(recruit.getId())
-                            .postType(PostType.RECRUIT.getName())
-                            .category(recruit.getCategory().getName())
+                            .postType(PostType.RECRUIT.name())
+                            .category(recruit.getCategory().name())
                             .title(recruit.getTitle())
                             .content(recruit.getContent())
                             .amount(recruit.getAmount())
@@ -110,12 +110,12 @@ public class SearchServiceImpl implements SearchService{
                                     .build())
                                 .collect(Collectors.toList()))
                             .build();
-                    case "community":
+                    case "COMMUNITY":
                         Community community = communityRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
                         return CommunityResponseDto.builder()
                             .id(community.getId())
-                            .postType(PostType.COMMUNITY.getName())
-                            .category(community.getCategory().getName())
+                            .postType(PostType.COMMUNITY.name())
+                            .category(community.getCategory().name())
                             .memberId(community.getMember().getId())
                             .memberNickName(community.getMember().getMemberNickname())
                             .memberProfile(community.getMember().getProfileUrl())

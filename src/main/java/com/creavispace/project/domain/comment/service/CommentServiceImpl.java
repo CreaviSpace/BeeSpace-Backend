@@ -50,8 +50,8 @@ public class CommentServiceImpl implements CommentService {
         
         List<CommentResponseDto> data = null;
 
-        switch (postType.getName()) {
-            case "project":
+        switch (postType.name()) {
+            case "PROJECT":
                 projectRepository.findById(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
                 List<ProjectComment> projectComments = projectCommentRepository.findByProjectId(postId);
                 data = projectComments.stream()
@@ -66,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
                     .collect(Collectors.toList());
                 break;
         
-            case "community":
+            case "COMMUNITY":
                 communityRepository.findById(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
                 List<CommunityComment> communityComments = communityCommentRepository.findByCommunityId(postId);
                 data = communityComments.stream()
@@ -81,7 +81,7 @@ public class CommentServiceImpl implements CommentService {
                     .collect(Collectors.toList());
                 break;
                 
-            case "recruit":
+            case "RECRUIT":
                 recruitRepository.findById(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
                 List<RecruitComment> recruitComments = recruitCommentRepository.findByRecruitId(postId);
                 data = recruitComments.stream()
@@ -110,8 +110,8 @@ public class CommentServiceImpl implements CommentService {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        switch (postType.getName()) {
-            case "project":
+        switch (postType.name()) {
+            case "PROJECT":
                 Optional<Project> optionalProject = projectRepository.findByIdAndStatusTrue(postId);
                 Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
@@ -133,7 +133,7 @@ public class CommentServiceImpl implements CommentService {
                     .build();
                 break;
         
-            case "recruit":
+            case "RECRUIT":
                 Optional<Recruit> optionalRecruit = recruitRepository.findByIdAndStatusTrue(postId);
                 Recruit recruit = optionalRecruit.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
 
@@ -155,7 +155,7 @@ public class CommentServiceImpl implements CommentService {
                     .build();
                 break;
         
-            case "community":
+            case "COMMUNITY":
                 Optional<Community> optionalCommunity = communityRepository.findByIdAndStatusTrue(postId);
                 Community community = optionalCommunity.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
 
@@ -193,8 +193,8 @@ public class CommentServiceImpl implements CommentService {
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
         
-        switch (postType.getName()) {
-            case "project":
+        switch (postType.name()) {
+            case "PROJECT":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
                 if(memberId != projectComment.getMember().getId() && !member.getRole().equals("Administrator")){
@@ -214,7 +214,7 @@ public class CommentServiceImpl implements CommentService {
                     .build();
                 break;
         
-            case "recruit":
+            case "RECRUIT":
                 RecruitComment recruitComment = recruitCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
                 if(memberId != recruitComment.getMember().getId() && !member.getRole().equals("Administrator")){
@@ -234,7 +234,7 @@ public class CommentServiceImpl implements CommentService {
                     .build();
                 break;
         
-            case "community":
+            case "COMMUNITY":
                 CommunityComment communityComment = communityCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
                 if(memberId != communityComment.getMember().getId() && !member.getRole().equals("Administrator")){
@@ -271,8 +271,8 @@ public class CommentServiceImpl implements CommentService {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        switch (postType.getName()) {
-            case "project":
+        switch (postType.name()) {
+            case "PROJECT":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                 
                 if(memberId != projectComment.getMember().getId() && !member.getRole().equals("Administrator")){
@@ -283,7 +283,7 @@ public class CommentServiceImpl implements CommentService {
 
                 break;
         
-            case "recruit":
+            case "RECRUIT":
                 RecruitComment recruitComment = recruitCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                 
                 if(memberId != recruitComment.getMember().getId() && !member.getRole().equals("Administrator")){
@@ -294,7 +294,7 @@ public class CommentServiceImpl implements CommentService {
                 
                 break;
         
-            case "community":
+            case "COMMUNITY":
                 CommunityComment communityComment = communityCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                     
                 if(memberId != communityComment.getMember().getId() && !member.getRole().equals("Administrator")){
@@ -309,7 +309,7 @@ public class CommentServiceImpl implements CommentService {
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }
 
-        data = CommentDeleteResponseDto.builder().commentId(commentId).postType(postType.getName()).build();
+        data = CommentDeleteResponseDto.builder().commentId(commentId).postType(postType.name()).build();
 
         log.info("/comment/service : deleteComment success data = {}", data);
         return new SuccessResponseDto<CommentDeleteResponseDto>(true, "댓글 삭제가 완료되었습니다.", data);

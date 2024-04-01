@@ -6,10 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CommunityCategory {
-    QNA("qna","QnA"), 
-    CHAT("chat","수다"), 
-    CONCERN("concern", "고민");
+    QNA("QnA"), 
+    CHAT("수다"), 
+    CONCERN("고민");
 
-    private String name;
     private String subName;
 }

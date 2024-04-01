@@ -52,8 +52,8 @@ public class ReportServiceImpl implements ReportService{
         // 신고 DTO
         data = ReportResponseDto.builder()
             .postId(report.getPostId())
-            .postType(report.getPostType().getName())
-            .category(report.getCategory().getName())
+            .postType(report.getPostType().name())
+            .category(report.getCategory().name())
             .content(report.getContent())
             .build();
         

@@ -6,13 +6,12 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ReportCategory {
-    SPAM("spam","스팸"),
-    PORNOGRAPHY("pornography","음란물"),
-    VIOLENCE("violence","폭력"),
-    HATE_SPEECH("hate-speech","혐오발언"),
-    PERSONAL_INFORMATION_DISCLOSURE("personal-information-disclosure","개인정보유출"),
-    INAPPROPRIATE_CONTENT("inappropriate-content","부적절한 콘텐츠");
+    SPAM("스팸"),
+    PORNOGRAPHY("음란물"),
+    VIOLENCE("폭력"),
+    HATE_SPEECH("혐오발언"),
+    PERSONAL_INFORMATION_DISCLOSURE("개인정보유출"),
+    INAPPROPRIATE_CONTENT("부적절한 콘텐츠");
 
-    private String name;
     private String subName;
 }

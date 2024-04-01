@@ -184,11 +184,11 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 생성 결과 DTO
         data = ProjectResponseDto.builder()
                 .id(project.getId())
-                .postType(PostType.PROJECT.getName())
+                .postType(PostType.PROJECT.name())
                 .memberId(project.getMember().getId())
                 .memberNickName(project.getMember().getMemberNickname())
                 .memberProfile(project.getMember().getProfileUrl())
-                .category(project.getCategory().getName())
+                .category(project.getCategory().name())
                 .field(project.getField())
                 .title(project.getTitle())
                 .content(project.getContent())
@@ -332,11 +332,11 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 수정 결과 DTO
         data = ProjectResponseDto.builder()
                 .id(project.getId())
-                .postType(PostType.PROJECT.getName())
+                .postType(PostType.PROJECT.name())
                 .memberId(project.getMember().getId())
                 .memberNickName(project.getMember().getMemberNickname())
                 .memberProfile(project.getMember().getProfileUrl())
-                .category(project.getCategory().getName())
+                .category(project.getCategory().name())
                 .field(project.getField())
                 .title(project.getTitle())
                 .content(project.getContent())
@@ -379,7 +379,7 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 삭제 결과 DTO
         data = ProjectDeleteResponseDto.builder()
                 .projectId(project.getId())
-                .postType(PostType.PROJECT.getName())
+                .postType(PostType.PROJECT.name())
                 .build();
 
         log.info("/project/service : deleteProject success data = {}", data);
@@ -397,10 +397,10 @@ public class ProjectServiceImpl implements ProjectService {
         data = projects.stream()
                 .map(project -> PopularProjectReadResponseDto.builder()
                         .id(project.getId())
-                        .postType(PostType.PROJECT.getName())
+                        .postType(PostType.PROJECT.name())
                         .title(project.getTitle())
                         .thumbnail(project.getThumbnail())
-                        .category(project.getCategory().getName())
+                        .category(project.getCategory().name())
                         .bannerContent(project.getBannerContent())
                         .build())
                 .collect(Collectors.toList());
@@ -418,7 +418,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 카테고리가 존재하면
         if(category != null){
-            pageable = projectRepository.findAllByStatusTrueAndCategory(category.getName(), pageRequest);
+            pageable = projectRepository.findAllByStatusTrueAndCategory(category.name(), pageRequest);
         }
         // 카테고리가 없다면
         else{
@@ -516,11 +516,11 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 디테일 결과 DTO
         data = ProjectReadResponseDto.builder()
                 .id(project.getId())
-                .postType(PostType.PROJECT.getName())
+                .postType(PostType.PROJECT.name())
                 .memberId(project.getMember().getId())
                 .memberNickName(project.getMember().getMemberNickname())
                 .memberProfile(project.getMember().getProfileUrl())
-                .category(project.getCategory().getName())
+                .category(project.getCategory().name())
                 .field(project.getField())
                 .title(project.getTitle())
                 .content(project.getContent())
@@ -581,8 +581,8 @@ public class ProjectServiceImpl implements ProjectService {
 
                     return ProjectListReadResponseDto.builder()
                             .id(project.getId())
-                            .postType(PostType.PROJECT.getName())
-                            .category(project.getCategory().getName())
+                            .postType(PostType.PROJECT.name())
+                            .category(project.getCategory().name())
                             .title(project.getTitle())
                             .thumbnail(project.getThumbnail())
                             .bannerContent(project.getBannerContent())

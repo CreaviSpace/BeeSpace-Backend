@@ -76,7 +76,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                 feedbackQuestionRepository.save(feedbackQuestion);
 
                 // 객관식 or 체크박스 타입인지
-                if(dto.getQuestionType().equals("objective") || dto.getQuestionType().equals("checkbox")){
+                if(dto.getQuestionType().equals("OBJECTIVE") || dto.getQuestionType().equals("CHECKBOX")){
                     // 선택지 생성
                     List<ChoiceItem> choiceItems = dto.getChoiceItems().stream()
                         .map(choiceItem -> ChoiceItem.builder()
@@ -100,7 +100,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                 return FeedbackQuestionResponseDto.builder()
                     .questionId(feedbackQuestion.getId())
                     .question(feedbackQuestion.getQuestion())
-                    .questionType(feedbackQuestion.getQuestionType().getName())
+                    .questionType(feedbackQuestion.getQuestionType().name())
                     .choiceItems(choiceItems.stream()
                         .map(choiceItem -> ChoiceItemResponseDto.builder()
                             .id(choiceItem.getId())
@@ -170,7 +170,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                     feedbackQuestionRepository.save(feedbackQuestion);
     
                     // 객관식 or 체크박스일 경우 선택지 저장
-                    if(dto.getQuestionType().equals("objective") || dto.getQuestionType().equals("checkbox")){
+                    if(dto.getQuestionType().equals("OBJECTIVE") || dto.getQuestionType().equals("CHECKBOX")){
                         // 선택지 생성
                         List<ChoiceItem> choiceItems = dto.getChoiceItems().stream()
                             .map(choiceTiem -> ChoiceItem.builder()
@@ -194,7 +194,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                 return FeedbackQuestionResponseDto.builder()
                     .questionId(feedbackQuestion.getId())
                     .question(feedbackQuestion.getQuestion())
-                    .questionType(feedbackQuestion.getQuestionType().getName())
+                    .questionType(feedbackQuestion.getQuestionType().name())
                     .choiceItems(choiceItems.stream()
                         .map(choiceItem -> ChoiceItemResponseDto.builder()
                             .id(choiceItem.getId())
@@ -224,7 +224,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                 return FeedbackQuestionResponseDto.builder()
                 .questionId(feedbackQuestion.getId())
                 .question(feedbackQuestion.getQuestion())
-                .questionType(feedbackQuestion.getQuestionType().getName())
+                .questionType(feedbackQuestion.getQuestionType().name())
                 .choiceItems(choiceItems.stream()
                     .map(choiceItem -> ChoiceItemResponseDto.builder()
                         .id(choiceItem.getId())
@@ -267,7 +267,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                     feedbackAnswerRepository.save(feedbackAnswer);
 
                     // 객관식이나 체크박스일 경우 선택지 답변 저장
-                    if(feedbackQuestion.getQuestionType().getName().equals("objective") || feedbackQuestion.getQuestionType().getName().equals("checkbox")){
+                    if(feedbackQuestion.getQuestionType().name().equals("OBJECTIVE") || feedbackQuestion.getQuestionType().name().equals("CHECKBOX")){
 
                         List<SelectedItem> selectedItems = dto.getSelectedItems().stream()
                             .map(selectedItemDto -> {
@@ -317,11 +317,11 @@ public class FeedbackServiceImpl implements FeedbackService {
         // 피드백 분석 DTO
         data = feedbackQuestions.stream()
             .map(feedbackQuestion -> {
-                switch (feedbackQuestion.getQuestionType().getName()) {
-                    case "objective":
+                switch (feedbackQuestion.getQuestionType().name()) {
+                    case "OBJECTIVE":
                         return ObjectiveFeedbackAnalysisResponseDto.builder()
                         .question(feedbackQuestion.getQuestion())
-                        .questionType(feedbackQuestion.getQuestionType().getName())
+                        .questionType(feedbackQuestion.getQuestionType().name())
                         .choiceItemsAnalysis(feedbackQuestion.getChoiceItems().stream()
                             .map(choiceItem -> {
                                 return ChoiceItemsAnalysisResponseDto.builder()
@@ -331,10 +331,10 @@ public class FeedbackServiceImpl implements FeedbackService {
                             })
                             .collect(Collectors.toList()))
                         .build();    
-                    case "checkbox":
+                    case "CHECKBOX":
                         return ObjectiveFeedbackAnalysisResponseDto.builder()
                         .question(feedbackQuestion.getQuestion())
-                        .questionType(feedbackQuestion.getQuestionType().getName())
+                        .questionType(feedbackQuestion.getQuestionType().name())
                         .choiceItemsAnalysis(feedbackQuestion.getChoiceItems().stream()
                             .map(choiceItem -> {
                                 return ChoiceItemsAnalysisResponseDto.builder()
@@ -344,11 +344,11 @@ public class FeedbackServiceImpl implements FeedbackService {
                             })
                             .collect(Collectors.toList()))
                         .build();    
-                    case "subjective":
+                    case "SUBJECTIVE":
                         List<FeedbackAnswer> feedbackAnswers = feedbackAnswerRepository.findByFeedbackQuestionId(feedbackQuestion.getId());
                         return SubjectiveFeedbackAnalysisResponseDto.builder()
                             .question(feedbackQuestion.getQuestion())
-                            .questionType(feedbackQuestion.getQuestionType().getName())
+                            .questionType(feedbackQuestion.getQuestionType().name())
                             .answers(feedbackAnswers.stream()
                                 .map(feedbackAnswer -> feedbackAnswer.getAnswer())
                                 .collect(Collectors.toList()))
