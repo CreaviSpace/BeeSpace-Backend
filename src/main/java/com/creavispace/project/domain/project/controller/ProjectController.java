@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.domain.project.dto.response.PopularProjectReadResponseDto;
 import com.creavispace.project.domain.project.dto.response.ProjectResponseDto;
@@ -13,6 +14,8 @@ import com.creavispace.project.domain.project.dto.response.ProjectDeleteResponse
 import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
 import com.creavispace.project.domain.project.dto.response.ProjectReadResponseDto;
 import com.creavispace.project.domain.project.service.ProjectService;
+import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.CustomValueOf;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,7 +53,7 @@ public class ProjectController {
         @AuthenticationPrincipal Long memberId,
         @RequestBody ProjectRequestDto dto
     ) {
-        log.info("프로젝트 게시글 생성");
+        log.info("/project/controller : 프로젝트 게시글 생성");
         return ResponseEntity.ok().body(projectService.createProject(memberId, dto));
     }
 
@@ -61,7 +64,7 @@ public class ProjectController {
         @PathVariable("projectId") Long projectId, 
         @RequestBody ProjectRequestDto dto
     ) {
-        
+        log.info("/project/controller : 프로젝트 게시글 수정");
         return ResponseEntity.ok().body(projectService.modifyProject(memberId, projectId, dto));
     }
     
@@ -71,12 +74,14 @@ public class ProjectController {
         @AuthenticationPrincipal Long memberId,
         @PathVariable("projectId") Long projectId
     ) {
+        log.info("/project/controller : 프로젝트 게시글 삭제");
         return ResponseEntity.ok().body(projectService.deleteProject(memberId, projectId));
     }
 
     @GetMapping(READ_POPULAR_PROJECT)
     @Operation(summary = "프로젝트 인기 게시글 6개 조회 / 프로젝트 베너 조회")
     public ResponseEntity<SuccessResponseDto<List<PopularProjectReadResponseDto>>> readPopularProjectList() {
+        log.info("/project/controller : 프로젝트 인기 게시글 6개 조회 / 프로젝트 베너 조회");
         return ResponseEntity.ok().body(projectService.readPopularProjectList());
     }
 
@@ -87,7 +92,9 @@ public class ProjectController {
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
         @RequestParam(value = "category", required = false) String category
     ) {
-        return ResponseEntity.ok().body(projectService.readProjectList(size, page, category));
+        log.info("/project/controller : 프로젝트 인기 게시글 6개 조회 / 프로젝트 베너 조회");
+        ProjectCategory projectCategory = CustomValueOf.valueOf(ProjectCategory.class, category, GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
+        return ResponseEntity.ok().body(projectService.readProjectList(size, page, projectCategory));
     }
 
     @GetMapping(READ_PROJECT)
@@ -97,6 +104,7 @@ public class ProjectController {
         @PathVariable("projectId") Long projectId,
         HttpServletRequest request
     ) {
+        log.info("/project/controller : 프로젝트 게시글 디테일");
         return ResponseEntity.ok().body(projectService.readProject(memberId, projectId, request));
     }
     

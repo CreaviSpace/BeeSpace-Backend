@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.search.constant.SwaggerExample;
 import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
 import com.creavispace.project.domain.search.service.SearchService;
+import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.CustomValueOf;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,7 +44,8 @@ public class SearchController {
         @RequestParam(value = "text", required = true) String text,
         @RequestParam(value = "postType", required = false) String postType
     ){
-        return ResponseEntity.ok().body(searchService.readSearchList(size, page, text, postType));
+        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
+        return ResponseEntity.ok().body(searchService.readSearchList(size, page, text, postTypeEnum));
     }
 
 }

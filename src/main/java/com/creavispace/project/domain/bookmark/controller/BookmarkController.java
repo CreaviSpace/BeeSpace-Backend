@@ -7,9 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.CustomValueOf;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/bookmark")
@@ -34,7 +39,9 @@ public class BookmarkController {
         @RequestParam("postId") Long postId,
         @RequestParam("postType") String postType
     ) {
-        return ResponseEntity.ok().body(bookmarkService.bookmarkToggle(memberId, postId, postType));
+        log.info("/bookmark/controller : 북마크 토글 기능");
+        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
+        return ResponseEntity.ok().body(bookmarkService.bookmarkToggle(memberId, postId, postTypeEnum));
     }
     
     @GetMapping(READ_BOOKMARK)
@@ -44,7 +51,9 @@ public class BookmarkController {
         @RequestParam("postId") Long postId,
         @RequestParam("postType") String postType
     ){
-        return ResponseEntity.ok().body(bookmarkService.readBookmark(memberId, postId, postType));
+        log.info("/bookmark/controller : 북마크 상태 조회 기능");
+        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
+        return ResponseEntity.ok().body(bookmarkService.readBookmark(memberId, postId, postTypeEnum));
     }
     
 }

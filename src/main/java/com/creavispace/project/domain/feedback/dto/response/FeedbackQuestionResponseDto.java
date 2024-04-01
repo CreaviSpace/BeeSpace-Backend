@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class FeedbackQuestionResponseDto {
     private Long questionId;
     private String question;
-    // enum으로 관리 변경
     private String questionType;
     private List<ChoiceItemResponseDto> choiceItems;
 }

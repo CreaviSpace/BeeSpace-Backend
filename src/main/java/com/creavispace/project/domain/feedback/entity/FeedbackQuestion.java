@@ -5,11 +5,14 @@ import java.util.List;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.creavispace.project.domain.common.dto.type.QuestionType;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.project.entity.Project;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -39,9 +42,10 @@ public class FeedbackQuestion extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String question;
-
+    
     @Column(nullable = false)
-    private String questionType;
+    @Enumerated(EnumType.STRING)
+    private QuestionType questionType;
 
     @OneToMany(mappedBy = "feedbackQuestion", fetch = FetchType.LAZY)
     private List<ChoiceItem> choiceItems;

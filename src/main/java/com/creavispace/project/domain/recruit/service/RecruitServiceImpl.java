@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.common.dto.type.RecruitCategory;
+import com.creavispace.project.domain.common.dto.type.RecruitContactWay;
+import com.creavispace.project.domain.common.dto.type.RecruitProceedWay;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.recruit.dto.request.RecruitPositionRequestDto;
@@ -33,12 +36,15 @@ import com.creavispace.project.domain.techStack.entity.TechStack;
 import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.CustomValueOf;
 import com.creavispace.project.global.util.TimeUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecruitServiceImpl implements RecruitService {
@@ -52,18 +58,23 @@ public class RecruitServiceImpl implements RecruitService {
     @Override
     @Transactional
     public SuccessResponseDto<RecruitResponseDto> createRecruit(Long memberId, RecruitRequestDto dto) {
+        RecruitResponseDto data = null;
+        RecruitCategory category = CustomValueOf.valueOf(RecruitCategory.class, dto.getCategory(), GlobalErrorCode.NOT_FOUND_RECRUIT_CATEGORY);
+        RecruitContactWay contactWay = CustomValueOf.valueOf(RecruitContactWay.class, dto.getContactWay(), GlobalErrorCode.NOT_FOUND_RECRUIT_CONTACTWAY);
+        RecruitProceedWay proceedWay = CustomValueOf.valueOf(RecruitProceedWay.class, dto.getProceedWay(), GlobalErrorCode.NOT_FOUND_RECRUIT_PROCEEDWAY);
+
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
         // 모집 게시글 생성
         Recruit recruit = Recruit.builder()
             .member(member)
-            .category(dto.getCategory())
+            .category(category)
             .amount(dto.getAmount())
-            .proceedWay(dto.getProceedWay())
+            .proceedWay(proceedWay)
             .workDay(dto.getWorkDay())
             .end(TimeUtil.getRecruitEnd(dto.getEnd(),dto.getEndFormat()))
-            .contactWay(dto.getContactWay())
+            .contactWay(contactWay)
             .contact(dto.getContact())
             .title(dto.getTitle())
             .content(dto.getContent())
@@ -95,7 +106,7 @@ public class RecruitServiceImpl implements RecruitService {
         if(techStackDtos != null && !techStackDtos.isEmpty()){
             List<RecruitTechStack> techStacks = techStackDtos.stream()
                 .map(techStackDto -> {
-                    TechStack techStack = techStackRepository.findById(techStackDto.getTackStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
+                    TechStack techStack = techStackRepository.findById(techStackDto.getTechStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
                     
                     return RecruitTechStack.builder()
                         .techStack(techStack)
@@ -132,18 +143,18 @@ public class RecruitServiceImpl implements RecruitService {
             .collect(Collectors.toList());
 
         // 모집 게시글 생성 DTO
-        RecruitResponseDto create = RecruitResponseDto.builder()
+        data = RecruitResponseDto.builder()
             .id(recruit.getId())
             .postType(PostType.RECRUIT.getName())
             .memberId(recruit.getMember().getId())
             .memberNickName(recruit.getMember().getMemberNickname())
             .memberProfile(recruit.getMember().getProfileUrl())
             .viewCount(recruit.getViewCount())
-            .category(recruit.getCategory())
-            .contactWay(recruit.getContactWay())
+            .category(recruit.getCategory().getName())
+            .contactWay(recruit.getContactWay().getName())
             .contact(recruit.getContact())
             .amount(recruit.getAmount())
-            .proceedWay(recruit.getProceedWay())
+            .proceedWay(recruit.getProceedWay().getName())
             .workDay(recruit.getWorkDay())
             .end(recruit.getEnd())
             .title(recruit.getTitle())
@@ -154,13 +165,15 @@ public class RecruitServiceImpl implements RecruitService {
             .techStacks(techStacks)
             .build();
 
+        log.info("/recruit/service : createRecruit success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "모집 게시글 생성이 완료되었습니다.", create);
+        return new SuccessResponseDto<>(true, "모집 게시글 생성이 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<RecruitResponseDto> modifyRecruit(Long memberId, Long recruitId, RecruitRequestDto dto) {
+        RecruitResponseDto data = null;
         List<RecruitPositionRequestDto> positionDtos = dto.getPositions();
         List<RecruitTechStackRequestDto> techStackDtos = dto.getTechStacks();
 
@@ -204,7 +217,7 @@ public class RecruitServiceImpl implements RecruitService {
         if(techStackDtos != null && !techStackDtos.isEmpty()){
             List<RecruitTechStack> recruitTechStacks = techStackDtos.stream()
                 .map(techStackDto -> {
-                    TechStack recruitTechStack = techStackRepository.findById(techStackDto.getTackStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
+                    TechStack recruitTechStack = techStackRepository.findById(techStackDto.getTechStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
 
                     return RecruitTechStack.builder()
                         .techStack(recruitTechStack)
@@ -240,18 +253,18 @@ public class RecruitServiceImpl implements RecruitService {
             .collect(Collectors.toList());
 
         // 모집 게시글 수정 DTO
-        RecruitResponseDto modify = RecruitResponseDto.builder()
+        data = RecruitResponseDto.builder()
             .id(recruit.getId())
             .postType(PostType.RECRUIT.getName())
             .memberId(recruit.getMember().getId())
             .memberNickName(recruit.getMember().getMemberNickname())
             .memberProfile(recruit.getMember().getProfileUrl())
             .viewCount(recruit.getViewCount())
-            .category(recruit.getCategory())
-            .contactWay(recruit.getContactWay())
+            .category(recruit.getCategory().getName())
+            .contactWay(recruit.getContactWay().getName())
             .contact(recruit.getContact())
             .amount(recruit.getAmount())
-            .proceedWay(recruit.getProceedWay())
+            .proceedWay(recruit.getProceedWay().getName())
             .workDay(recruit.getWorkDay())
             .end(recruit.getEnd())
             .title(recruit.getTitle())
@@ -262,14 +275,17 @@ public class RecruitServiceImpl implements RecruitService {
             .techStacks(techStacks)
             .build();
 
+        log.info("/recruit/service : modifyRecruit success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "모집 게시글의 수정이 완료되었습니다.", modify);
+        return new SuccessResponseDto<>(true, "모집 게시글의 수정이 완료되었습니다.", data);
             
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<RecruitDeleteResponseDto> deleteRecruit(Long memberId, Long recruitId) {
+        RecruitDeleteResponseDto data = null;
+
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -278,7 +294,7 @@ public class RecruitServiceImpl implements RecruitService {
 
         // 삭제할 권한이 있는지
         if(recruit.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
-            new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
         // 모집 게시글 비활성화 및 저장
@@ -286,23 +302,25 @@ public class RecruitServiceImpl implements RecruitService {
         recruitRepository.save(recruit);
 
         // 모집 게시글 삭제 DTO
-        RecruitDeleteResponseDto delete = RecruitDeleteResponseDto.builder()
+        data = RecruitDeleteResponseDto.builder()
             .recruitId(recruit.getId())
             .postType(PostType.RECRUIT.getName())
             .build();
         
+        log.info("/recruit/service : deleteRecruit success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "모집 게시글 삭제가 완료되었습니다.", delete);
+        return new SuccessResponseDto<>(true, "모집 게시글 삭제가 완료되었습니다.", data);
     }
 
     @Override
-    public SuccessResponseDto<List<RecruitListReadResponseDto>> readRecruitList(Integer size, Integer page, String category) {
+    public SuccessResponseDto<List<RecruitListReadResponseDto>> readRecruitList(Integer size, Integer page, RecruitCategory category) {
+        List<RecruitListReadResponseDto> data = null;
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<Recruit> pageable;
 
         // 카테고리가 존재한다면
         if(category != null){
-            pageable = recruitRepository.findAllByStatusTrueAndCategory(category, pageRequest);
+            pageable = recruitRepository.findAllByStatusTrueAndCategory(category.getName(), pageRequest);
         }
         // 카테고리가 없다면
         else{
@@ -314,11 +332,11 @@ public class RecruitServiceImpl implements RecruitService {
         List<Recruit> recruits = pageable.getContent();
 
         // 모집 게시글 리스트 DTO
-        List<RecruitListReadResponseDto> reads = recruits.stream()
+        data = recruits.stream()
             .map(recruit -> RecruitListReadResponseDto.builder()
                     .id(recruit.getId())
                     .postType(PostType.RECRUIT.getName())
-                    .category(recruit.getCategory())
+                    .category(recruit.getCategory().getName())
                     .title(recruit.getTitle())
                     .content(recruit.getContent())
                     .amount(recruit.getAmount())
@@ -335,13 +353,15 @@ public class RecruitServiceImpl implements RecruitService {
                     .build())
             .collect(Collectors.toList());
 
+        log.info("/recruit/service : readRecruitList success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true,"모집 게시글 리스트 조회가 완료되었습니다.", reads);
+        return new SuccessResponseDto<>(true,"모집 게시글 리스트 조회가 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<RecruitReadResponseDto> readRecruit(Long memberId, Long recruitId, HttpServletRequest request) {
+        RecruitReadResponseDto data = null;
         Optional<Recruit> optionalRecruit;
 
         // JWT 회원과 모집 게시글 작성자와 일치하는지
@@ -378,18 +398,18 @@ public class RecruitServiceImpl implements RecruitService {
         }
 
         // 모집게시글 디테일 DTO
-        RecruitReadResponseDto read = RecruitReadResponseDto.builder()
+        data = RecruitReadResponseDto.builder()
             .id(recruit.getId())
             .postType(PostType.RECRUIT.getName())
             .memberId(recruit.getMember().getId())
             .memberNickName(recruit.getMember().getMemberNickname())
             .memberProfile(recruit.getMember().getProfileUrl())
             .viewCount(recruit.getViewCount())
-            .category(recruit.getCategory())
-            .contactWay(recruit.getContactWay())
+            .category(recruit.getCategory().getName())
+            .contactWay(recruit.getContactWay().getName())
             .contact(recruit.getContact())
             .amount(recruit.getAmount())
-            .proceedWay(recruit.getProceedWay())
+            .proceedWay(recruit.getProceedWay().getName())
             .workDay(recruit.getWorkDay())
             .end(recruit.getEnd())
             .title(recruit.getTitle())
@@ -414,17 +434,20 @@ public class RecruitServiceImpl implements RecruitService {
             .recruitViewLog(recruitViewLogHeader)
             .build();
 
+        log.info("/recruit/service : readRecruit success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "모집 게시글 디테일 조회가 완료되었습니다.", read);
+        return new SuccessResponseDto<>(true, "모집 게시글 디테일 조회가 완료되었습니다.", data);
     }
 
     @Override
     public SuccessResponseDto<List<DeadLineRecruitListReadResponseDto>> readDeadlineRecruitList() {
+        List<DeadLineRecruitListReadResponseDto> data = null;
+
         // 마감일에 가까운 Top3 모집 게시글 가져오기
         List<Recruit> recruits = recruitRepository.findTop3ByStatusTrueOrderByEndAsc();
 
         // 모집 마감 게시글 DTO
-        List<DeadLineRecruitListReadResponseDto> readDeadLineList = recruits.stream()
+        data = recruits.stream()
             .map(recruit -> DeadLineRecruitListReadResponseDto.builder()
                 .id(recruit.getId())
                 .postType(PostType.RECRUIT.getName())
@@ -443,8 +466,9 @@ public class RecruitServiceImpl implements RecruitService {
                 .build())
             .collect(Collectors.toList());
         
+        log.info("/recruit/service : readDeadlineRecruitList success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "마감 모집 리스트 조회가 완료되었습니다.", readDeadLineList);
+        return new SuccessResponseDto<>(true, "마감 모집 리스트 조회가 완료되었습니다.", data);
 
     }
     

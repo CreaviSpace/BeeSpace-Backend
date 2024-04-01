@@ -11,7 +11,9 @@ import com.creavispace.project.domain.techStack.entity.TechStack;
 import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TechStackServiceImpl implements TechStackService{
@@ -20,7 +22,7 @@ public class TechStackServiceImpl implements TechStackService{
 
     @Override
     public SuccessResponseDto<List<TechStackListReadResponseDto>> readTechStackList(String text) {
-
+        List<TechStackListReadResponseDto> data = null;
         List<TechStack> techStacks;
 
         if(text == null){
@@ -34,7 +36,7 @@ public class TechStackServiceImpl implements TechStackService{
             techStacks.add(techStackRepository.findById(1L).get()); // 기타 etc
         }
 
-        List<TechStackListReadResponseDto> reads = techStacks.stream()
+        data = techStacks.stream()
             .map(techStack-> TechStackListReadResponseDto.builder()
                 .techStackId(techStack.getId())
                 .techStack(techStack.getTechStack())
@@ -42,7 +44,9 @@ public class TechStackServiceImpl implements TechStackService{
                 .build())
             .collect(Collectors.toList());
 
-        return new SuccessResponseDto<>(true, "기술스택 조회가 완료되었습니다.", reads);
+        log.info("/techStack/service : readTechStackList success data = {}", data);
+        // 성공 응답 반환
+        return new SuccessResponseDto<>(true, "기술스택 조회가 완료되었습니다.", data);
     }
     
 }

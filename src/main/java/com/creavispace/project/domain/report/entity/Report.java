@@ -1,10 +1,14 @@
 package com.creavispace.project.domain.report.entity;
 
+import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.common.dto.type.ReportCategory;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,10 +35,12 @@ public class Report extends BaseTimeEntity{
     private Member member;
 
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private ReportCategory category;
 
     @Column(nullable = false)
-    private String postType;
+    @Enumerated(EnumType.STRING)
+    private PostType postType;
 
     @Column(nullable = false)
     private Long postId;

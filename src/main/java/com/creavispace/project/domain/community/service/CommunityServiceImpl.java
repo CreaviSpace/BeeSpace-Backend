@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
+import com.creavispace.project.domain.common.dto.type.OrderBy;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
@@ -29,11 +30,13 @@ import com.creavispace.project.global.util.CustomValueOf;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommunityServiceImpl implements CommunityService{
@@ -46,6 +49,7 @@ public class CommunityServiceImpl implements CommunityService{
     @Override
     @Transactional
     public SuccessResponseDto<CommunityResponseDto> createCommunity(Long memberId, CommunityRequestDto dto) {
+        CommunityResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -99,7 +103,7 @@ public class CommunityServiceImpl implements CommunityService{
             .collect(Collectors.toList());
         
         // 커뮤니티 게시글 생성 DTO
-        CommunityResponseDto create = CommunityResponseDto.builder()
+        data = CommunityResponseDto.builder()
             .id(community.getId())
             .postType(PostType.COMMUNITY.getName())
             .category(community.getCategory().getName())
@@ -114,8 +118,10 @@ public class CommunityServiceImpl implements CommunityService{
             .hashTags(communityHashTagDtos)
             .build();
 
+
+        log.info("/community/service : createCommunity success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 생성이 완료되었습니다.", create);
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 생성이 완료되었습니다.", data);
         
     }
 
@@ -123,6 +129,7 @@ public class CommunityServiceImpl implements CommunityService{
     @Transactional
     public SuccessResponseDto<CommunityResponseDto> modifyCommunity(Long memberId, Long communityId,
         CommunityRequestDto dto) {
+        CommunityResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -175,7 +182,7 @@ public class CommunityServiceImpl implements CommunityService{
             .collect(Collectors.toList());
 
         // 커뮤니티 수정 DTO
-        CommunityResponseDto modify = CommunityResponseDto.builder()
+        data = CommunityResponseDto.builder()
             .id(community.getId())
             .postType(PostType.COMMUNITY.getName())
             .category(community.getCategory().getName())
@@ -190,14 +197,16 @@ public class CommunityServiceImpl implements CommunityService{
             .hashTags(hashTags)
             .build();
 
+        log.info("/community/service : modifyCommunity success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 수정이 완료되었습니다.", modify);
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 수정이 완료되었습니다.", data);
 
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<CommunityDeleteResponseDto> deleteCommunity(Long memberId, Long communityId) {
+        CommunityDeleteResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -214,18 +223,20 @@ public class CommunityServiceImpl implements CommunityService{
         communityRepository.save(community);
 
         // 커뮤니티 삭제 결과 DTO변환
-        CommunityDeleteResponseDto delete = CommunityDeleteResponseDto.builder()
+        data = CommunityDeleteResponseDto.builder()
             .communityId(community.getId())
             .postType(PostType.COMMUNITY.getName())
             .build();
 
+        log.info("/community/service : deleteCommunity success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 삭제가 완료되었습니다.", delete);
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 삭제가 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<CommunityReadResponseDto> readCommunity(Long memberId, Long communityId, HttpServletRequest request) {
+        CommunityReadResponseDto data = null;
         Optional<Community> optionalCommunity;
         // JWT 회원과 커뮤니티 게시글 작성자와 일치하는지
         boolean isWriter = communityRepository.existsByIdAndMemberId(communityId, memberId);
@@ -259,7 +270,7 @@ public class CommunityServiceImpl implements CommunityService{
         }
         
         // 커뮤니티 디테일 DTO변환
-        CommunityReadResponseDto read = CommunityReadResponseDto.builder()
+        data = CommunityReadResponseDto.builder()
             .id(community.getId())
             .postType(PostType.COMMUNITY.getName())
             .category(community.getCategory().getName())
@@ -280,24 +291,24 @@ public class CommunityServiceImpl implements CommunityService{
             .communityViewLog(communityViewLogHeader)
             .build();
 
+        log.info("/community/service : readCommunity success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 디테일 조회가 완료되었습니다.", read);
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 디테일 조회가 완료되었습니다.", data);
     }
 
     @Override
-    public SuccessResponseDto<List<CommunityResponseDto>> readCommunityList(Integer size, Integer page, String category, String hashTag, String orderby) {
+    public SuccessResponseDto<List<CommunityResponseDto>> readCommunityList(Integer size, Integer page, CommunityCategory category, String hashTag, OrderBy orderby) {
+        List<CommunityResponseDto> data = null;
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<Community> pageable;
-        CommunityCategory communityCategory;
 
         // 정렬 조건
-        switch (orderby) {
+        switch (orderby.getName()) {
             case "latest-activity":
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
-                        communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
                         Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                        pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(communityCategory.getName(), hashTagId, pageRequest);
+                        pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category.getName(), hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -306,8 +317,7 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
-                    pageable = communityRepository.findAllByStatusTrueAndCategory(communityCategory.getName(), pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategory(category.getName(), pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -318,9 +328,8 @@ public class CommunityServiceImpl implements CommunityService{
             case "recommended":
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
-                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
                     Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(communityCategory.getName(), hashTagId, pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(category.getName(), hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -329,8 +338,7 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByLikeCountDesc(communityCategory.getName(), pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByLikeCountDesc(category.getName(), pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -341,9 +349,8 @@ public class CommunityServiceImpl implements CommunityService{
             case "most-viewed":
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
-                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
                     Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(communityCategory.getName(), hashTagId, pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category.getName(), hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -352,8 +359,7 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    communityCategory = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByViewCountDesc(communityCategory.getName(), pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByViewCountDesc(category.getName(), pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -370,7 +376,7 @@ public class CommunityServiceImpl implements CommunityService{
         List<Community> communities = pageable.getContent();
 
         // 조건에 맞는 게시글 리스트 DTO 변환
-        List<CommunityResponseDto> reads = communities.stream()
+        data = communities.stream()
             .map(community -> CommunityResponseDto.builder()
                 .id(community.getId())
                 .postType(PostType.COMMUNITY.getName())
@@ -390,8 +396,9 @@ public class CommunityServiceImpl implements CommunityService{
                 .build())
             .collect(Collectors.toList());
 
+        log.info("/community/service : readCommunityList success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", reads);
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
                 
     }
     

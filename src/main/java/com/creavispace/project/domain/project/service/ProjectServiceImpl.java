@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
@@ -41,11 +42,14 @@ import com.creavispace.project.domain.techStack.entity.TechStack;
 import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.CustomValueOf;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
@@ -60,9 +64,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public SuccessResponseDto<ProjectResponseDto> createProject(Long memberId, ProjectRequestDto dto) {
+        ProjectResponseDto data = null;
         List<ProjectMemberRequestDto> memberDtos = dto.getMemberDtos();
         List<ProjectTechStackRequestDto> techStackDtos = dto.getTechStackDtos();
         List<ProjectLinkRequestDto> linkDtos = dto.getLinkDtos();
+        ProjectCategory categoryEnum = CustomValueOf.valueOf(ProjectCategory.class, dto.getCategory(), GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
 
         // JWT에 저장된 회원이 존재하는지
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -71,7 +77,7 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 생성
         Project project = Project.builder()
                 .member(member)
-                .category(dto.getCategory())
+                .category(categoryEnum)
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .thumbnail(dto.getThumbnail())
@@ -176,13 +182,13 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
 
         // 프로젝트 생성 결과 DTO
-        ProjectResponseDto create = ProjectResponseDto.builder()
+        data = ProjectResponseDto.builder()
                 .id(project.getId())
                 .postType(PostType.PROJECT.getName())
                 .memberId(project.getMember().getId())
                 .memberNickName(project.getMember().getMemberNickname())
                 .memberProfile(project.getMember().getProfileUrl())
-                .category(project.getCategory())
+                .category(project.getCategory().getName())
                 .field(project.getField())
                 .title(project.getTitle())
                 .content(project.getContent())
@@ -196,13 +202,15 @@ public class ProjectServiceImpl implements ProjectService {
                 .techStacks(techStacks)
                 .build();
 
+        log.info("/project/service : createProject success data = {}", data);
         // 성공적인 응답 반환
-        return new SuccessResponseDto<>(true, "프로젝트 게시글 생성이 완료 되었습니다.", create);
+        return new SuccessResponseDto<>(true, "프로젝트 게시글 생성이 완료 되었습니다.", data);
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<ProjectResponseDto> modifyProject(Long memberId, Long projectId, ProjectRequestDto dto) {
+        ProjectResponseDto data = null;
         List<ProjectMemberRequestDto> memberDtos = dto.getMemberDtos();
         List<ProjectTechStackRequestDto> techStackDtos = dto.getTechStackDtos();
         List<ProjectLinkRequestDto> linkDtos = dto.getLinkDtos();
@@ -322,13 +330,13 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
 
         // 프로젝트 수정 결과 DTO
-        ProjectResponseDto modify = ProjectResponseDto.builder()
+        data = ProjectResponseDto.builder()
                 .id(project.getId())
                 .postType(PostType.PROJECT.getName())
                 .memberId(project.getMember().getId())
                 .memberNickName(project.getMember().getMemberNickname())
                 .memberProfile(project.getMember().getProfileUrl())
-                .category(project.getCategory())
+                .category(project.getCategory().getName())
                 .field(project.getField())
                 .title(project.getTitle())
                 .content(project.getContent())
@@ -342,13 +350,15 @@ public class ProjectServiceImpl implements ProjectService {
                 .techStacks(techStacks)
                 .build();
 
+        log.info("/project/service : modifyProject success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "프로젝트 게시글의 수정이 완료되었습니다.", modify);
+        return new SuccessResponseDto<>(true, "프로젝트 게시글의 수정이 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<ProjectDeleteResponseDto> deleteProject(Long memberId, Long projectId) {
+        ProjectDeleteResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
@@ -367,44 +377,48 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.save(project);
 
         // 프로젝트 삭제 결과 DTO
-        ProjectDeleteResponseDto delete = ProjectDeleteResponseDto.builder()
+        data = ProjectDeleteResponseDto.builder()
                 .projectId(project.getId())
                 .postType(PostType.PROJECT.getName())
                 .build();
 
+        log.info("/project/service : deleteProject success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "프로젝트 게시글 삭제가 완료되었습니다.", delete);
+        return new SuccessResponseDto<>(true, "프로젝트 게시글 삭제가 완료되었습니다.", data);
     }
 
     @Override
     public SuccessResponseDto<List<PopularProjectReadResponseDto>> readPopularProjectList() {
+        List<PopularProjectReadResponseDto> data = null;
         // 인기 프로젝트 가져옴(주간 조회수 기준 Top 6개)
         List<Project> projects = projectRepository.findTop6ByStatusTrueOrderByWeekViewCountDesc();
 
         // 인기 프로젝트 결과 DTO
-        List<PopularProjectReadResponseDto> readPopularList = projects.stream()
+        data = projects.stream()
                 .map(project -> PopularProjectReadResponseDto.builder()
                         .id(project.getId())
                         .postType(PostType.PROJECT.getName())
                         .title(project.getTitle())
                         .thumbnail(project.getThumbnail())
-                        .category(project.getCategory())
+                        .category(project.getCategory().getName())
                         .bannerContent(project.getBannerContent())
                         .build())
                 .collect(Collectors.toList());
 
+        log.info("/project/service : readPopularProjectList success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "인기 프로젝트 조회가 완료 되었습니다.", readPopularList);
+        return new SuccessResponseDto<>(true, "인기 프로젝트 조회가 완료 되었습니다.", data);
     }
 
     @Override
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Integer size, Integer page, String category) {
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Integer size, Integer page, ProjectCategory category) {
+        List<ProjectListReadResponseDto> data = null;
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<Project> pageable;
 
         // 카테고리가 존재하면
         if(category != null){
-            pageable = projectRepository.findAllByStatusTrueAndCategory(category, pageRequest);
+            pageable = projectRepository.findAllByStatusTrueAndCategory(category.getName(), pageRequest);
         }
         // 카테고리가 없다면
         else{
@@ -416,15 +430,17 @@ public class ProjectServiceImpl implements ProjectService {
         List<Project> projects = pageable.getContent();
 
         // 프로젝트 리스트 결과 DTO
-        List<ProjectListReadResponseDto> reads = getProjectListReadResponseDtos(projects);
+        data = getProjectListReadResponseDtos(projects);
 
+        log.info("/project/service : readProjectList success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", reads);
+        return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
     public SuccessResponseDto<ProjectReadResponseDto> readProject(Long memberId, Long projectId, HttpServletRequest request) {
+        ProjectReadResponseDto data = null;
         Optional<Project> optionalProject;
 
         // JWT 회원과 프로젝트 게시글 작성자와 일치하는지
@@ -498,13 +514,13 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
 
         // 프로젝트 디테일 결과 DTO
-        ProjectReadResponseDto read = ProjectReadResponseDto.builder()
+        data = ProjectReadResponseDto.builder()
                 .id(project.getId())
                 .postType(PostType.PROJECT.getName())
                 .memberId(project.getMember().getId())
                 .memberNickName(project.getMember().getMemberNickname())
                 .memberProfile(project.getMember().getProfileUrl())
-                .category(project.getCategory())
+                .category(project.getCategory().getName())
                 .field(project.getField())
                 .title(project.getTitle())
                 .content(project.getContent())
@@ -519,8 +535,9 @@ public class ProjectServiceImpl implements ProjectService {
                 .projectViewLog(projectViewLogHeader)
                 .build();
 
+        log.info("/project/service : readProject success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "프로젝트 게시글 상세조회가 완료되었습니다.", read);
+        return new SuccessResponseDto<>(true, "프로젝트 게시글 상세조회가 완료되었습니다.", data);
     }
 
     //ky
@@ -565,7 +582,7 @@ public class ProjectServiceImpl implements ProjectService {
                     return ProjectListReadResponseDto.builder()
                             .id(project.getId())
                             .postType(PostType.PROJECT.getName())
-                            .category(project.getCategory())
+                            .category(project.getCategory().getName())
                             .title(project.getTitle())
                             .thumbnail(project.getThumbnail())
                             .bannerContent(project.getBannerContent())

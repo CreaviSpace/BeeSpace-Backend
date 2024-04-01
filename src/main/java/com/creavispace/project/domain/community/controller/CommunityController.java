@@ -15,16 +15,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.CommunityCategory;
+import com.creavispace.project.domain.common.dto.type.OrderBy;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
+import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.CustomValueOf;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/community")
@@ -44,6 +50,7 @@ public class CommunityController {
         @AuthenticationPrincipal Long memberId, 
         @RequestBody CommunityRequestDto requestBody
     ){
+        log.info("/community/controller : 커뮤니티 게시글 생성");
         return ResponseEntity.ok().body(communityService.createCommunity(memberId, requestBody));
     }
 
@@ -54,6 +61,7 @@ public class CommunityController {
         @PathVariable("communityId") Long communityId, 
         @RequestBody CommunityRequestDto requestBody
     ){
+        log.info("/community/controller : 커뮤니티 게시글 수정");
         return ResponseEntity.ok().body(communityService.modifyCommunity(memberId, communityId, requestBody));
     }
 
@@ -63,6 +71,7 @@ public class CommunityController {
         @AuthenticationPrincipal Long memberId,
         @PathVariable("communityId") Long communityId
     ){
+        log.info("/community/controller : 커뮤니티 게시글 삭제");
         return ResponseEntity.ok().body(communityService.deleteCommunity(memberId, communityId));
     }
 
@@ -73,6 +82,7 @@ public class CommunityController {
         @PathVariable("communityId") Long communityId,
         HttpServletRequest request
     ){
+        log.info("/community/controller : 커뮤니티 게시글 디테일");
         return ResponseEntity.ok().body(communityService.readCommunity(memberId, communityId, request));
     }
     
@@ -86,7 +96,10 @@ public class CommunityController {
         @RequestParam(value = "orderby", required = false, defaultValue = "latest-activity") String orderby
 
     ){
-        return ResponseEntity.ok().body(communityService.readCommunityList(size, page, category, hashTag, orderby));
+        log.info("/community/controller : 커뮤니티 게시글 리스트 조회");
+        CommunityCategory CategoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+        OrderBy orderByEnum = CustomValueOf.valueOf(OrderBy.class, orderby, GlobalErrorCode.NOT_FOUND_ORDERBY);
+        return ResponseEntity.ok().body(communityService.readCommunityList(size, page, CategoryEnum, hashTag, orderByEnum));
     }
 
 

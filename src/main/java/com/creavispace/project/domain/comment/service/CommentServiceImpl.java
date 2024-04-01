@@ -30,7 +30,9 @@ import com.creavispace.project.global.exception.GlobalErrorCode;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
@@ -44,11 +46,11 @@ public class CommentServiceImpl implements CommentService {
     private final CommunityRepository communityRepository;
 
     @Override
-    public SuccessResponseDto<List<CommentResponseDto>> readCommentList(Long postId, String postType) {
+    public SuccessResponseDto<List<CommentResponseDto>> readCommentList(Long postId, PostType postType) {
         
-        List<CommentResponseDto> data;
+        List<CommentResponseDto> data = null;
 
-        switch (postType) {
+        switch (postType.getName()) {
             case "project":
                 projectRepository.findById(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
                 List<ProjectComment> projectComments = projectCommentRepository.findByProjectId(postId);
@@ -96,19 +98,19 @@ public class CommentServiceImpl implements CommentService {
             default:
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }
-
+        log.info("/comment/service : readCommentList success data = {}", data);
         return new SuccessResponseDto<>(false, "댓글 리스트 조회가 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommentResponseDto> createComment(Long memberId, Long postId, String postType, CommentRequestDto dto) {
-        CommentResponseDto data;
+    public SuccessResponseDto<CommentResponseDto> createComment(Long memberId, Long postId, PostType postType, CommentRequestDto dto) {
+        CommentResponseDto data = null;
 
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        switch (postType) {
+        switch (postType.getName()) {
             case "project":
                 Optional<Project> optionalProject = projectRepository.findByIdAndStatusTrue(postId);
                 Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
@@ -178,20 +180,20 @@ public class CommentServiceImpl implements CommentService {
             default:
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }
-
+        log.info("/comment/service : createComment success data = {}", data);
         return new SuccessResponseDto<CommentResponseDto>(true, "댓글 생성이 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommentResponseDto> modifyComment(Long memberId, Long commentId, String postType, CommentRequestDto dto) {
-        CommentResponseDto data;
+    public SuccessResponseDto<CommentResponseDto> modifyComment(Long memberId, Long commentId, PostType postType, CommentRequestDto dto) {
+        CommentResponseDto data = null;
 
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
         
-        switch (postType) {
+        switch (postType.getName()) {
             case "project":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
@@ -257,18 +259,19 @@ public class CommentServiceImpl implements CommentService {
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }
 
+        log.info("/comment/service : modifyComment success data = {}", data);
         return new SuccessResponseDto<>(true, "댓글 수정이 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommentDeleteResponseDto> deleteComment(Long memberId, Long commentId, String postType) {
-        CommentDeleteResponseDto data;
+    public SuccessResponseDto<CommentDeleteResponseDto> deleteComment(Long memberId, Long commentId, PostType postType) {
+        CommentDeleteResponseDto data = null;
 
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        switch (postType) {
+        switch (postType.getName()) {
             case "project":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                 
@@ -306,8 +309,9 @@ public class CommentServiceImpl implements CommentService {
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }
 
-        data = CommentDeleteResponseDto.builder().commentId(commentId).postType(postType).build();
+        data = CommentDeleteResponseDto.builder().commentId(commentId).postType(postType.getName()).build();
 
+        log.info("/comment/service : deleteComment success data = {}", data);
         return new SuccessResponseDto<CommentDeleteResponseDto>(true, "댓글 삭제가 완료되었습니다.", data);
     }
 

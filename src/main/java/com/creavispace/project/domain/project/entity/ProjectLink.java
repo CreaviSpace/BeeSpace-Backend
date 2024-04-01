@@ -29,7 +29,6 @@ public class ProjectLink extends BaseTimeEntity {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    // enum으로 관리 변경
     @Column(nullable = false)
     private String linkType;
     

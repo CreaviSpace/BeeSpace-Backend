@@ -23,7 +23,9 @@ import com.creavispace.project.domain.feedback.service.FeedbackService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/feedback")
@@ -44,6 +46,7 @@ public class FeedbackController {
         @RequestParam("projectId") Long projectId, 
         @RequestBody List<FeedbackQuestionCreateRequestDto> requestBody
     ){
+        log.info("/feedback/controller : 피드백 질문 생성");
         return ResponseEntity.ok().body(feedbackService.createFeedbackQuestion(memberId, projectId, requestBody));
     }
 
@@ -54,6 +57,7 @@ public class FeedbackController {
         @RequestParam("projectId") Long projectId,
         @RequestBody List<FeedbackQuestionModifyRequestDto> requestBody
     ){
+        log.info("/feedback/controller : 피드백 질문 수정");
         return ResponseEntity.ok().body(feedbackService.modifyFeedbackQuestion(memberId, projectId, requestBody));
     }
 
@@ -62,6 +66,7 @@ public class FeedbackController {
     public ResponseEntity<SuccessResponseDto<List<FeedbackQuestionResponseDto>>> readFeedbackQuestion(
         @RequestParam("projectId") Long projectId
     ){
+        log.info("/feedback/controller : 피드백 질문 리스트");
         return ResponseEntity.ok().body(feedbackService.readFeedbackQuestion(projectId));
     }
 
@@ -72,6 +77,7 @@ public class FeedbackController {
         @RequestParam("projectId") Long projectId,
         @RequestBody List<FeedbackAnswerCreateRequestDto> requestBody
     ){
+        log.info("/feedback/controller : 피드백 답변 생성");
         return ResponseEntity.ok().body(feedbackService.createFeedbackAnswer(memberId, projectId, requestBody));
     }
 
@@ -81,6 +87,7 @@ public class FeedbackController {
         @AuthenticationPrincipal Long memberId,
         @RequestParam("projectId") Long projectId
     ){
+        log.info("/feedback/controller : 피드백 분석");
         return ResponseEntity.ok().body(feedbackService.analysisFeedback(memberId, projectId));
     }
 }

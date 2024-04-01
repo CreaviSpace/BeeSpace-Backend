@@ -14,7 +14,9 @@ import com.creavispace.project.domain.report.service.ReportService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/report")
@@ -30,6 +32,7 @@ public class ReportController {
         @AuthenticationPrincipal Long memberId,
         @RequestBody ReportRequestDto requestBody
     ){
+        log.info("/report/controller : 신고하기");
         return ResponseEntity.ok().body(reportService.createReport(memberId, requestBody));
     }
 }

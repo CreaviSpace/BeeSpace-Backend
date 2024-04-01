@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
@@ -27,7 +28,9 @@ import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SearchServiceImpl implements SearchService{
@@ -38,14 +41,15 @@ public class SearchServiceImpl implements SearchService{
 
     @Override
     public SuccessResponseDto<List<SearchListReadResponseDto>> readSearchList(Integer size, Integer page, String text,
-            String postType) {
+            PostType postType) {
+        List<SearchListReadResponseDto> data = null;
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<SearchResultSet> pageable;
 
         if(postType == null){
             pageable = projectRepository.findIntegratedSearchData(text, pageRequest);
         }else{
-            switch (postType) {
+            switch (postType.getName()) {
                 case "project":
                     pageable = projectRepository.findProjectSearchData(text, pageRequest);
                     break;
@@ -66,7 +70,7 @@ public class SearchServiceImpl implements SearchService{
         if(!pageable.hasContent()) throw new CreaviCodeException(GlobalErrorCode.NOT_SEARCH_CONTENT);
         List<SearchResultSet> searchResults = pageable.getContent();
 
-        List<SearchListReadResponseDto> searchs = searchResults.stream()
+        data = searchResults.stream()
             .map(searchResult -> {
                 Long postId = searchResult.getPostId();
                 switch (searchResult.getPostType()) {
@@ -74,8 +78,8 @@ public class SearchServiceImpl implements SearchService{
                         Project project = projectRepository.findByIdAndStatusTrue(postId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
                         return ProjectListReadResponseDto.builder()
                             .id(project.getId())
-                            .postType("project")
-                            .category(project.getCategory())
+                            .postType(PostType.PROJECT.getName())
+                            .category(project.getCategory().getName())
                             .title(project.getTitle())
                             .links(project.getLinks().stream()
                                 .map(link -> ProjectLinkResponseDto.builder()
@@ -90,8 +94,8 @@ public class SearchServiceImpl implements SearchService{
                         Recruit recruit = recruitRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
                         return RecruitListReadResponseDto.builder()
                             .id(recruit.getId())
-                            .postType("recruit")
-                            .category(recruit.getCategory())
+                            .postType(PostType.RECRUIT.getName())
+                            .category(recruit.getCategory().getName())
                             .title(recruit.getTitle())
                             .content(recruit.getContent())
                             .amount(recruit.getAmount())
@@ -110,7 +114,7 @@ public class SearchServiceImpl implements SearchService{
                         Community community = communityRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
                         return CommunityResponseDto.builder()
                             .id(community.getId())
-                            .postType("community")
+                            .postType(PostType.COMMUNITY.getName())
                             .category(community.getCategory().getName())
                             .memberId(community.getMember().getId())
                             .memberNickName(community.getMember().getMemberNickname())
@@ -133,7 +137,9 @@ public class SearchServiceImpl implements SearchService{
             })
             .collect(Collectors.toList());
 
-        return new SuccessResponseDto<>(true, "통합 검색 리스트 조회가 완료되었습니다.", searchs);
+        log.info("/search/service : readSearchList success data = {}", data);
+        // 성공 응답 반환
+        return new SuccessResponseDto<>(true, "통합 검색 리스트 조회가 완료되었습니다.", data);
     }
 
 }

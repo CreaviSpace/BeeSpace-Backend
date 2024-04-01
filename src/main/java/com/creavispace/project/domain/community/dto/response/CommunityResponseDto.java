@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 public class CommunityResponseDto implements SearchListReadResponseDto{
     private Long id;
     private String postType;
-    // enum으로 교체
     private String category;
     private Long memberId;
     private String memberNickName;
