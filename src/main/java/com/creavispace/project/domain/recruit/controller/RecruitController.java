@@ -85,7 +85,10 @@ public class RecruitController {
         @RequestParam(value = "category", required = false) String category
     ){
         log.info("/recruit/controller : 모집 게시글 리스트");
-        RecruitCategory recruitCategory = CustomValueOf.valueOf(RecruitCategory.class, category, GlobalErrorCode.NOT_FOUND_RECRUIT_CATEGORY);
+        RecruitCategory recruitCategory = null;
+        if(category != null){
+            recruitCategory = CustomValueOf.valueOf(RecruitCategory.class, category, GlobalErrorCode.NOT_FOUND_RECRUIT_CATEGORY);
+        }
         return ResponseEntity.ok().body(recruitService.readRecruitList(size, page, recruitCategory));
     }
 

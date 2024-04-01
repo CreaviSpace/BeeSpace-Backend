@@ -92,8 +92,11 @@ public class ProjectController {
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
         @RequestParam(value = "category", required = false) String category
     ) {
-        log.info("/project/controller : 프로젝트 인기 게시글 6개 조회 / 프로젝트 베너 조회");
-        ProjectCategory projectCategory = CustomValueOf.valueOf(ProjectCategory.class, category, GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
+        log.info("/project/controller : 프로젝트 게시글 리스트 조회");
+        ProjectCategory projectCategory = null;
+        if(category != null){
+            projectCategory = CustomValueOf.valueOf(ProjectCategory.class, category, GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
+        }
         return ResponseEntity.ok().body(projectService.readProjectList(size, page, projectCategory));
     }
 

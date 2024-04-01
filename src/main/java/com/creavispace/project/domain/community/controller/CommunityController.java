@@ -93,11 +93,14 @@ public class CommunityController {
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
         @RequestParam(value = "category", required = false) String category,
         @RequestParam(value = "hashTag", required = false) String hashTag,
-        @RequestParam(value = "orderby", required = false, defaultValue = "latest-activity") String orderby
+        @RequestParam(value = "orderby", required = false, defaultValue = "LATEST_ACTIVITY") String orderby
 
     ){
-        log.info("/community/controller : 커뮤니티 게시글 리스트 조회");
-        CommunityCategory CategoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+        log.info("/community/controller : 커뮤니티 게시글 리스트 조회 / 인기 태그 게시글 조회");
+        CommunityCategory CategoryEnum = null;
+        if(category != null){
+            CategoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+        } 
         OrderBy orderByEnum = CustomValueOf.valueOf(OrderBy.class, orderby, GlobalErrorCode.NOT_FOUND_ORDERBY);
         return ResponseEntity.ok().body(communityService.readCommunityList(size, page, CategoryEnum, hashTag, orderByEnum));
     }
