@@ -25,6 +25,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     @Query(value = "SELECT 'PROJECT' AS postType, p.id AS postId, p.created_date AS createdDate FROM project p WHERE (p.content LIKE %:text% OR p.title LIKE %:text%) AND p.status = true ORDER BY createdDate DESC", nativeQuery = true)
     public Page<SearchResultSet> findProjectSearchData(@Param("text") String text, Pageable pageable);
 
+    @Query(value = "SELECT 'PROJECT' AS postType, p.id AS postId, p.created_date AS createdDate FROM project p WHERE (p.content LIKE %:text% OR p.title LIKE %:text%) AND p.status = true AND p.category = :searchType ORDER BY createdDate DESC", nativeQuery = true)
+    public Page<SearchResultSet> findProjectCategorySearchData(@Param("text") String text, @Param("searchType") String searchType, Pageable pageable);
+
     @Query(value = "SELECT postType, postId, createdDate FROM ( " +
             "SELECT 'PROJECT' AS postType, p.id AS postId, p.created_date AS createdDate FROM project p WHERE (p.content LIKE %:text% OR p.title LIKE %:text%) AND p.status = true " +
             "UNION ALL " +

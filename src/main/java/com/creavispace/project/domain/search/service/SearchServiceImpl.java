@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.common.dto.type.SearchType;
 import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
@@ -41,26 +42,55 @@ public class SearchServiceImpl implements SearchService{
 
     @Override
     public SuccessResponseDto<List<SearchListReadResponseDto>> readSearchList(Integer size, Integer page, String text,
-            PostType postType) {
+            SearchType searchType) {
         List<SearchListReadResponseDto> data = null;
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<SearchResultSet> pageable;
 
-        if(postType == null){
+        if(searchType == null){
             pageable = projectRepository.findIntegratedSearchData(text, pageRequest);
         }else{
-            switch (postType.name()) {
+            switch (searchType.name()) {
                 case "PROJECT":
                     pageable = projectRepository.findProjectSearchData(text, pageRequest);
                     break;
-            
+
+                case "TEAM":
+                    pageable = projectRepository.findProjectCategorySearchData(text, searchType.name() ,pageRequest);
+                    break;
+                    
+                case "INDIVIDUAL":
+                    pageable = projectRepository.findProjectCategorySearchData(text, searchType.name() ,pageRequest);
+                    break;
+                    
                 case "RECRUIT":
                     pageable = recruitRepository.findRecruitSearchData(text, pageRequest);
                     break;
-            
+                    
+                case "PROJECT_RECRUIT":
+                    pageable = recruitRepository.findRecruitCategorySearchData(text, searchType.name(), pageRequest);
+                    break;
+                    
+                case "STUDY":
+                    pageable = recruitRepository.findRecruitCategorySearchData(text, searchType.name(), pageRequest);
+                    break;
+                
                 case "COMMUNITY":
                     pageable = communityRepository.findCommunitySearchData(text, pageRequest);
                     break;
+                    
+                case "QNA":
+                    pageable = communityRepository.findCommunityCategorySearchData(text, searchType.name(), pageRequest);
+                    break;
+                    
+                case "CHAT":
+                    pageable = communityRepository.findCommunityCategorySearchData(text, searchType.name(), pageRequest);
+                    break;
+                    
+                case "CONCERN":
+                    pageable = communityRepository.findCommunityCategorySearchData(text, searchType.name(), pageRequest);
+                    break;
+                    
             
                 default:
                     throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.common.dto.type.SearchType;
 import com.creavispace.project.domain.search.constant.SwaggerExample;
 import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
 import com.creavispace.project.domain.search.service.SearchService;
@@ -47,11 +47,11 @@ public class SearchController {
         @RequestParam(value = "postType", required = false) String postType
     ){
         log.info("/search/controller : 통합 검색 리스트 조회");
-        PostType postTypeEnum = null;
+        SearchType searchType = null;
         if(postType != null){
-            postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
+            searchType = CustomValueOf.valueOf(SearchType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
         }
-        return ResponseEntity.ok().body(searchService.readSearchList(size, page, text, postTypeEnum));
+        return ResponseEntity.ok().body(searchService.readSearchList(size, page, text, searchType));
     }
 
 }
