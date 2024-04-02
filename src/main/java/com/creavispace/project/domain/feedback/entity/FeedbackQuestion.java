@@ -47,6 +47,9 @@ public class FeedbackQuestion extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
+    @Column(nullable = false)
+    private Long memberId;
+
     @OneToMany(mappedBy = "feedbackQuestion", fetch = FetchType.LAZY)
     private List<ChoiceItem> choiceItems;
 

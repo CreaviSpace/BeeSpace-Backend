@@ -71,6 +71,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .project(project)
                 .question(dto.getQuestion())
                 .questionType(questionType)
+                .memberId(memberId)
                 .build();
                 // 질문 저장
                 feedbackQuestionRepository.save(feedbackQuestion);
@@ -165,6 +166,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                     .project(project)
                     .question(dto.getQuestion())
                     .questionType(questionType)
+                    .memberId(memberId)
                     .build();
                     // 신규 피드백 저장
                     feedbackQuestionRepository.save(feedbackQuestion);
