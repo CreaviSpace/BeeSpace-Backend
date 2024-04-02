@@ -21,7 +21,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/search")
@@ -44,7 +46,11 @@ public class SearchController {
         @RequestParam(value = "text", required = true) String text,
         @RequestParam(value = "postType", required = false) String postType
     ){
-        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
+        log.info("/search/controller : 통합 검색 리스트 조회");
+        PostType postTypeEnum = null;
+        if(postType != null){
+            postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
+        }
         return ResponseEntity.ok().body(searchService.readSearchList(size, page, text, postTypeEnum));
     }
 
