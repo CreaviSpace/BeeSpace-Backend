@@ -71,7 +71,6 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .project(project)
                 .question(dto.getQuestion())
                 .questionType(questionType)
-                .memberId(memberId)
                 .build();
                 // 질문 저장
                 feedbackQuestionRepository.save(feedbackQuestion);
@@ -92,6 +91,9 @@ public class FeedbackServiceImpl implements FeedbackService {
                 return feedbackQuestion;
             })
             .collect(Collectors.toList());
+
+        project.feedbackTrue();
+        projectRepository.save(project);
 
         // 피드백 질문 DTO
         data = feedbackQuestions.stream()
@@ -137,6 +139,8 @@ public class FeedbackServiceImpl implements FeedbackService {
         // 피드백 질문을 모두 삭제했다면
         if(dtos == null || dtos.isEmpty()) {
             feedbackQuestionRepository.deleteByProjectId(projectId);
+            project.feedbackFalse();
+            projectRepository.save(project);
             return new SuccessResponseDto<>(true, "피드백 질문 추가/삭제 저장이 완료되었습니다.", new ArrayList<FeedbackQuestionResponseDto>());
         }
 
@@ -166,7 +170,6 @@ public class FeedbackServiceImpl implements FeedbackService {
                     .project(project)
                     .question(dto.getQuestion())
                     .questionType(questionType)
-                    .memberId(memberId)
                     .build();
                     // 신규 피드백 저장
                     feedbackQuestionRepository.save(feedbackQuestion);
@@ -187,6 +190,9 @@ public class FeedbackServiceImpl implements FeedbackService {
                 }
             })
             .collect(Collectors.toList());
+
+        project.feedbackTrue();
+        projectRepository.save(project);
 
         // 피드백 질문 DTO
         data = feedbackQuestions.stream()

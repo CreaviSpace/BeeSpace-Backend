@@ -66,6 +66,8 @@ public class Project extends BaseTimeEntity{
 
     private boolean status;
 
+    private boolean feedback;
+
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectLink> links;
 
@@ -100,6 +102,14 @@ public class Project extends BaseTimeEntity{
     public void plusViewCount(){
         this.viewCount++;
         this.weekViewCount++;
+    }
+
+    public void feedbackTrue(){
+        this.feedback = true;
+    }
+    
+    public void feedbackFalse(){
+        this.feedback = false;
     }
 
 }
