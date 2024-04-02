@@ -112,4 +112,8 @@ public class Project extends BaseTimeEntity{
         this.feedback = false;
     }
 
+    public void resetWeekViewCount(){
+        this.weekViewCount = 0;
+    }
+
 }
