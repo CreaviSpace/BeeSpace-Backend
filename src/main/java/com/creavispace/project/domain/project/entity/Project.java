@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.List;
 
 import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
@@ -38,7 +39,7 @@ public class Project extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Member.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -67,22 +68,22 @@ public class Project extends BaseTimeEntity{
     private boolean status;
 
     private boolean feedback;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectLink> links;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectComment> comments;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectBookmark> bookmarks;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectLike> likes;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectMember> members;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectTechStack> techStacks;
 
