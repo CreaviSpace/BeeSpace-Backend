@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
@@ -170,7 +171,7 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public SuccessResponseDto<BookmarkContentsResponseDto> readMyBookmark(Long memberId, Integer page, Integer size, String postType, String sortType) {
-        Pageable pageRequest = PageRequest.of(page - 1, size);
+        Pageable pageRequest = pageable(page, size, sortType);
         BookmarkContentsResponseDto data;
         List<Bookmark> bookmarks;
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
@@ -178,45 +179,21 @@ public class BookmarkServiceImpl implements BookmarkService {
         switch (postType.toLowerCase()) {
             case "project":
                 List<ProjectBookmark> projectBookmark = null;
-                if (sortType.equalsIgnoreCase("asc")) {
-                    projectBookmark = projectBookmarkRepository.findByMemberIdOrderByContentsCreatedDateAsc(memberId, pageRequest);
-                }
-                if (sortType.equalsIgnoreCase("desc")) {
-                    projectBookmark = projectBookmarkRepository.findByMemberIdOrderByContentsCreatedDateDesc(memberId, pageRequest);
-                }
-                if (projectBookmark == null) {
-                    projectBookmark = projectBookmarkRepository.findByMemberIdOrderByContentsCreatedDateDesc(memberId, pageRequest);
-                }
+                    projectBookmark = projectBookmarkRepository.findByMemberId(memberId, pageRequest);
                 bookmarks = new ArrayList<>(projectBookmark);
                 data = new BookmarkContentsResponseDto(bookmarks);
                 break;
 
             case "recruit":
                 List<RecruitBookmark> recruitBookmark = null;
-                if (sortType.equalsIgnoreCase("asc")) {
-                    recruitBookmark = recruitBookmarkRepository.findByMemberIdOrderByContentsCreatedDateAsc(memberId, pageRequest);
-                }
-                if (sortType.equalsIgnoreCase("desc")) {
-                    recruitBookmark = recruitBookmarkRepository.findByMemberIdOrderByContentsCreatedDateDesc(memberId, pageRequest);
-                }
-                if (recruitBookmark == null) {
-                    recruitBookmark = recruitBookmarkRepository.findByMemberIdOrderByContentsCreatedDateDesc(memberId, pageRequest);
-                }
+                    recruitBookmark = recruitBookmarkRepository.findByMemberId(memberId, pageRequest);
                 bookmarks = new ArrayList<>(recruitBookmark);
                 data = new BookmarkContentsResponseDto(bookmarks);
                 break;
 
             case "community":
                 List<CommunityBookmark> communityBookmark = null;
-                if (sortType.equalsIgnoreCase("asc")) {
-                    communityBookmark = communityBookmarkRepository.findByMemberIdOrderByContentsCreatedDateAsc(memberId, pageRequest);
-                }
-                if (sortType.equalsIgnoreCase("desc")) {
-                    communityBookmark = communityBookmarkRepository.findByMemberIdOrderByContentsCreatedDateDesc(memberId, pageRequest);
-                }
-                if (communityBookmark == null) {
-                    communityBookmark = communityBookmarkRepository.findByMemberIdOrderByContentsCreatedDateDesc(memberId, pageRequest);
-                }
+                    communityBookmark = communityBookmarkRepository.findByMemberId(memberId, pageRequest);
 
                 bookmarks = new ArrayList<>(communityBookmark);
                 data = new BookmarkContentsResponseDto(bookmarks);
@@ -227,5 +204,15 @@ public class BookmarkServiceImpl implements BookmarkService {
         }
 
         return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", data);
+    }
+
+    private static PageRequest pageable(Integer page, Integer size, String sortType) {
+        if (sortType.equalsIgnoreCase("asc")) {
+            return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").ascending());
+        }
+        if (sortType.equalsIgnoreCase("desc")) {
+            return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").descending());
+        }
+        return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").descending());
     }
 }
