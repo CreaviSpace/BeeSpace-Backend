@@ -597,11 +597,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     private Page<Project> getProjects(Long memberId, String sortType, Pageable pageRequest) {
         Page<Project> pageable;
-        if (sortType.equals("asc")) {
+        if (sortType.equalsIgnoreCase("asc")) {
             pageable = projectRepository.findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(pageRequest, memberId);
             return pageable;
         }
-        if (sortType.equals("desc")) {
+        if (sortType.equalsIgnoreCase("desc")) {
             pageable = projectRepository.findAllByStatusTrueAndMemberIdOrderByCreatedDateDesc(pageRequest, memberId);
             return pageable;
         }
