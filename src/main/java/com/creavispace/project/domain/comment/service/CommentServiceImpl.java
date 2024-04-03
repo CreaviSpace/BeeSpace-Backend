@@ -373,7 +373,7 @@ public class CommentServiceImpl implements CommentService {
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }
 
-        return new SuccessResponseDto<>(false, "댓글 리스트 조회가 완료되었습니다.", data);
+        return new SuccessResponseDto<>(true, "댓글 리스트 조회가 완료되었습니다.", data);
     }
 
 }
