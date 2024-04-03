@@ -319,18 +319,17 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public SuccessResponseDto<List<CommentResponseDto>> readMyContentsList(Long memberId, Integer page, Integer size,
-                                                                           String postType, String category) {
+                                                                           String postType, String sortType) {
         Pageable pageRequest = PageRequest.of(page-1, size);
         List<CommentResponseDto> data;
 
         switch (postType) {
             case "project":
-                Project project = projectRepository.findById(memberId)
-                        .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+                System.out.println("CommentServiceImpl.readMyContentsList");
                 List<ProjectComment> projectComments = projectCommentRepository.findByMemberId(memberId, pageRequest);
                 data = projectComments.stream()
                         .map(projectComment -> CommentResponseDto.builder()
-                                .contentsTitle(project.getTitle())
+                                .contentsTitle(projectComment.getProject().getTitle())
                                 .id(projectComment.getId())
                                 .memberId(projectComment.getMember().getId())
                                 .memberNickName(projectComment.getMember().getMemberNickname())
@@ -342,12 +341,10 @@ public class CommentServiceImpl implements CommentService {
                 break;
 
             case "community":
-                Community community = communityRepository.findById(memberId)
-                        .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
                 List<CommunityComment> communityComments = communityCommentRepository.findByCommunityId(memberId, pageRequest);
                 data = communityComments.stream()
                         .map(communityComment -> CommentResponseDto.builder()
-                                .contentsTitle(community.getTitle())
+                                .contentsTitle(communityComment.getCommunity().getTitle())
                                 .id(communityComment.getId())
                                 .memberId(communityComment.getMember().getId())
                                 .memberNickName(communityComment.getMember().getMemberNickname())
@@ -359,12 +356,10 @@ public class CommentServiceImpl implements CommentService {
                 break;
 
             case "recruit":
-                Recruit recruit = recruitRepository.findById(memberId)
-                        .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
                 List<RecruitComment> recruitComments = recruitCommentRepository.findByRecruitId(memberId, pageRequest);
                 data = recruitComments.stream()
                         .map(recruitComment -> CommentResponseDto.builder()
-                                .contentsTitle(recruit.getTitle())
+                                .contentsTitle(recruitComment.getRecruit().getTitle())
                                 .id(recruitComment.getId())
                                 .memberId(recruitComment.getMember().getId())
                                 .memberNickName(recruitComment.getMember().getMemberNickname())

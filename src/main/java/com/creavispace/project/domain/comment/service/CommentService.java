@@ -16,5 +16,5 @@ public interface CommentService {
 
     //ky
     SuccessResponseDto<List<CommentResponseDto>> readMyContentsList(Long memberId, Integer page, Integer size,
-                                                                    String postType, String category);
+                                                                    String postType, String sortType);
 }

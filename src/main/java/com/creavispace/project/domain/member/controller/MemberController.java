@@ -27,7 +27,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import static com.creavispace.project.global.util.UsableConst.*;
+
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
@@ -89,7 +91,7 @@ public class MemberController {
     @Operation(summary = " 사용자 아이디로 사용자가 북마크한 게시물 검색, sortType = asc or desc 대 소문자 구분 안함")
     public ResponseEntity<SuccessResponseDto<BookmarkContentsResponseDto>> readMemberBookmarkContents(
             @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam(SORT_TYPE) String sortType, @RequestParam String category) throws JsonProcessingException {
+            @RequestParam String category, @RequestParam(SORT_TYPE) String sortType) throws JsonProcessingException {
         SuccessResponseDto<BookmarkContentsResponseDto> bookmark = bookmarkService.readMyBookmark(memberId, page, size,
                 category, sortType);
 
@@ -111,10 +113,10 @@ public class MemberController {
     @Operation(summary = "사용자 아이디로 사용자 댓글 조회")
     public ResponseEntity<SuccessResponseDto<List<CommentResponseDto>>> readMemberComment(
             @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam(SORT_TYPE) String sortType, @RequestParam String category) {
-        SuccessResponseDto<List<CommentResponseDto>> listSuccessResponseDto = commentService.readMyContentsList(memberId,
-                page, size, sortType,
-                category);
+            @RequestParam String category, @RequestParam(SORT_TYPE) String sortType) {
+        SuccessResponseDto<List<CommentResponseDto>> listSuccessResponseDto = commentService.readMyContentsList(
+                memberId,
+                page, size, category, sortType);
 
         return ResponseEntity.ok().body(listSuccessResponseDto);
     }
