@@ -175,7 +175,7 @@ public class BookmarkServiceImpl implements BookmarkService {
         List<Bookmark> bookmarks;
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        switch (postType) {
+        switch (postType.toLowerCase()) {
             case "project":
                 List<ProjectBookmark> projectBookmark = null;
                 if (sortType.equalsIgnoreCase("asc")) {

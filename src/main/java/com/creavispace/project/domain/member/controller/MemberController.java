@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import static com.creavispace.project.global.util.UsableConst.*;
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ public class MemberController {
 
     @GetMapping("/read/profile")
     @Operation(summary = "사용자 아이디로 사용자 프로필 조회")
-    public MemberResponseDto readMember(@RequestParam("memberId") Long memberId) {
+    public MemberResponseDto readMember(@RequestParam(MEMBER_ID) Long memberId) {
         System.out.println("MemberController.readMember");
         MemberResponseDto member = memberService.findById(memberId);
         return member;
@@ -55,8 +55,8 @@ public class MemberController {
     @GetMapping("/read/contents/project")
     @Operation(summary = "사용자 아이디와 일치하는 프로젝트 게시물 조회")
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readMemberProjectContents(
-            @RequestParam("memberId") Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam String sortType) {
+            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(SORT_TYPE) String sortType) {
         SuccessResponseDto<List<ProjectListReadResponseDto>> memberProjectContents = projectService.readMyProjectList(
                 memberId, size, page, sortType);
         return ResponseEntity.ok().body(memberProjectContents);
@@ -65,8 +65,8 @@ public class MemberController {
     @GetMapping("/read/contents/recruit")
     @Operation(summary = "사용자 아이디와 일치하는 모집 게시물 조회")
     public ResponseEntity<SuccessResponseDto<List<RecruitListReadResponseDto>>> readMemberRecruitContents(
-            @RequestParam("memberId") Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam String sortType) {
+            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(SORT_TYPE) String sortType) {
 
         SuccessResponseDto<List<RecruitListReadResponseDto>> memberRecruitContents = recruitService.readMyRecruitList(
                 memberId, size, page, sortType);
@@ -77,8 +77,8 @@ public class MemberController {
     @GetMapping("/read/contents/community")
     @Operation(summary = "사용자 아이디와 일치하는 커뮤니티 게시물 조회")
     public ResponseEntity<SuccessResponseDto<List<CommunityResponseDto>>> readMemberCommunityContents(
-            @RequestParam("memberId") Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam String sortType) {
+            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(SORT_TYPE) String sortType) {
 
         SuccessResponseDto<List<CommunityResponseDto>> memberCommunityContents = communityService.readMyCommunityList(
                 memberId, size, page, sortType);
@@ -86,10 +86,10 @@ public class MemberController {
     }
 
     @GetMapping("/read/bookmark")
-    @Operation(summary = " 사용자 아이디로 사용자가 북마크한 게시물 검색")
+    @Operation(summary = " 사용자 아이디로 사용자가 북마크한 게시물 검색, sortType = asc or desc 대 소문자 구분 안함")
     public ResponseEntity<SuccessResponseDto<BookmarkContentsResponseDto>> readMemberBookmarkContents(
-            @RequestParam("memberId") Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam String sortType, @RequestParam String category) throws JsonProcessingException {
+            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(SORT_TYPE) String sortType, @RequestParam String category) throws JsonProcessingException {
         SuccessResponseDto<BookmarkContentsResponseDto> bookmark = bookmarkService.readMyBookmark(memberId, page, size,
                 category, sortType);
 
@@ -99,8 +99,8 @@ public class MemberController {
     @GetMapping("/read/feedback")
     @Operation(summary = "사용자 아이디로 사용자 피드백 조회")
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readMemberFeedbackContents(
-            @RequestParam("memberId") Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam String sortType) {
+            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(SORT_TYPE) String sortType) {
         SuccessResponseDto<List<ProjectListReadResponseDto>> memberProjectContents = projectService.readMyProjectFeedBackList(
                 memberId, size, page, sortType);
         return ResponseEntity.ok().body(memberProjectContents);
@@ -110,8 +110,8 @@ public class MemberController {
     @GetMapping("/read/comment")
     @Operation(summary = "사용자 아이디로 사용자 댓글 조회")
     public ResponseEntity<SuccessResponseDto<List<CommentResponseDto>>> readMemberComment(
-            @RequestParam("memberId") Long memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam String sortType, @RequestParam String category) {
+            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(SORT_TYPE) String sortType, @RequestParam String category) {
         SuccessResponseDto<List<CommentResponseDto>> listSuccessResponseDto = commentService.readMyContentsList(memberId,
                 page, size, sortType,
                 category);
