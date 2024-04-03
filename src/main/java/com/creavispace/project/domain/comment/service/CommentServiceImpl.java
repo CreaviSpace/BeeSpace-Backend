@@ -1,11 +1,13 @@
 package com.creavispace.project.domain.comment.service;
 
+import java.awt.Cursor;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
@@ -320,10 +322,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public SuccessResponseDto<List<CommentResponseDto>> readMyContentsList(Long memberId, Integer page, Integer size,
                                                                            String postType, String sortType) {
-        Pageable pageRequest = PageRequest.of(page-1, size);
+        Pageable pageRequest = pageable(page, size, sortType);
         List<CommentResponseDto> data;
 
-        switch (postType) {
+        switch (postType.toLowerCase()) {
             case "project":
                 System.out.println("CommentServiceImpl.readMyContentsList");
                 List<ProjectComment> projectComments = projectCommentRepository.findByMemberId(memberId, pageRequest);
@@ -376,4 +378,13 @@ public class CommentServiceImpl implements CommentService {
         return new SuccessResponseDto<>(true, "댓글 리스트 조회가 완료되었습니다.", data);
     }
 
+    private static PageRequest pageable(Integer page, Integer size, String sortType) {
+        if (sortType.equalsIgnoreCase("asc")) {
+            return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").ascending());
+        }
+        if (sortType.equalsIgnoreCase("desc")) {
+            return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").descending());
+        }
+        return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").descending());
+    }
 }
