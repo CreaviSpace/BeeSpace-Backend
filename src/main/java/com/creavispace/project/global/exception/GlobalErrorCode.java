@@ -37,8 +37,9 @@ public enum GlobalErrorCode {
     ALREADY_FEEDBACK_ANSWER(400, "이미 피드백한 프로젝트입니다."),
     QUESTION_TYPE_NOT_FOUND(400, "피드백 일부의 QuestionType을 찾을 수 없습니다."),
     NOT_QUESTION_ANALYSIS_CONTENT(204, "해당 프로젝트의 피드백 분석할 질문이 0건입니다."),
-    NOT_FEEDBACK_ANSWER_CONTENT(400, "피드백 답변이 존재하지 않습니다.");
+    NOT_FEEDBACK_ANSWER_CONTENT(400, "피드백 답변이 존재하지 않습니다."),
+    NOT_FOUND_ALARM(400,"해당 알림이 존재하지 않습니다." );
 
-    private Integer code;
-    private String message;
+    private final Integer code;
+    private final String message;
 }

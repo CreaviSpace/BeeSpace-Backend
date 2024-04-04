@@ -1,18 +1,8 @@
 package com.creavispace.project.domain.feedback.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.creavispace.project.domain.alarm.service.AlarmService;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackAnswerCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionModifyRequestDto;
@@ -20,10 +10,14 @@ import com.creavispace.project.domain.feedback.dto.response.FeedbackAnalysisResp
 import com.creavispace.project.domain.feedback.dto.response.FeedbackAnswerCreateResponseDto;
 import com.creavispace.project.domain.feedback.dto.response.FeedbackQuestionResponseDto;
 import com.creavispace.project.domain.feedback.service.FeedbackService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -32,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FeedbackController {
     
     private final FeedbackService feedbackService;
+    private final AlarmService alarmService;
 
     private final static String CREATE_FEEDBACK_QUESTION = "/question";
     private final static String MODIFY_FEEDBACK_QUESTION = "/question";
@@ -78,7 +73,9 @@ public class FeedbackController {
         @RequestBody List<FeedbackAnswerCreateRequestDto> requestBody
     ){
         log.info("/feedback/controller : 피드백 답변 생성");
-        return ResponseEntity.ok().body(feedbackService.createFeedbackAnswer(memberId, projectId, requestBody));
+        SuccessResponseDto<FeedbackAnswerCreateResponseDto> response = feedbackService.createFeedbackAnswer(memberId, projectId, requestBody);
+        alarmService.createAlarm(memberId, PostType.PROJECT+"의 "+projectId+"번에 작성된 피드백이 있습니다.");
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping(ANALYSIS_FEEDBACK)
