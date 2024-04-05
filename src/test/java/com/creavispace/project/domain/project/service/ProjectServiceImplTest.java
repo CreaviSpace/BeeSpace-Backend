@@ -41,7 +41,7 @@ class ProjectServiceImplTest {
 
         ProjectMemberRequestDto projectMemberRequestDto = ProjectMemberRequestDto.
                 builder().
-                memberId(4L).
+                memberId(1L).
                 position("")
                 .build();
 
@@ -49,7 +49,7 @@ class ProjectServiceImplTest {
 
         ProjectTechStackRequestDto techStackRequestDto = new ProjectTechStackRequestDto(1L);
 
-        ProjectRequestDto projectRequestDto = ProjectRequestDto.builder().category("oTEAM")
+        ProjectRequestDto projectRequestDto = ProjectRequestDto.builder().category("TEAM")
                 .linkDtos(projectLinkRequestDtos)
                 .memberDtos(List.of(projectMemberRequestDto))
                 .title("타이틀 1")
@@ -60,7 +60,7 @@ class ProjectServiceImplTest {
                 .content("테스트 내용")
                 .build();
 
-        projectService.createProject(4L, projectRequestDto);
+        projectService.createProject(1L, projectRequestDto);
     }
 
     @Test
@@ -73,7 +73,7 @@ class ProjectServiceImplTest {
     @Test
     @Commit
     void readMyProject() {
-        Member member = memberRepository.findById(4L).orElseThrow();
+        Member member = memberRepository.findById(1L).orElseThrow();
 
         SuccessResponseDto<List<ProjectListReadResponseDto>> listSuccessResponseDto = projectService.readMyProjectList(
                 member, 6, 1, "asc");

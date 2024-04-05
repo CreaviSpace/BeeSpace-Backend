@@ -16,6 +16,7 @@ import com.creavispace.project.domain.recruit.dto.response.RecruitListReadRespon
 import com.creavispace.project.domain.recruit.service.RecruitService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/admin")
 @RestController
+@RequiredArgsConstructor
 public class AdminController {
 
     private String jwtSecret;
-    private MemberRepository memberRepository;
-    private MemberService memberService;
-    private ProjectService projectService;
-    private RecruitService recruitService;
-    private CommunityService communityService;
+    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final ProjectService projectService;
+    private final RecruitService recruitService;
+    private final CommunityService communityService;
 
     @PostMapping("/sanction")
     public void sanctionMember(@RequestBody Long memberId, HttpServletRequest request) {
@@ -53,6 +55,7 @@ public class AdminController {
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> projectContentsList(
             @RequestParam Integer size,
             @RequestParam Integer page) {
+        System.out.println("AdminController.projectContentsList");
         SuccessResponseDto<List<ProjectListReadResponseDto>> projectList = projectService.readProjectList(size, page,
                 null);
         return ResponseEntity.ok().body(projectList);

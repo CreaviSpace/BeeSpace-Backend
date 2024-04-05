@@ -67,7 +67,7 @@ public class SecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable).cors(httpSecurityCorsConfigurer -> corsFilter()).httpBasic(
                         AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
+                        auth -> auth.requestMatchers("/admin/**").hasRole(Role.MEMBER.name())
                                 .requestMatchers("/member/read/contents/**","/api/auth/**","config/login", "/login/**", "member/login", "/join", "/swagger-ui/**", "/v3/api-docs/**")
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "/community/**", "/hashtag/**", "/project/**", "/comment/**", "/recruit/**", "/bookmark/**", "/like/**", "/search/**","/feedback/**", "/tackStack/**").permitAll()
