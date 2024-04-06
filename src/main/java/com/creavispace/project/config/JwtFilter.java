@@ -2,6 +2,7 @@ package com.creavispace.project.config;
 
 import com.creavispace.project.config.auth.utils.JwtUtil;
 import com.creavispace.project.domain.member.dto.response.MemberJwtResponseDto;
+import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -61,10 +62,11 @@ public class JwtFilter extends OncePerRequestFilter {
         String memberEmail = responseDto.memberEmail();
         String loginType = responseDto.loginType();
 
+        Member member = memberService.findByEmailAndLoginTypeAndMemberId(memberEmail, loginType, memberId).orElseThrow();
         log.info("로그인 한 사용자 = {}, 로그인 타입 = {}",memberEmail, loginType);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(memberId, loginType, List.of(new SimpleGrantedAuthority("ROLE_MEMBER")));
+                new UsernamePasswordAuthenticationToken(memberId, loginType, List.of(new SimpleGrantedAuthority(member.getRoleKey())));
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
