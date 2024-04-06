@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 public interface MemberService {
     Member save(Member member);
 
-    void update(Member member, MyPageModifyRequestDto updateParam);
+    Member update(Member member, MyPageModifyRequestDto updateParam);
 
     Optional<Member> findByEmail(String email);
 

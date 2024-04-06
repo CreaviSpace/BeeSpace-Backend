@@ -34,7 +34,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public void update(Member member, MyPageModifyRequestDto updateParam) {
+    public Member update(Member member, MyPageModifyRequestDto updateParam) {
         member.setMemberNickname(updateParam.nickName());
         member.setMemberIntroduce(updateParam.introduce());
         member.setMemberPosition(updateParam.position());
@@ -45,7 +45,7 @@ public class MemberServiceImpl implements MemberService {
         if (!member.isEnabled()) {
             member.setEnabled(true);
         }
-        memberRepository.save(member);
+        return memberRepository.save(member);
     }
 
     @Override

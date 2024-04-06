@@ -68,14 +68,21 @@ public class SecurityConfig {
                         AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers("/admin/**").hasRole(Role.MEMBER.name())
-                                .requestMatchers("/member/read/contents/**","/api/auth/**","config/login", "/login/**", "member/login", "/join", "/swagger-ui/**", "/v3/api-docs/**")
+                                .requestMatchers("/member/read/profile/**", "/member/read/contents/**", "/api/auth/**",
+                                        "config/login", "/login/**", "member/login", "/join", "/swagger-ui/**",
+                                        "/v3/api-docs/**")
                                 .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/community/**", "/hashtag/**", "/project/**", "/comment/**", "/recruit/**", "/bookmark/**", "/like/**", "/search/**","/feedback/**", "/tackStack/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/member/**", "/review", "/file/**", "/like/**","/project/**", "/comment/**", "/recruit/**", "/bookmark/**", "/report/**", "/community/**","/feedback/**", "/tackStack/**")
+                                .requestMatchers(HttpMethod.GET, "/community/**", "/hashtag/**", "/project/**",
+                                        "/comment/**", "/recruit/**", "/bookmark/**", "/like/**", "/search/**",
+                                        "/feedback/**", "/tackStack/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/member/**", "/review", "/file/**", "/like/**",
+                                        "/project/**", "/comment/**", "/recruit/**", "/bookmark/**", "/report/**",
+                                        "/community/**", "/feedback/**", "/tackStack/**")
                                 .hasAnyRole(Role.MEMBER.name(), Role.ADMIN.name()).anyRequest()
                                 .authenticated())
                 .logout(logout -> logout.logoutSuccessHandler(new LogoutHandler()).logoutUrl("/logout"))
-                .oauth2Login(login -> login.userInfoEndpoint(endPoint -> endPoint.userService(customOauth2Service)).successHandler(new LoginSuccessHandler(memberService)))
+                .oauth2Login(login -> login.userInfoEndpoint(endPoint -> endPoint.userService(customOauth2Service))
+                        .successHandler(new LoginSuccessHandler(memberService)))
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtFilter(memberService, jwtSecret), UsernamePasswordAuthenticationFilter.class)
