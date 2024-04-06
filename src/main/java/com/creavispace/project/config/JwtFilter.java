@@ -65,6 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
         Member member = memberService.findByEmailAndLoginTypeAndMemberId(memberEmail, loginType, memberId).orElseThrow();
         log.info("로그인 한 사용자 = {}, 로그인 타입 = {}",memberEmail, loginType);
 
+        Member member = memberService.findByEmailAndLoginTypeAndMemberId(memberEmail, loginType, memberId).orElseThrow();
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(memberId, loginType, List.of(new SimpleGrantedAuthority(member.getRoleKey())));
 
