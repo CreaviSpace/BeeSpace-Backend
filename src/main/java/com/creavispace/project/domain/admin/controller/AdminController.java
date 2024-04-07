@@ -2,6 +2,7 @@ package com.creavispace.project.domain.admin.controller;
 
 
 import com.creavispace.project.config.auth.utils.JwtUtil;
+import com.creavispace.project.domain.admin.dto.MemberListDto;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
@@ -16,7 +17,9 @@ import com.creavispace.project.domain.recruit.dto.response.RecruitListReadRespon
 import com.creavispace.project.domain.recruit.service.RecruitService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminController {
 
+    @Value("${jwt.secret}")
     private String jwtSecret;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
@@ -87,8 +91,12 @@ public class AdminController {
     }
 
     @GetMapping("/member")
-    public Page<Member> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam("sort-type") String sortType) {
-        return memberService.findAllMembers(size, page, sortType);
+    public List<MemberListDto> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam("sort-type") String sortType) {
+
+        List<Member> members = memberService.findAllMembers(size, page, sortType);
+        List<MemberListDto> collect = members.stream().map(member -> new MemberListDto(member)).collect(Collectors.toList());
+        return collect;
+
     }
 
     private void deleteFactory(String category, Long id, MemberJwtResponseDto dto) {

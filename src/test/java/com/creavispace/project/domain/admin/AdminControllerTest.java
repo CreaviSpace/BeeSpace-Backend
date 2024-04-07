@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.creavispace.project.domain.admin.controller.AdminController;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -30,7 +30,7 @@ public class AdminControllerTest {
     @Test
     void memberListtest() {
         Pageable pageRequest = PageRequest.of(1 - 1, 6);
-        Page<Member> all = memberRepository.findAll(pageRequest);
+        List<Member> all = memberRepository.findBy(pageRequest);
         all.forEach(System.out::println);
 
     }
