@@ -53,9 +53,10 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     private JwtDto loadJwt(Member member) {
-        String jwt = memberService.login(member.getMemberEmail(), member.getLoginType(), member.getId());
-        Long memberId = member.getId();
+        String jwt = memberService.login(member.getMemberEmail(), member.getLoginType(), member.getIdTag());
+        String memberIdTag = member.getIdTag();
 
-        return new JwtDto(jwt, memberId, member.isEnabled());
+        boolean enabled = member.isEnabled();
+        return new JwtDto(jwt, memberIdTag, enabled);
     }
 }

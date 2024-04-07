@@ -17,6 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m FROM Member m WHERE m.memberNickname LIKE %:keyword% OR m.idTag LIKE %:keyword%")
     List<Member> findByMemberNicknameOrIdTagContaining(String keyword);
     Optional<Member> findByLoginId(String loginId);
+    Optional<Member> findByIdTag(String memberIdTag);
 
 
     Page<Member> findAll(Pageable pageable);

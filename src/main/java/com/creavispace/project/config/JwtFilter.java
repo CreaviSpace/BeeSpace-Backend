@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,15 +59,15 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("인증 성공 authorization = {}", authorization);
 
         MemberJwtResponseDto responseDto = JwtUtil.getUserInfo(authorization, jwtSecret);
-        Long memberId = responseDto.memberId();
+        String memberIdTag = responseDto.memberIdTag();
         String memberEmail = responseDto.memberEmail();
         String loginType = responseDto.loginType();
-        Member member = memberService.findByEmailAndLoginTypeAndMemberId(memberEmail, loginType, memberId).orElseThrow();
 
+        Member member = memberService.findByMemberIdTag(memberIdTag).orElseThrow();
         log.info("로그인 한 사용자 = {}, 로그인 타입 = {}",memberEmail, loginType);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(memberId, loginType, List.of(new SimpleGrantedAuthority(member.getRoleKey())));
+                new UsernamePasswordAuthenticationToken(member.getId(), loginType, List.of(new SimpleGrantedAuthority(member.getRoleKey())));
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);

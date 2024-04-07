@@ -55,8 +55,7 @@ public class MyPageController {
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         MemberJwtResponseDto memberInfo = JwtUtil.getUserInfo(authorization, secretKey);
-        Optional<Member> member = memberService.findByEmailAndLoginTypeAndMemberId(memberInfo.memberEmail(),
-                memberInfo.loginType(), memberInfo.memberId());
+        Optional<Member> member = memberService.findByMemberIdTag(memberInfo.memberIdTag());
         return member;
     }
 }

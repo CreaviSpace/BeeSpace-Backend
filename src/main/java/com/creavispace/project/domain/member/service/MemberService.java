@@ -22,7 +22,7 @@ public interface MemberService {
 
     Page<Member> findAllMembers(Integer size, Integer page, String sortType);
 
-    String login(String memberEmail, String loginType, Long memberId);
+    String login(String memberEmail, String loginType, String memberIdTag);
 
     Optional<Member> findByEmailAndLoginTypeAndMemberId(String memberEmail, String loginType, Long memberId);
 
@@ -30,4 +30,6 @@ public interface MemberService {
     Optional<Member> findByLoginId(String loginId);
 
     void expireMember(String jwt);
+
+    Optional<Member> findByMemberIdTag(String memberIdTag);
 }

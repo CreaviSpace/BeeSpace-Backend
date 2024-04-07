@@ -40,14 +40,14 @@ public class AdminController {
     private final CommunityService communityService;
 
     @PostMapping("/sanction")
-    public void sanctionMember(@RequestBody Long memberId, HttpServletRequest request) {
+    public void sanctionMember(@RequestBody String memberIdTag, HttpServletRequest request) {
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
-        Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
+        Member admin = memberRepository.findByIdTag(userInfo.memberIdTag()).orElseThrow();
         if (!isAdmin(admin)) {
             return;
         }
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findByIdTag(memberIdTag).orElseThrow();
         member.setExpired(true);
     }
 
@@ -87,27 +87,27 @@ public class AdminController {
     }
 
     @GetMapping("/member")
-    public Page<Member> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam String sort) {
-        return memberService.findAllMembers(size, page, sort);
+    public Page<Member> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam("sort-type") String sortType) {
+        return memberService.findAllMembers(size, page, sortType);
     }
 
     private void deleteFactory(String category, Long id, MemberJwtResponseDto dto) {
-        Member member = memberRepository.findById(dto.memberId()).orElseThrow();
+        Member member = memberRepository.findByIdTag(dto.memberIdTag()).orElseThrow();
         boolean isAdmin = isAdmin(member);
         if (!isAdmin) {
             return;
         }
 
         if (category.equals("project")) {
-            projectService.deleteProject(dto.memberId(), id);
+            projectService.deleteProject(member.getId(), id);
         }
 
         if (category.equals("recruit")) {
-            recruitService.deleteRecruit(dto.memberId(), id);
+            recruitService.deleteRecruit(member.getId(), id);
         }
 
         if (category.equals("community")) {
-            communityService.deleteCommunity(dto.memberId(), id);
+            communityService.deleteCommunity(member.getId(), id);
         }
     }
 

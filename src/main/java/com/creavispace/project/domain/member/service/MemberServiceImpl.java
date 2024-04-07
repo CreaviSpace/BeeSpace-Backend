@@ -79,9 +79,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public String login(String memberEmail, String loginType, Long memberId) {
+    public String login(String memberEmail, String loginType, String memberIdTag) {
 
-        return JwtUtil.createJwt(memberEmail, loginType, memberId, jwtSecret, 1000 * 60 * 60L);
+        return JwtUtil.createJwt(memberEmail, loginType, memberIdTag, jwtSecret, 1000 * 60 * 60L);
     }
 
     @Override
@@ -101,14 +101,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void expireMember(String jwt) {
-        Long memberId = JwtUtil.getUserInfo(jwt, jwtSecret).memberId();
-        Member member = member(memberRepository.findById(memberId));
+        String memberIdTag = JwtUtil.getUserInfo(jwt, jwtSecret).memberIdTag();
+        Member member = findMember(memberRepository.findByIdTag(memberIdTag));
         member.setExpired(true);
         member.setEnabled(false);
         memberRepository.save(member);
     }
 
-    private Member member(Optional<Member> memberOptional) {
+    @Override
+    public Optional<Member> findByMemberIdTag(String memberIdTag) {
+        return memberRepository.findByIdTag(memberIdTag);
+    }
+
+    private Member findMember(Optional<Member> memberOptional) {
         if (memberOptional.isPresent()) {
             return memberOptional.get();
         }

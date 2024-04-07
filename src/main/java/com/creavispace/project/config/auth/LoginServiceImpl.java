@@ -90,7 +90,7 @@ public class LoginServiceImpl implements LoginService {
             memberRepository.save(member);
         }
         
-        String token = JwtUtil.createJwt(member.getMemberEmail(), member.getLoginType(), member.getId(), JWT_SECRET, 1000 * 60 * 60L);
+        String token = JwtUtil.createJwt(member.getMemberEmail(), member.getLoginType(), member.getIdTag(), JWT_SECRET, 1000 * 60 * 60L);
 
         LoginResponseDto responseDto = LoginResponseDto.builder()
             .token(token)

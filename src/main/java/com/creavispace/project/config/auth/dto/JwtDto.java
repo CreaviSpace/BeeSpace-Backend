@@ -5,13 +5,13 @@ import lombok.Getter;
 @Getter
 public class JwtDto {
     String jwt;
-    Long memberId;
-    boolean memberEnabled;
+    String memberIdTag;
+    boolean oldUser;
 
-    public JwtDto(String jwt, Long memberId, boolean memberEnabled) {
+    public JwtDto(String jwt, String memberIdTag, boolean memberEnabled) {
         this.jwt = jwt;
-        this.memberId = memberId;
-        this.memberEnabled = memberEnabled;
+        this.memberIdTag = memberIdTag;
+        this.oldUser = memberEnabled;
     }
 
 
