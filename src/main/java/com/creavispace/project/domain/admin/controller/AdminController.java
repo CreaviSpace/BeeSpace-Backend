@@ -87,8 +87,8 @@ public class AdminController {
     }
 
     @GetMapping("/member")
-    public Page<Member> memberList(@RequestParam Integer page, @RequestParam Integer size, @RequestParam("sort-type") String sortType) {
-        return memberService.findAllMembers(page, size, sortType);
+    public Page<Member> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam("sort-type") String sortType) {
+        return memberService.findAllMembers(size, page, sortType);
     }
 
     private void deleteFactory(String category, Long id, MemberJwtResponseDto dto) {

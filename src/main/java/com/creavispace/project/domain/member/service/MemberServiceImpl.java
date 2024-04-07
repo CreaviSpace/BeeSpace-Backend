@@ -71,7 +71,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<Member> findAllMembers(Integer page, Integer size, String sortType) {
+    public Page<Member> findAllMembers(Integer size, Integer page, String sortType) {
         Pageable pageRequest = PageRequest.of(page - 1, size);
         Page<Member> pageable = memberRepository.findAll(pageRequest);
 
