@@ -20,7 +20,7 @@ public interface MemberService {
 
     boolean emailExsists(String memberEmail);
 
-    Page<Member> findAllMembers(Integer size, Integer page, String sortType);
+    List<Member> findAllMembers(Integer size, Integer page, String sortType);
 
     String login(String memberEmail, String loginType, String memberIdTag);
 

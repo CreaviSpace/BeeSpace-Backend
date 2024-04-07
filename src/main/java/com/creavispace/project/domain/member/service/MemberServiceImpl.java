@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -71,11 +70,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<Member> findAllMembers(Integer size, Integer page, String sortType) {
+    public List<Member> findAllMembers(Integer size, Integer page, String sortType) {
         Pageable pageRequest = PageRequest.of(page - 1, size);
-        Page<Member> pageable = memberRepository.findAll(pageRequest);
-
-        return pageable;
+        List<Member> memberList = memberRepository.findBy(pageRequest);
+        System.out.println("memberList = " + memberList);
+        return memberList;
     }
 
     @Override
