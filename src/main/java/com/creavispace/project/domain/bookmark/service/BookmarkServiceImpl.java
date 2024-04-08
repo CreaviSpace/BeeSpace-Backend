@@ -170,9 +170,8 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     @Override
-    public SuccessResponseDto<BookmarkContentsResponseDto> readMyBookmark(Long memberId, Integer page, Integer size, String postType, String sortType) {
+    public SuccessResponseDto<List<Bookmark>> readMyBookmark(Long memberId, Integer page, Integer size, String postType, String sortType) {
         Pageable pageRequest = pageable(page, size, sortType);
-        BookmarkContentsResponseDto data;
         List<Bookmark> bookmarks;
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -181,14 +180,12 @@ public class BookmarkServiceImpl implements BookmarkService {
                 List<ProjectBookmark> projectBookmark = null;
                     projectBookmark = projectBookmarkRepository.findByMemberId(memberId, pageRequest);
                 bookmarks = new ArrayList<>(projectBookmark);
-                data = new BookmarkContentsResponseDto(bookmarks);
                 break;
 
             case "recruit":
                 List<RecruitBookmark> recruitBookmark = null;
                     recruitBookmark = recruitBookmarkRepository.findByMemberId(memberId, pageRequest);
                 bookmarks = new ArrayList<>(recruitBookmark);
-                data = new BookmarkContentsResponseDto(bookmarks);
                 break;
 
             case "community":
@@ -196,14 +193,13 @@ public class BookmarkServiceImpl implements BookmarkService {
                     communityBookmark = communityBookmarkRepository.findByMemberId(memberId, pageRequest);
 
                 bookmarks = new ArrayList<>(communityBookmark);
-                data = new BookmarkContentsResponseDto(bookmarks);
                 break;
 
             default:
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }
 
-        return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", data);
+        return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", bookmarks);
     }
 
     private static PageRequest pageable(Integer page, Integer size, String sortType) {

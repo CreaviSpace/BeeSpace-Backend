@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.member.controller;
 
-import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
+import com.creavispace.project.domain.bookmark.entity.Bookmark;
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
 import com.creavispace.project.domain.comment.service.CommentService;
@@ -89,13 +89,13 @@ public class MemberController {
 
     @GetMapping("/read/bookmark")
     @Operation(summary = " 사용자 아이디로 사용자가 북마크한 게시물 검색, sortType = asc or desc 대 소문자 구분 안함")
-    public ResponseEntity<SuccessResponseDto<BookmarkContentsResponseDto>> readMemberBookmarkContents(
+    public ResponseEntity<SuccessResponseDto<List<Bookmark>>> readMemberBookmarkContents(
             @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam String category, @RequestParam(SORT_TYPE) String sortType) throws JsonProcessingException {
-        SuccessResponseDto<BookmarkContentsResponseDto> bookmark = bookmarkService.readMyBookmark(memberId, page, size,
+        SuccessResponseDto<List<Bookmark>> listSuccessResponseDto = bookmarkService.readMyBookmark(memberId, page, size,
                 category, sortType);
 
-        return ResponseEntity.ok().body(bookmark);
+        return ResponseEntity.ok().body(listSuccessResponseDto);
     }
 
     @GetMapping("/read/feedback")
