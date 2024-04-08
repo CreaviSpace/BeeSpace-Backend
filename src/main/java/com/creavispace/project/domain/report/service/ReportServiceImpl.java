@@ -27,7 +27,7 @@ public class ReportServiceImpl implements ReportService{
     private final MemberRepository memberRepository;
 
     @Override
-    public SuccessResponseDto<ReportResponseDto> createReport(Long memberId, ReportRequestDto dto) {
+    public SuccessResponseDto<ReportResponseDto> createReport(String memberId, ReportRequestDto dto) {
         ReportResponseDto data = null;
 
         // 회원이 존재하는지

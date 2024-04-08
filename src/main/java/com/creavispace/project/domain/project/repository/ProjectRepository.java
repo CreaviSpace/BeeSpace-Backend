@@ -1,8 +1,8 @@
 package com.creavispace.project.domain.project.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.creavispace.project.domain.member.entity.Member;
+import com.creavispace.project.domain.project.entity.Project;
+import com.creavispace.project.domain.search.entity.SearchResultSet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,9 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.creavispace.project.domain.project.entity.Project;
-import com.creavispace.project.domain.member.entity.Member;
-import com.creavispace.project.domain.search.entity.SearchResultSet;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>{
@@ -20,7 +19,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     public Page<Project> findAllByStatusTrue(Pageable pageable);
     public Page<Project> findAllByStatusTrueAndCategory(String category, Pageable pageable);
     public Optional<Project> findByIdAndStatusTrue(Long projectId);
-    public Boolean existsByIdAndMemberId(Long projectId, Long memberId);
+    public Boolean existsByIdAndMemberId(Long projectId, String memberId);
 
     @Query(value = "SELECT 'PROJECT' AS postType, p.id AS postId, p.created_date AS createdDate FROM project p WHERE (p.content LIKE %:text% OR p.title LIKE %:text%) AND p.status = true ORDER BY createdDate DESC", nativeQuery = true)
     public Page<SearchResultSet> findProjectSearchData(@Param("text") String text, Pageable pageable);
@@ -48,9 +47,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 
     Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(Pageable pageRequest, Member member);
     Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateDesc(Pageable pageRequest, Member member);
-    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(Pageable pageRequest, Long memberId);
-    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateDesc(Pageable pageRequest, Long memberId);
+    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(Pageable pageRequest, String memberId);
+    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateDesc(Pageable pageRequest, String memberId);
 
-    Optional<Project> findById(Long memberId);
+//    Optional<Project> findById(String memberId);
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.creavispace.project.domain.member.Role;
 import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
@@ -52,7 +53,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<List<FeedbackQuestionResponseDto>> createFeedbackQuestion(Long memberId, Long projectId,
+    public SuccessResponseDto<List<FeedbackQuestionResponseDto>> createFeedbackQuestion(String memberId, Long projectId,
             List<FeedbackQuestionCreateRequestDto> dtos) {
         List<FeedbackQuestionResponseDto> data = null;
         // JWT에 저장된 회원이 존재하는지
@@ -122,7 +123,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<List<FeedbackQuestionResponseDto>> modifyFeedbackQuestion(Long memberId, Long projectId,
+    public SuccessResponseDto<List<FeedbackQuestionResponseDto>> modifyFeedbackQuestion(String memberId, Long projectId,
             List<FeedbackQuestionModifyRequestDto> dtos) {
         List<FeedbackQuestionResponseDto> data = null;
         // JWT에 저장된 회원이 존재하는지
@@ -132,7 +133,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 수정 권한이 있는지
-        if(project.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -251,7 +252,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     @Transactional
     public SuccessResponseDto<FeedbackAnswerCreateResponseDto> createFeedbackAnswer(
-            Long memberId, Long projectId, List<FeedbackAnswerCreateRequestDto> dtos) {
+            String memberId, Long projectId, List<FeedbackAnswerCreateRequestDto> dtos) {
         FeedbackAnswerCreateResponseDto data = null;
 
         // JWT에 저장된 회원이 존재하는지
@@ -303,7 +304,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     @Override
-    public SuccessResponseDto<List<FeedbackAnalysisResponseDto>> analysisFeedback(Long memberId, Long projectId) {
+    public SuccessResponseDto<List<FeedbackAnalysisResponseDto>> analysisFeedback(String memberId, Long projectId) {
         List<FeedbackAnalysisResponseDto> data = null;
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
@@ -312,7 +313,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 피드백 분석 조회 권한이 있는지
-        if(project.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -326,7 +327,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         data = feedbackQuestions.stream()
             .map(feedbackQuestion -> {
                 switch (feedbackQuestion.getQuestionType().name()) {
-                    case "OBJECTIVE":
+                    case "OBJECTIVE", "CHECKBOX":
                         return ObjectiveFeedbackAnalysisResponseDto.builder()
                         .question(feedbackQuestion.getQuestion())
                         .questionType(feedbackQuestion.getQuestionType().name())
@@ -338,20 +339,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                                 .build();
                             })
                             .collect(Collectors.toList()))
-                        .build();    
-                    case "CHECKBOX":
-                        return ObjectiveFeedbackAnalysisResponseDto.builder()
-                        .question(feedbackQuestion.getQuestion())
-                        .questionType(feedbackQuestion.getQuestionType().name())
-                        .choiceItemsAnalysis(feedbackQuestion.getChoiceItems().stream()
-                            .map(choiceItem -> {
-                                return ChoiceItemsAnalysisResponseDto.builder()
-                                .choiceItem(choiceItem.getItem())
-                                .selectedCount(selectedItemRepository.countByChoiceItemId(choiceItem.getId()))
-                                .build();
-                            })
-                            .collect(Collectors.toList()))
-                        .build();    
+                        .build();
                     case "SUBJECTIVE":
                         List<FeedbackAnswer> feedbackAnswers = feedbackAnswerRepository.findByFeedbackQuestionId(feedbackQuestion.getId());
                         return SubjectiveFeedbackAnalysisResponseDto.builder()

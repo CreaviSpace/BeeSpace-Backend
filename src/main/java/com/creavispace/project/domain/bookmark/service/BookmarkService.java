@@ -10,11 +10,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 
 public interface BookmarkService {
-    public SuccessResponseDto<BookmarkResponseDto> bookmarkToggle(Long memberId, Long postId, PostType postType);
-    public SuccessResponseDto<BookmarkResponseDto> readBookmark(Long memberId, Long postId, PostType postType);
+    public SuccessResponseDto<BookmarkResponseDto> bookmarkToggle(String memberId, Long postId, PostType postType);
+    public SuccessResponseDto<BookmarkResponseDto> readBookmark(String memberId, Long postId, PostType postType);
 
 
     //ky
-    public SuccessResponseDto<List<Bookmark>> readMyBookmark(Long memberId, Integer page, Integer size, String postType, String sortType)
+    public SuccessResponseDto<List<Bookmark>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType)
             throws JsonProcessingException;
 }

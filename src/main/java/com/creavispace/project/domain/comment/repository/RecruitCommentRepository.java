@@ -12,7 +12,7 @@ import com.creavispace.project.domain.comment.entity.RecruitComment;
 public interface RecruitCommentRepository extends JpaRepository<RecruitComment, Long> {
     public List<RecruitComment> findByRecruitId(Long recruitId);
 
-    List<RecruitComment> findByRecruitId(Long memberId, Pageable pageRequest);
+    List<RecruitComment> findByRecruitId(String memberId, Pageable pageRequest);
 
-    List<RecruitComment> findByMemberId(Long memberId, Pageable pageRequest);
+    List<RecruitComment> findByMemberId(String memberId, Pageable pageRequest);
 }

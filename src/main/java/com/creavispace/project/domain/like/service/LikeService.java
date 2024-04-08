@@ -6,7 +6,7 @@ import com.creavispace.project.domain.like.dto.response.LikeCountResponseDto;
 import com.creavispace.project.domain.like.dto.response.LikeResponseDto;
 
 public interface LikeService {
-    public SuccessResponseDto<LikeResponseDto> likeToggle(Long memberId, Long postId, PostType postType);
-    public SuccessResponseDto<LikeResponseDto> readLike(Long memberId, Long postId, PostType postType);
+    public SuccessResponseDto<LikeResponseDto> likeToggle(String memberId, Long postId, PostType postType);
+    public SuccessResponseDto<LikeResponseDto> readLike(String memberId, Long postId, PostType postType);
     public SuccessResponseDto<LikeCountResponseDto> likeCount(Long postId, PostType postType);
 }

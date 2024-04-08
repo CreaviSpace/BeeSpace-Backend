@@ -5,5 +5,5 @@ import com.creavispace.project.domain.report.dto.request.ReportRequestDto;
 import com.creavispace.project.domain.report.dto.response.ReportResponseDto;
 
 public interface ReportService {
-    public SuccessResponseDto<ReportResponseDto> createReport(Long memberId, ReportRequestDto dto);
+    public SuccessResponseDto<ReportResponseDto> createReport(String memberId, ReportRequestDto dto);
 }

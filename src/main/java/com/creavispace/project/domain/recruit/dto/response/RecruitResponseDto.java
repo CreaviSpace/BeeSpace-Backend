@@ -13,7 +13,7 @@ import java.util.List;
 public class RecruitResponseDto {
     private Long id;
     private String postType;
-    private Long memberId;
+    private String memberId;
     private String memberNickName;
     private String memberProfile;
     private Integer viewCount;

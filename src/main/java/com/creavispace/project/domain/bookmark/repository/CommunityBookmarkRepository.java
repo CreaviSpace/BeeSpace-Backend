@@ -1,20 +1,20 @@
 package com.creavispace.project.domain.bookmark.repository;
 
-import java.util.List;
+import com.creavispace.project.domain.bookmark.entity.CommunityBookmark;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.creavispace.project.domain.bookmark.entity.CommunityBookmark;
+import java.util.List;
 
 @Repository
 public interface CommunityBookmarkRepository extends JpaRepository<CommunityBookmark, Long>{
-    public CommunityBookmark findByCommunityIdAndMemberId(Long communityId, Long memberId);
+    public CommunityBookmark findByCommunityIdAndMemberId(Long communityId, String memberId);
 
-    List<CommunityBookmark> findByMemberId(Long memberId, Pageable pageable);
+    List<CommunityBookmark> findByMemberId(String memberId, Pageable pageable);
 
-    List<CommunityBookmark> findByMemberIdOrderByContentsCreatedDateAsc(Long memberId, Pageable pageRequest);
+    List<CommunityBookmark> findByMemberIdOrderByContentsCreatedDateAsc(String memberId, Pageable pageRequest);
 
-    List<CommunityBookmark> findByMemberIdOrderByContentsCreatedDateDesc(Long memberId, Pageable pageRequest);
+    List<CommunityBookmark> findByMemberIdOrderByContentsCreatedDateDesc(String memberId, Pageable pageRequest);
 
 }

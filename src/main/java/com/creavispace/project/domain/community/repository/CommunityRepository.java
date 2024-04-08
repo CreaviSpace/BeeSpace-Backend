@@ -1,19 +1,18 @@
 package com.creavispace.project.domain.community.repository;
 
-import java.util.Optional;
-
+import com.creavispace.project.domain.community.entity.Community;
+import com.creavispace.project.domain.search.entity.SearchResultSet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.creavispace.project.domain.community.entity.Community;
-import com.creavispace.project.domain.search.entity.SearchResultSet;
+import java.util.Optional;
 
 @Repository
 public interface CommunityRepository extends JpaRepository<Community, Long> {
-    public boolean existsByIdAndMemberId(Long communityId, Long memberId);
+    public boolean existsByIdAndMemberId(Long communityId, String memberId);
     public Optional<Community> findByIdAndStatusTrue(Long communityId);
     
     @Query(value = "SELECT * " +
@@ -127,11 +126,11 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
 
     //ky
-    public Page<Community> findAllByMemberIdAndStatusTrueOrderByCreatedDateAsc(Long memberId, Pageable pageable);
-    public Page<Community> findAllByMemberIdAndStatusTrueOrderByCreatedDateDesc(Long memberId, Pageable pageable);
+    public Page<Community> findAllByMemberIdAndStatusTrueOrderByCreatedDateAsc(String memberId, Pageable pageable);
+    public Page<Community> findAllByMemberIdAndStatusTrueOrderByCreatedDateDesc(String memberId, Pageable pageable);
 
 
-    Optional<Community> findById(Long memberId);
+//    Optional<Community> findById(String memberId);
 
     @Query(value = "SELECT 'COMMUNITY' AS postType, c.id AS postId, c.created_date AS createdDate FROM community c WHERE (c.content LIKE %:text% OR c.title LIKE %:text%) AND c.status = true AND c.category = :searchType ORDER BY created_date DESC", nativeQuery = true)
     public Page<SearchResultSet> findCommunityCategorySearchData(String text, String searchType, Pageable pageable);

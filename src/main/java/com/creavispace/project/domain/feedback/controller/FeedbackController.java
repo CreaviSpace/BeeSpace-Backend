@@ -37,7 +37,7 @@ public class FeedbackController {
     @PostMapping(CREATE_FEEDBACK_QUESTION)
     @Operation(summary = "피드백 질문 생성")
     public ResponseEntity<SuccessResponseDto<List<FeedbackQuestionResponseDto>>> createFeedbackQuestion(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId, 
         @RequestBody List<FeedbackQuestionCreateRequestDto> requestBody
     ){
@@ -48,7 +48,7 @@ public class FeedbackController {
     @PutMapping(MODIFY_FEEDBACK_QUESTION)
     @Operation(summary = "피드백 질문 수정 - 기존 질문을 수정할순 없고, 질문의 추가 생성/삭제가 가능한 기능")
     public ResponseEntity<SuccessResponseDto<List<FeedbackQuestionResponseDto>>> modifyFeedbackQuestion(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId,
         @RequestBody List<FeedbackQuestionModifyRequestDto> requestBody
     ){
@@ -68,7 +68,7 @@ public class FeedbackController {
     @PostMapping(CREATE_FEEDBACK_ANSWER)
     @Operation(summary = "피드백 답변 생성")
     public ResponseEntity<SuccessResponseDto<FeedbackAnswerCreateResponseDto>> createFeedbackAnswer(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId,
         @RequestBody List<FeedbackAnswerCreateRequestDto> requestBody
     ){
@@ -81,7 +81,7 @@ public class FeedbackController {
     @GetMapping(ANALYSIS_FEEDBACK)
     @Operation(summary = "피드백 분석")
     public ResponseEntity<SuccessResponseDto<List<FeedbackAnalysisResponseDto>>> analysisFeedback(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId
     ){
         log.info("/feedback/controller : 피드백 분석");

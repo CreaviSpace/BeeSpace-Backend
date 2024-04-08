@@ -1,15 +1,5 @@
 package com.creavispace.project.domain.comment.service;
 
-import java.awt.Cursor;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
 import com.creavispace.project.domain.comment.dto.response.CommentDeleteResponseDto;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
@@ -23,6 +13,7 @@ import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.project.entity.Project;
@@ -31,10 +22,17 @@ import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.recruit.repository.RecruitRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -108,7 +106,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommentResponseDto> createComment(Long memberId, Long postId, PostType postType, CommentRequestDto dto) {
+    public SuccessResponseDto<CommentResponseDto> createComment(String memberId, Long postId, PostType postType, CommentRequestDto dto) {
         CommentResponseDto data = null;
 
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -190,7 +188,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommentResponseDto> modifyComment(Long memberId, Long commentId, PostType postType, CommentRequestDto dto) {
+    public SuccessResponseDto<CommentResponseDto> modifyComment(String memberId, Long commentId, PostType postType, CommentRequestDto dto) {
         CommentResponseDto data = null;
 
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -201,7 +199,7 @@ public class CommentServiceImpl implements CommentService {
             case "PROJECT":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
-                if(memberId != projectComment.getMember().getId() && !member.getRole().equals("Administrator")){
+                if(memberId.equals(projectComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -221,7 +219,7 @@ public class CommentServiceImpl implements CommentService {
             case "RECRUIT":
                 RecruitComment recruitComment = recruitCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
-                if(memberId != recruitComment.getMember().getId() && !member.getRole().equals("Administrator")){
+                if(memberId.equals(recruitComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -241,7 +239,7 @@ public class CommentServiceImpl implements CommentService {
             case "COMMUNITY":
                 CommunityComment communityComment = communityCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
-                if(memberId != communityComment.getMember().getId() && !member.getRole().equals("Administrator")){
+                if(memberId.equals(communityComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -269,7 +267,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommentDeleteResponseDto> deleteComment(Long memberId, Long commentId, PostType postType) {
+    public SuccessResponseDto<CommentDeleteResponseDto> deleteComment(String memberId, Long commentId, PostType postType) {
         CommentDeleteResponseDto data = null;
 
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -279,7 +277,7 @@ public class CommentServiceImpl implements CommentService {
             case "PROJECT":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                 
-                if(memberId != projectComment.getMember().getId() && !member.getRole().equals("Administrator")){
+                if(memberId.equals(projectComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -290,7 +288,7 @@ public class CommentServiceImpl implements CommentService {
             case "RECRUIT":
                 RecruitComment recruitComment = recruitCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                 
-                if(memberId != recruitComment.getMember().getId() && !member.getRole().equals("Administrator")){
+                if(memberId.equals(recruitComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -301,7 +299,7 @@ public class CommentServiceImpl implements CommentService {
             case "COMMUNITY":
                 CommunityComment communityComment = communityCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                     
-                if(memberId != communityComment.getMember().getId() && !member.getRole().equals("Administrator")){
+                if(memberId.equals(communityComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -320,7 +318,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public SuccessResponseDto<List<CommentResponseDto>> readMyContentsList(Long memberId, Integer page, Integer size,
+    public SuccessResponseDto<List<CommentResponseDto>> readMyContentsList(String memberId, Integer page, Integer size,
                                                                            String postType, String sortType) {
         Pageable pageRequest = pageable(page, size, sortType);
         List<CommentResponseDto> data;

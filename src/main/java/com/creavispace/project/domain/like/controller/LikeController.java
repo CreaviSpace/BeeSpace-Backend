@@ -36,7 +36,7 @@ public class LikeController {
     @PostMapping(LIKE_TOGGLE)
     @Operation(summary = "좋아요 토글 기능")
     public ResponseEntity<SuccessResponseDto<LikeResponseDto>> likeToggle(
-        @AuthenticationPrincipal Long memberId,    
+        @AuthenticationPrincipal String memberId,
         @RequestParam(value = "postId") Long postId,
         @RequestParam(value = "postType") String postType
     ) {
@@ -48,7 +48,7 @@ public class LikeController {
     @GetMapping(READ_LIKE)
     @Operation(summary = "좋아요 상태 조회 기능")
     public ResponseEntity<SuccessResponseDto<LikeResponseDto>> readLike(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam(value = "postId") Long postId,
         @RequestParam(value = "postType") String postType
     ){

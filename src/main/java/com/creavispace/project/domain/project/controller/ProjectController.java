@@ -50,7 +50,7 @@ public class ProjectController {
     @PostMapping(CREATE_PROJECT)
     @Operation(summary = "프로젝트 게시글 생성")
     public ResponseEntity<SuccessResponseDto<ProjectResponseDto>> createProject(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestBody ProjectRequestDto dto
     ) {
         log.info("/project/controller : 프로젝트 게시글 생성");
@@ -60,7 +60,7 @@ public class ProjectController {
     @PutMapping(MODIFY_PROJECT)
     @Operation(summary = "프로젝트 게시글 수정")
     public ResponseEntity<SuccessResponseDto<ProjectResponseDto>> modifyProject(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("projectId") Long projectId, 
         @RequestBody ProjectRequestDto dto
     ) {
@@ -71,7 +71,7 @@ public class ProjectController {
     @DeleteMapping(DELETE_PROJECT)
     @Operation(summary = "프로젝트 게시글 삭제")
     public ResponseEntity<SuccessResponseDto<ProjectDeleteResponseDto>> deleteProject(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("projectId") Long projectId
     ) {
         log.info("/project/controller : 프로젝트 게시글 삭제");
@@ -103,7 +103,7 @@ public class ProjectController {
     @GetMapping(READ_PROJECT)
     @Operation(summary = "프로젝트 게시글 디테일")
     public ResponseEntity<SuccessResponseDto<ProjectReadResponseDto>> readProject(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("projectId") Long projectId,
         HttpServletRequest request
     ) {

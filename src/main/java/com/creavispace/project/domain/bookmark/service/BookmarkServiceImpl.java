@@ -1,6 +1,5 @@
 package com.creavispace.project.domain.bookmark.service;
 
-import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.entity.Bookmark;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,7 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<BookmarkResponseDto> bookmarkToggle(Long memberId, Long postId, PostType postType) {
+    public SuccessResponseDto<BookmarkResponseDto> bookmarkToggle(String memberId, Long postId, PostType postType) {
         BookmarkResponseDto data= null;
         String message;
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -122,7 +121,7 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     @Override
-    public SuccessResponseDto<BookmarkResponseDto> readBookmark(Long memberId, Long postId, PostType postType) {
+    public SuccessResponseDto<BookmarkResponseDto> readBookmark(String memberId, Long postId, PostType postType) {
         BookmarkResponseDto data;
 
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
@@ -170,7 +169,7 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     @Override
-    public SuccessResponseDto<List<Bookmark>> readMyBookmark(Long memberId, Integer page, Integer size, String postType, String sortType) {
+    public SuccessResponseDto<List<Bookmark>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType) {
         Pageable pageRequest = pageable(page, size, sortType);
         List<Bookmark> bookmarks;
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
