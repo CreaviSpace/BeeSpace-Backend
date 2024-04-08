@@ -380,11 +380,11 @@ public class CommentServiceImpl implements CommentService {
 
     private static PageRequest pageable(Integer page, Integer size, String sortType) {
         if (sortType.equalsIgnoreCase("asc")) {
-            return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").ascending());
+            return PageRequest.of(page - 1, size, Sort.by("createdDate").ascending());
         }
         if (sortType.equalsIgnoreCase("desc")) {
-            return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").descending());
+            return PageRequest.of(page - 1, size, Sort.by("createdDate").descending());
         }
-        return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").descending());
+        return PageRequest.of(page - 1, size, Sort.by("createdDate").descending());
     }
 }
