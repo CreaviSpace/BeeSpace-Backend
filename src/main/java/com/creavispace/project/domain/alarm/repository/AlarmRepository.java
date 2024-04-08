@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
-    public List<Alarm> findByMemberId(Long memberId);
+    public List<Alarm> findByMemberId(String memberId);
 }

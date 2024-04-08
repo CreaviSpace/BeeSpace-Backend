@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.creavispace.project.domain.member.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -57,7 +58,7 @@ public class RecruitServiceImpl implements RecruitService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<RecruitResponseDto> createRecruit(Long memberId, RecruitRequestDto dto) {
+    public SuccessResponseDto<RecruitResponseDto> createRecruit(String memberId, RecruitRequestDto dto) {
         RecruitResponseDto data = null;
         RecruitCategory category = CustomValueOf.valueOf(RecruitCategory.class, dto.getCategory(), GlobalErrorCode.NOT_FOUND_RECRUIT_CATEGORY);
         RecruitContactWay contactWay = CustomValueOf.valueOf(RecruitContactWay.class, dto.getContactWay(), GlobalErrorCode.NOT_FOUND_RECRUIT_CONTACTWAY);
@@ -172,7 +173,7 @@ public class RecruitServiceImpl implements RecruitService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<RecruitResponseDto> modifyRecruit(Long memberId, Long recruitId, RecruitRequestDto dto) {
+    public SuccessResponseDto<RecruitResponseDto> modifyRecruit(String memberId, Long recruitId, RecruitRequestDto dto) {
         RecruitResponseDto data = null;
         List<RecruitPositionRequestDto> positionDtos = dto.getPositions();
         List<RecruitTechStackRequestDto> techStackDtos = dto.getTechStacks();
@@ -184,7 +185,7 @@ public class RecruitServiceImpl implements RecruitService {
         Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
 
         // 수정 권한이 있는지
-        if(recruit.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(recruit.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -283,7 +284,7 @@ public class RecruitServiceImpl implements RecruitService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<RecruitDeleteResponseDto> deleteRecruit(Long memberId, Long recruitId) {
+    public SuccessResponseDto<RecruitDeleteResponseDto> deleteRecruit(String memberId, Long recruitId) {
         RecruitDeleteResponseDto data = null;
 
         // JWT에 저장된 회원이 존재하는지
@@ -293,7 +294,7 @@ public class RecruitServiceImpl implements RecruitService {
         Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
 
         // 삭제할 권한이 있는지
-        if(recruit.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(recruit.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -360,7 +361,7 @@ public class RecruitServiceImpl implements RecruitService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<RecruitReadResponseDto> readRecruit(Long memberId, Long recruitId, HttpServletRequest request) {
+    public SuccessResponseDto<RecruitReadResponseDto> readRecruit(String memberId, Long recruitId, HttpServletRequest request) {
         RecruitReadResponseDto data = null;
         Optional<Recruit> optionalRecruit;
 
@@ -521,7 +522,7 @@ public class RecruitServiceImpl implements RecruitService {
     }
 
     @Override
-    public SuccessResponseDto<List<RecruitListReadResponseDto>> readMyRecruitList(Long memberId, Integer size,
+    public SuccessResponseDto<List<RecruitListReadResponseDto>> readMyRecruitList(String memberId, Integer size,
                                                                                   Integer page, String sortType) {
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<Recruit> pageable;
@@ -558,7 +559,7 @@ public class RecruitServiceImpl implements RecruitService {
         return new SuccessResponseDto<>(true,"모집 게시글 리스트 조회가 완료되었습니다.", reads);
     }
 
-    private Page<Recruit> getRecruit(Long memberId, String sortType, Pageable pageRequest) {
+    private Page<Recruit> getRecruit(String memberId, String sortType, Pageable pageRequest) {
         Page<Recruit> pageable = recruitRepository.findByMemberIdAndStatusTrueOrderByCreatedDateAsc(memberId, pageRequest);
         if (sortType.toLowerCase().equals("asc")) {
             pageable = recruitRepository.findByMemberIdAndStatusTrueOrderByCreatedDateAsc(memberId, pageRequest);

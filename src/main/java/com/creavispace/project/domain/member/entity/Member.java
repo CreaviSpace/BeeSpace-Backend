@@ -5,24 +5,12 @@ import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.dto.request.MemberSaveRequestDto;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 //이메일
 //비밀번호
@@ -46,9 +34,8 @@ import lombok.ToString;
 public class Member extends BaseTimeEntity {
     @Id
     @Column(name = "member_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     //회원 관련 정보와 로그인 정보는 분리
-    private Long id;
+    private String id;
 
     @Column(nullable = false)
     @JsonBackReference

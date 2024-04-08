@@ -47,7 +47,7 @@ public class CommunityController {
     @PostMapping(CREATE_COMMUNITY)
     @Operation(summary = "커뮤니티 게시글 생성")
     public ResponseEntity<SuccessResponseDto<CommunityResponseDto>> createCommunity(
-        @AuthenticationPrincipal Long memberId, 
+        @AuthenticationPrincipal String memberId,
         @RequestBody CommunityRequestDto requestBody
     ){
         log.info("/community/controller : 커뮤니티 게시글 생성");
@@ -57,7 +57,7 @@ public class CommunityController {
     @PutMapping(MODIFY_COMMUNITY)
     @Operation(summary = "커뮤니티 게시글 수정")
     public ResponseEntity<SuccessResponseDto<CommunityResponseDto>> modifyCommunity(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("communityId") Long communityId, 
         @RequestBody CommunityRequestDto requestBody
     ){
@@ -68,7 +68,7 @@ public class CommunityController {
     @DeleteMapping(DELETE_COMMUNITY)
     @Operation(summary = "커뮤니티 게시글 삭제")
     public ResponseEntity<SuccessResponseDto<CommunityDeleteResponseDto>> deleteCommunity(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("communityId") Long communityId
     ){
         log.info("/community/controller : 커뮤니티 게시글 삭제");
@@ -78,7 +78,7 @@ public class CommunityController {
     @GetMapping(READ_COMMUNITY)
     @Operation(summary = "커뮤니티 게시글 디테일")
     public ResponseEntity<SuccessResponseDto<CommunityReadResponseDto>> readCommunity(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("communityId") Long communityId,
         HttpServletRequest request
     ){

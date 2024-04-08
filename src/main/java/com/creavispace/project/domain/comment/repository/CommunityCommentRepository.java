@@ -12,7 +12,7 @@ import com.creavispace.project.domain.comment.entity.CommunityComment;
 public interface CommunityCommentRepository extends JpaRepository<CommunityComment, Long>{
     public List<CommunityComment> findByCommunityId(Long communityId);
 
-    List<CommunityComment> findByCommunityId(Long memberId, Pageable pageRequest);
+    List<CommunityComment> findByCommunityId(String memberId, Pageable pageRequest);
 
-    List<CommunityComment> findByMemberId(Long memberId, Pageable pageRequest);
+    List<CommunityComment> findByMemberId(String memberId, Pageable pageRequest);
 }

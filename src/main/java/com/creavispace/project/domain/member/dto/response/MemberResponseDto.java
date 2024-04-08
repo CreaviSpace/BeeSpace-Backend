@@ -1,10 +1,10 @@
 package com.creavispace.project.domain.member.dto.response;
 
 import com.creavispace.project.domain.member.entity.Member;
-import java.util.List;
-import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.List;
 
 /**
  * 사용자가 조회 할 수 있는 데이터
@@ -16,7 +16,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class MemberResponseDto {
-    private Long memberId;
+    private String memberId;
     private String profileUrl;
     private String memberNickname;
     private String idTag;

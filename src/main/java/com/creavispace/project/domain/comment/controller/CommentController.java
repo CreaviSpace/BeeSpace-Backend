@@ -46,7 +46,7 @@ public class CommentController {
     @PostMapping(CREATE_COMMENT)
     @Operation(summary = "댓글 등록")
     public ResponseEntity<SuccessResponseDto<CommentResponseDto>> createComment(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam("postId") Long postId,
         @RequestParam("postType") String postType,
         @RequestBody CommentRequestDto requestBody
@@ -61,7 +61,7 @@ public class CommentController {
     @PutMapping(MODIFY_COMMENT)
     @Operation(summary = "댓글 수정")
     public ResponseEntity<SuccessResponseDto<CommentResponseDto>> modifyComment(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("commentId") Long commentId,
         @RequestParam("postType") String postType,
         @RequestBody CommentRequestDto requestBody
@@ -74,7 +74,7 @@ public class CommentController {
     @DeleteMapping(DELETE_COMMENT)
     @Operation(summary = "댓글 삭제")
     public ResponseEntity<SuccessResponseDto<CommentDeleteResponseDto>> deleteComment(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("commentId") Long commentId,
         @RequestParam("postType") String postType
     ){

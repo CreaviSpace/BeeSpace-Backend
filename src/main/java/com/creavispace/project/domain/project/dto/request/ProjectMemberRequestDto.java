@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectMemberRequestDto {
-    private Long memberId;
+    private String memberId;
     // enum으로 관리 변경
     private String position;
 }

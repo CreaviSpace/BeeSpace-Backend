@@ -1,19 +1,19 @@
 package com.creavispace.project.domain.bookmark.repository;
 
-import java.util.List;
+import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
+import java.util.List;
 
 @Repository
 public interface RecruitBookmarkRepository extends JpaRepository<RecruitBookmark, Long> {
-    public RecruitBookmark findByRecruitIdAndMemberId(Long recruitId, Long memberId);
+    public RecruitBookmark findByRecruitIdAndMemberId(Long recruitId, String memberId);
 
-    List<RecruitBookmark> findByMemberId(Long memberId, Pageable pageable);
+    List<RecruitBookmark> findByMemberId(String memberId, Pageable pageable);
 
-    List<RecruitBookmark> findByMemberIdOrderByContentsCreatedDateDesc(Long memberId, Pageable pageRequest);
+    List<RecruitBookmark> findByMemberIdOrderByContentsCreatedDateDesc(String memberId, Pageable pageRequest);
 
-    List<RecruitBookmark> findByMemberIdOrderByContentsCreatedDateAsc(Long memberId, Pageable pageRequest);
+    List<RecruitBookmark> findByMemberIdOrderByContentsCreatedDateAsc(String memberId, Pageable pageRequest);
 }

@@ -1,35 +1,21 @@
 package com.creavispace.project.domain.recruit.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
-import com.creavispace.project.domain.recruit.dto.response.DeadLineRecruitListReadResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitDeleteResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitListReadResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitReadResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitResponseDto;
+import com.creavispace.project.domain.recruit.dto.response.*;
 import com.creavispace.project.domain.recruit.service.RecruitService;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
-
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,7 +35,7 @@ public class RecruitController {
     @PostMapping(CREATE_RECRUIT)
     @Operation(summary = "모집 게시글 생성")
     public ResponseEntity<SuccessResponseDto<RecruitResponseDto>> createRecruit(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestBody RecruitRequestDto requestBody
     ){
         log.info("/recruit/controller : 모집 게시글 생성");
@@ -59,7 +45,7 @@ public class RecruitController {
     @PutMapping(MODIFY_RECRUIT)
     @Operation(summary = "모집 게시글 수정")
     public ResponseEntity<SuccessResponseDto<RecruitResponseDto>> modifyRecruit(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("recruitId") Long recruitId, 
         @RequestBody RecruitRequestDto requestBody
     ){
@@ -70,7 +56,7 @@ public class RecruitController {
     @DeleteMapping(DELETE_RECRUIT)
     @Operation(summary = "모집 게시글 삭제")
     public ResponseEntity<SuccessResponseDto<RecruitDeleteResponseDto>> deleteRecruit(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("recruitId") Long recruitId
     ){
         log.info("/recruit/controller : 모집 게시글 삭제");
@@ -95,7 +81,7 @@ public class RecruitController {
     @GetMapping(READ_RECRUIT)
     @Operation(summary = "모집 게시글 디테일")
     public ResponseEntity<SuccessResponseDto<RecruitReadResponseDto>> readRecruit(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("recruitId") Long recruitId,
         HttpServletRequest request
     ){

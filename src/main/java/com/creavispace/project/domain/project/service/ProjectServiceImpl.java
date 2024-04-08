@@ -1,35 +1,16 @@
 package com.creavispace.project.domain.project.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
+import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
-import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.domain.project.dto.request.ProjectLinkRequestDto;
 import com.creavispace.project.domain.project.dto.request.ProjectMemberRequestDto;
+import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.domain.project.dto.request.ProjectTechStackRequestDto;
-import com.creavispace.project.domain.project.dto.response.ProjectResponseDto;
-import com.creavispace.project.domain.project.dto.response.PopularProjectReadResponseDto;
-import com.creavispace.project.domain.project.dto.response.ProjectDeleteResponseDto;
-import com.creavispace.project.domain.project.dto.response.ProjectLinkResponseDto;
-import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
-import com.creavispace.project.domain.project.dto.response.ProjectMemberResponseDto;
-import com.creavispace.project.domain.project.dto.response.ProjectPositionResponseDto;
-import com.creavispace.project.domain.project.dto.response.ProjectReadResponseDto;
-import com.creavispace.project.domain.project.dto.response.ProjectTechStackResponseDto;
+import com.creavispace.project.domain.project.dto.response.*;
 import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.project.entity.ProjectLink;
 import com.creavispace.project.domain.project.entity.ProjectMember;
@@ -43,11 +24,17 @@ import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -63,7 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<ProjectResponseDto> createProject(Long memberId, ProjectRequestDto dto) {
+    public SuccessResponseDto<ProjectResponseDto> createProject(String memberId, ProjectRequestDto dto) {
         ProjectResponseDto data = null;
         List<ProjectMemberRequestDto> memberDtos = dto.getMemberDtos();
         List<ProjectTechStackRequestDto> techStackDtos = dto.getTechStackDtos();
@@ -209,7 +196,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<ProjectResponseDto> modifyProject(Long memberId, Long projectId, ProjectRequestDto dto) {
+    public SuccessResponseDto<ProjectResponseDto> modifyProject(String memberId, Long projectId, ProjectRequestDto dto) {
         ProjectResponseDto data = null;
         List<ProjectMemberRequestDto> memberDtos = dto.getMemberDtos();
         List<ProjectTechStackRequestDto> techStackDtos = dto.getTechStackDtos();
@@ -224,7 +211,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 수정할 권한이 있는지
-        if(project.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -357,7 +344,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<ProjectDeleteResponseDto> deleteProject(Long memberId, Long projectId) {
+    public SuccessResponseDto<ProjectDeleteResponseDto> deleteProject(String memberId, Long projectId) {
         ProjectDeleteResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -368,7 +355,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 삭제할 권한이 있는지
-        if(project.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -441,7 +428,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public SuccessResponseDto<ProjectReadResponseDto> readProject(Long memberId, Long projectId, HttpServletRequest request) {
+    public SuccessResponseDto<ProjectReadResponseDto> readProject(String memberId, Long projectId, HttpServletRequest request) {
         ProjectReadResponseDto data = null;
         Optional<Project> optionalProject;
 
@@ -562,7 +549,7 @@ public class ProjectServiceImpl implements ProjectService {
         return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", reads);
     }
     @Override
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(Long memberId, Integer size,
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(String memberId, Integer size,
                                                                                   Integer page, String sortType) {
         Pageable pageRequest = PageRequest.of(page - 1, size);
         Page<Project> pageable = getProjects(memberId, sortType, pageRequest);
@@ -578,7 +565,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectFeedBackList(Long memberId, Integer size,
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectFeedBackList(String memberId, Integer size,
                                                                                           Integer page,
                                                                                           String sortType) {
         Pageable pageRequest = PageRequest.of(page - 1, size);
@@ -595,7 +582,7 @@ public class ProjectServiceImpl implements ProjectService {
         return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", reads);
     }
 
-    private Page<Project> getProjects(Long memberId, String sortType, Pageable pageRequest) {
+    private Page<Project> getProjects(String memberId, String sortType, Pageable pageRequest) {
         Page<Project> pageable;
         if (sortType.equalsIgnoreCase("asc")) {
             pageable = projectRepository.findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(pageRequest, memberId);

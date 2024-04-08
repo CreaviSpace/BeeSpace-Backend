@@ -36,7 +36,7 @@ public class LikeServiceImpl implements LikeService{
 
     @Override
     @Transactional
-    public SuccessResponseDto<LikeResponseDto> likeToggle(Long memberId, Long postId, PostType postType) {
+    public SuccessResponseDto<LikeResponseDto> likeToggle(String memberId, Long postId, PostType postType) {
         LikeResponseDto data = null;
         String message;
 
@@ -92,7 +92,7 @@ public class LikeServiceImpl implements LikeService{
     }
 
     @Override
-    public SuccessResponseDto<LikeResponseDto> readLike(Long memberId, Long postId, PostType postType) {
+    public SuccessResponseDto<LikeResponseDto> readLike(String memberId, Long postId, PostType postType) {
         LikeResponseDto data = null;
 
         // 회원이 존재하는지
@@ -129,11 +129,11 @@ public class LikeServiceImpl implements LikeService{
             case "PROJECT":
                 likeCount = projectLikeRepository.countByProjectId(postId);
                 break;
-        
+
             case "COMMUNITY":
                 likeCount = communityLikeRepository.countByCommunityId(postId);
                 break;
-        
+
             default:
                 throw new CreaviCodeException(GlobalErrorCode.TYPE_NOT_FOUND);
         }

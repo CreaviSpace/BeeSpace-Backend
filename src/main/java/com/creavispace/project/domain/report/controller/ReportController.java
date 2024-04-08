@@ -29,7 +29,7 @@ public class ReportController {
     @PostMapping(CREATE_REPORT)
     @Operation(summary = "신고하기")
     public ResponseEntity<SuccessResponseDto<ReportResponseDto>> createReport(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestBody ReportRequestDto requestBody
     ){
         log.info("/report/controller : 신고하기");

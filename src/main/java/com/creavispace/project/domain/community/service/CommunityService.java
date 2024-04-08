@@ -1,27 +1,25 @@
 package com.creavispace.project.domain.community.service;
 
-import com.creavispace.project.domain.member.entity.Member;
-import java.util.List;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.common.dto.type.OrderBy;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
-import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
-
-import jakarta.servlet.http.HttpServletRequest;
-
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
+import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
+import com.creavispace.project.domain.member.entity.Member;
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 public interface CommunityService {
-    public SuccessResponseDto<CommunityResponseDto> createCommunity(Long memberId, CommunityRequestDto requestBody);
-    public SuccessResponseDto<CommunityResponseDto> modifyCommunity(Long memberId, Long communityId, CommunityRequestDto requestBody);
-    public SuccessResponseDto<CommunityDeleteResponseDto> deleteCommunity(Long memberId, Long communityId);
-    public SuccessResponseDto<CommunityReadResponseDto> readCommunity(Long memberId, Long communityId, HttpServletRequest request);
+    public SuccessResponseDto<CommunityResponseDto> createCommunity(String memberId, CommunityRequestDto requestBody);
+    public SuccessResponseDto<CommunityResponseDto> modifyCommunity(String memberId, Long communityId, CommunityRequestDto requestBody);
+    public SuccessResponseDto<CommunityDeleteResponseDto> deleteCommunity(String memberId, Long communityId);
+    public SuccessResponseDto<CommunityReadResponseDto> readCommunity(String memberId, Long communityId, HttpServletRequest request);
     public SuccessResponseDto<List<CommunityResponseDto>> readCommunityList(Integer size, Integer page, CommunityCategory category, String hashTag, OrderBy orderby);
 
     //ky
-     SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(Long memberId, Integer size, Integer page, String orderby);
+     SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(String memberId, Integer size, Integer page, String orderby);
      SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(Member member, Integer size, Integer page, String orderby);
 }

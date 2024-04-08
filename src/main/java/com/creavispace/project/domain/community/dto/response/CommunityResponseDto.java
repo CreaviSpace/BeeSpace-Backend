@@ -1,14 +1,13 @@
 package com.creavispace.project.domain.community.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -18,7 +17,7 @@ public class CommunityResponseDto implements SearchListReadResponseDto{
     private Long id;
     private String postType;
     private String category;
-    private Long memberId;
+    private String memberId;
     private String memberNickName;
     private String memberProfile;
     private Integer viewCount;

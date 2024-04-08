@@ -1,19 +1,13 @@
 package com.creavispace.project.domain.community.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.common.dto.type.OrderBy;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
+import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
+import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
+import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.community.entity.CommunityHashTag;
@@ -21,20 +15,24 @@ import com.creavispace.project.domain.community.repository.CommunityHashTagRepos
 import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.hashTag.entity.HashTag;
 import com.creavispace.project.domain.hashTag.repository.HashTagRepository;
+import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
-import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
-import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,7 +46,7 @@ public class CommunityServiceImpl implements CommunityService{
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommunityResponseDto> createCommunity(Long memberId, CommunityRequestDto dto) {
+    public SuccessResponseDto<CommunityResponseDto> createCommunity(String memberId, CommunityRequestDto dto) {
         CommunityResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
@@ -127,7 +125,7 @@ public class CommunityServiceImpl implements CommunityService{
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommunityResponseDto> modifyCommunity(Long memberId, Long communityId,
+    public SuccessResponseDto<CommunityResponseDto> modifyCommunity(String memberId, Long communityId,
         CommunityRequestDto dto) {
         CommunityResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
@@ -137,7 +135,7 @@ public class CommunityServiceImpl implements CommunityService{
         Community community = communityRepository.findById(communityId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
 
         // 수정 권한이 있는지
-        if(community.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(community.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -205,7 +203,7 @@ public class CommunityServiceImpl implements CommunityService{
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommunityDeleteResponseDto> deleteCommunity(Long memberId, Long communityId) {
+    public SuccessResponseDto<CommunityDeleteResponseDto> deleteCommunity(String memberId, Long communityId) {
         CommunityDeleteResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
@@ -214,7 +212,7 @@ public class CommunityServiceImpl implements CommunityService{
         Community community = communityRepository.findById(communityId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
 
         // 삭제할 권한이 있는지
-        if(community.getMember().getId() != memberId && !member.getRole().equals("Administrator")){
+        if(memberId.equals(community.getMember().getId()) && !member.getRole().equals("Administrator")){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -235,7 +233,7 @@ public class CommunityServiceImpl implements CommunityService{
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommunityReadResponseDto> readCommunity(Long memberId, Long communityId, HttpServletRequest request) {
+    public SuccessResponseDto<CommunityReadResponseDto> readCommunity(String memberId, Long communityId, HttpServletRequest request) {
         CommunityReadResponseDto data = null;
         Optional<Community> optionalCommunity;
         // JWT 회원과 커뮤니티 게시글 작성자와 일치하는지
@@ -403,7 +401,7 @@ public class CommunityServiceImpl implements CommunityService{
     }
 
     @Override
-    public SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(Long memberId, Integer size, Integer page,
+    public SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(String memberId, Integer size, Integer page,
                                                                               String orderby) {
         Pageable pageRequest = PageRequest.of(page-1, size);
 
@@ -446,7 +444,7 @@ public class CommunityServiceImpl implements CommunityService{
         return null;
     }
 
-    private Page<Community> getCommunities(Long memberId, String orderby, Pageable pageRequest) {
+    private Page<Community> getCommunities(String memberId, String orderby, Pageable pageRequest) {
         Page<Community> pageable = communityRepository.findAllByMemberIdAndStatusTrueOrderByCreatedDateAsc(memberId, pageRequest);
         if (orderby.toLowerCase().equals("asc")) {
             pageable = communityRepository.findAllByMemberIdAndStatusTrueOrderByCreatedDateAsc(memberId, pageRequest);

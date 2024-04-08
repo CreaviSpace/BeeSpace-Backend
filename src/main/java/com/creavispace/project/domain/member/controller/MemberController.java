@@ -18,17 +18,15 @@ import com.creavispace.project.domain.recruit.service.RecruitService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static com.creavispace.project.global.util.UsableConst.*;
+import java.util.List;
+
+import static com.creavispace.project.global.util.UsableConst.MEMBER_ID;
+import static com.creavispace.project.global.util.UsableConst.SORT_TYPE;
 
 @RestController
 @RequestMapping("/member")
@@ -48,7 +46,7 @@ public class MemberController {
 
     @GetMapping("/read/profile")
     @Operation(summary = "사용자 아이디로 사용자 프로필 조회")
-    public MemberResponseDto readMember(@RequestParam(MEMBER_ID) Long memberId) {
+    public MemberResponseDto readMember(@RequestParam(MEMBER_ID) String memberId) {
         System.out.println("MemberController.readMember");
         MemberResponseDto member = memberService.findById(memberId);
         return member;
@@ -57,7 +55,7 @@ public class MemberController {
     @GetMapping("/read/contents/project")
     @Operation(summary = "사용자 아이디와 일치하는 프로젝트 게시물 조회")
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readMemberProjectContents(
-            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam(SORT_TYPE) String sortType) {
         SuccessResponseDto<List<ProjectListReadResponseDto>> memberProjectContents = projectService.readMyProjectList(
                 memberId, size, page, sortType);
@@ -67,7 +65,7 @@ public class MemberController {
     @GetMapping("/read/contents/recruit")
     @Operation(summary = "사용자 아이디와 일치하는 모집 게시물 조회")
     public ResponseEntity<SuccessResponseDto<List<RecruitListReadResponseDto>>> readMemberRecruitContents(
-            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam(SORT_TYPE) String sortType) {
 
         SuccessResponseDto<List<RecruitListReadResponseDto>> memberRecruitContents = recruitService.readMyRecruitList(
@@ -79,7 +77,7 @@ public class MemberController {
     @GetMapping("/read/contents/community")
     @Operation(summary = "사용자 아이디와 일치하는 커뮤니티 게시물 조회")
     public ResponseEntity<SuccessResponseDto<List<CommunityResponseDto>>> readMemberCommunityContents(
-            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam(SORT_TYPE) String sortType) {
 
         SuccessResponseDto<List<CommunityResponseDto>> memberCommunityContents = communityService.readMyCommunityList(
@@ -90,7 +88,7 @@ public class MemberController {
     @GetMapping("/read/bookmark")
     @Operation(summary = " 사용자 아이디로 사용자가 북마크한 게시물 검색, sortType = asc or desc 대 소문자 구분 안함")
     public ResponseEntity<SuccessResponseDto<List<Bookmark>>> readMemberBookmarkContents(
-            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam String category, @RequestParam(SORT_TYPE) String sortType) throws JsonProcessingException {
         SuccessResponseDto<List<Bookmark>> listSuccessResponseDto = bookmarkService.readMyBookmark(memberId, page, size,
                 category, sortType);
@@ -101,7 +99,7 @@ public class MemberController {
     @GetMapping("/read/feedback")
     @Operation(summary = "사용자 아이디로 사용자 피드백 조회")
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readMemberFeedbackContents(
-            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam(SORT_TYPE) String sortType) {
         SuccessResponseDto<List<ProjectListReadResponseDto>> memberProjectContents = projectService.readMyProjectFeedBackList(
                 memberId, size, page, sortType);
@@ -112,7 +110,7 @@ public class MemberController {
     @GetMapping("/read/comment")
     @Operation(summary = "사용자 아이디로 사용자 댓글 조회")
     public ResponseEntity<SuccessResponseDto<List<CommentResponseDto>>> readMemberComment(
-            @RequestParam(MEMBER_ID) Long memberId, @RequestParam Integer page, @RequestParam Integer size,
+            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam String category, @RequestParam(SORT_TYPE) String sortType) {
         SuccessResponseDto<List<CommentResponseDto>> listSuccessResponseDto = commentService.readMyContentsList(
                 memberId,

@@ -26,7 +26,7 @@ public class AlarmController {
     @GetMapping(READ_ALARM_LIST)
     @Operation(summary = "알림 리스트 조회")
     public ResponseEntity<SuccessResponseDto<List<AlarmResponseDto>>> readAlarmList(
-            @AuthenticationPrincipal Long memberId
+            @AuthenticationPrincipal String memberId
     ){
         log.info("/alarm/controller : 알림 리스트 조회");
         return ResponseEntity.ok().body(alarmService.readAlarmList(memberId));
@@ -35,7 +35,7 @@ public class AlarmController {
     @PutMapping(MODIFY_ALARM)
     @Operation(summary = "알림 읽음 처리")
     public ResponseEntity<SuccessResponseDto<AlarmResponseDto>> modifyAlarm(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @PathVariable("alarmId") Long alarmId
     ){
         log.info("/alarm/controller : 알림 읽음 처리");

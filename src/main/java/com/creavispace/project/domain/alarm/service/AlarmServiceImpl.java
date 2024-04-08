@@ -25,7 +25,7 @@ public class AlarmServiceImpl implements AlarmService{
     private final MemberRepository memberRepository;
 
     @Override
-    public SuccessResponseDto<AlarmResponseDto> createAlarm(Long memberId, String alarmType, PostType postType, Long postId) {
+    public SuccessResponseDto<AlarmResponseDto> createAlarm(String memberId, String alarmType, PostType postType, Long postId) {
         AlarmResponseDto data = null;
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -51,7 +51,7 @@ public class AlarmServiceImpl implements AlarmService{
     }
 
     @Override
-    public SuccessResponseDto<List<AlarmResponseDto>> readAlarmList(Long memberId) {
+    public SuccessResponseDto<List<AlarmResponseDto>> readAlarmList(String memberId) {
         List<AlarmResponseDto> data = null;
         if(!memberRepository.existsById(memberId)) throw new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND);
 
@@ -72,7 +72,7 @@ public class AlarmServiceImpl implements AlarmService{
     }
 
     @Override
-    public SuccessResponseDto<AlarmResponseDto> modifyAlarm(Long memberId, Long alarmId) {
+    public SuccessResponseDto<AlarmResponseDto> modifyAlarm(String memberId, Long alarmId) {
         AlarmResponseDto data = null;
 
         if(!memberRepository.existsById(memberId)) throw new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND);

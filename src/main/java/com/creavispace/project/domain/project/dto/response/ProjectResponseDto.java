@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ProjectResponseDto {
     private Long id;
     private String postType;
-    private Long memberId;
+    private String memberId;
     private String memberNickName;
     private String memberProfile;
     // enum 관리로 변경

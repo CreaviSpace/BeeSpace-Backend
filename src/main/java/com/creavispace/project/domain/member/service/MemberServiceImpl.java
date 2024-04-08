@@ -5,9 +5,6 @@ import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.mypage.dto.request.MyPageModifyRequestDto;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -53,7 +54,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberResponseDto findById(Long memberId) {
+    public MemberResponseDto findById(String memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow();
         MemberResponseDto dto = new MemberResponseDto(member);
         return dto;
@@ -84,7 +85,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Optional<Member> findByEmailAndLoginTypeAndMemberId(String memberEmail, String loginType, Long memberId) {
+    public Optional<Member> findByEmailAndLoginTypeAndMemberId(String memberEmail, String loginType, String memberId) {
         return memberRepository.findByMemberEmailAndLoginTypeAndId(memberEmail, loginType, memberId);
     }
 

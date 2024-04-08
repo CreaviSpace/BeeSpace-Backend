@@ -35,7 +35,7 @@ public class BookmarkController {
     @PostMapping(TOGGLE_BOOKMARK)
     @Operation(summary = "북마크 토글 기능")
     public ResponseEntity<SuccessResponseDto<BookmarkResponseDto>> bookmark(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam("postId") Long postId,
         @RequestParam("postType") String postType
     ) {
@@ -47,7 +47,7 @@ public class BookmarkController {
     @GetMapping(READ_BOOKMARK)
     @Operation(summary = "북마크 상태 조회 기능")
     public ResponseEntity<SuccessResponseDto<BookmarkResponseDto>> readBookmark(
-        @AuthenticationPrincipal Long memberId,
+        @AuthenticationPrincipal String memberId,
         @RequestParam("postId") Long postId,
         @RequestParam("postType") String postType
     ){

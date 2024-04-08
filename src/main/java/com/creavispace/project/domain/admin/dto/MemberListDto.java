@@ -2,20 +2,11 @@ package com.creavispace.project.domain.admin.dto;
 
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.util.List;
 import lombok.Getter;
 
 @Getter
 public class MemberListDto {
-    private Long id;
+    private String id;
     private String loginId;
     private String memberEmail;
     private String memberName;
