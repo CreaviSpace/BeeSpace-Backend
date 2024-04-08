@@ -19,7 +19,7 @@ import java.util.List;
 public class AlarmController {
 
     private static final String READ_ALARM_LIST = "";
-    private static final String MODIFY_ALARM = "";
+    private static final String MODIFY_ALARM = "/{alarmId}";
 
     private final AlarmService alarmService;
 

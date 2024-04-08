@@ -10,6 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 public class AlarmResponseDto {
     private Long id;
-    private String content;
+    private String alarmType;
+    private String postType;
+    private Long postId;
     private Alarm.readStatus readStatus;
 }
