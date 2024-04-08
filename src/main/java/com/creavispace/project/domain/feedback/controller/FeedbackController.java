@@ -74,7 +74,7 @@ public class FeedbackController {
     ){
         log.info("/feedback/controller : 피드백 답변 생성");
         SuccessResponseDto<FeedbackAnswerCreateResponseDto> response = feedbackService.createFeedbackAnswer(memberId, projectId, requestBody);
-        alarmService.createAlarm(memberId, PostType.PROJECT+"의 "+projectId+"번에 작성된 피드백이 있습니다.");
+        alarmService.createAlarm(memberId,"피드백" ,PostType.PROJECT, projectId);
         return ResponseEntity.ok().body(response);
     }
 

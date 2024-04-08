@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.alarm.entity;
 
+import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.entity.Member;
 import jakarta.persistence.*;
@@ -19,7 +20,12 @@ public class Alarm extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String content;
+    private String alarmType;
+
+    @Enumerated(EnumType.STRING)
+    private PostType postType;
+
+    private Long postId;
 
     @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)

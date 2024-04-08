@@ -4,6 +4,7 @@ import com.creavispace.project.domain.alarm.dto.response.AlarmResponseDto;
 import com.creavispace.project.domain.alarm.entity.Alarm;
 import com.creavispace.project.domain.alarm.repository.AlarmRepository;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
@@ -24,12 +25,14 @@ public class AlarmServiceImpl implements AlarmService{
     private final MemberRepository memberRepository;
 
     @Override
-    public SuccessResponseDto<AlarmResponseDto> createAlarm(Long memberId, String message) {
+    public SuccessResponseDto<AlarmResponseDto> createAlarm(Long memberId, String alarmType, PostType postType, Long postId) {
         AlarmResponseDto data = null;
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
         Alarm alarm = Alarm.builder()
-                .content(message)
+                .alarmType(alarmType)
+                .postType(postType)
+                .postId(postId)
                 .member(member)
                 .readStatus(Alarm.readStatus.UNREAD)
                 .build();
@@ -38,7 +41,9 @@ public class AlarmServiceImpl implements AlarmService{
 
         data = AlarmResponseDto.builder()
                 .id(alarm.getId())
-                .content(alarm.getContent())
+                .alarmType(alarmType)
+                .postType(postType.name())
+                .postId(postId)
                 .readStatus(alarm.getReadStatus())
                 .build();
         log.info("/alarm/service : createAlarm success data ={}", data);
@@ -55,7 +60,9 @@ public class AlarmServiceImpl implements AlarmService{
         data = alarms.stream()
                 .map(alarm -> AlarmResponseDto.builder()
                         .id(alarm.getId())
-                        .content(alarm.getContent())
+                        .alarmType(alarm.getAlarmType())
+                        .postType(alarm.getPostType().name())
+                        .postId(alarm.getPostId())
                         .readStatus(alarm.getReadStatus())
                         .build())
                 .collect(Collectors.toList());
@@ -76,10 +83,12 @@ public class AlarmServiceImpl implements AlarmService{
         alarmRepository.save(alarm);
 
         data = AlarmResponseDto.builder()
-                        .id(alarm.getId())
-                        .content(alarm.getContent())
-                        .readStatus(alarm.getReadStatus())
-                        .build();
+                .id(alarm.getId())
+                .alarmType(alarm.getAlarmType())
+                .postId(alarm.getPostId())
+                .postType(alarm.getPostType().name())
+                .readStatus(alarm.getReadStatus())
+                .build();
 
         log.info("/alarm/service : modifyAlarm success data = {}", data);
         return new SuccessResponseDto<>(true, "알림 읽음 처리가 완료되었습니다.", data);
