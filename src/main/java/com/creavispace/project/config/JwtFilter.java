@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +35,6 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-        request.getHeaderNames().asIterator().forEachRemaining(System.out::println);
 
         log.info("authorization = {}" , authorization);
         log.info("Headers.logintype = {}", request.getHeader("logintype"));
@@ -59,11 +57,11 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("인증 성공 authorization = {}", authorization);
 
         MemberJwtResponseDto responseDto = JwtUtil.getUserInfo(authorization, jwtSecret);
-        String memberIdTag = responseDto.memberIdTag();
+        String memberId = responseDto.memberId();
         String memberEmail = responseDto.memberEmail();
         String loginType = responseDto.loginType();
 
-        Member member = memberService.findByMemberIdTag(memberIdTag).orElseThrow();
+        Member member = memberService.findById(memberId);
         log.info("로그인 한 사용자 = {}, 로그인 타입 = {}",memberEmail, loginType);
 
         UsernamePasswordAuthenticationToken authenticationToken =

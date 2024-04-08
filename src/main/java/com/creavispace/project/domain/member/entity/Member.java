@@ -1,16 +1,14 @@
 package com.creavispace.project.domain.member.entity;
 
-import com.creavispace.project.config.auth.dto.OAuthAttributes;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.dto.request.MemberSaveRequestDto;
+import com.creavispace.project.domain.member.service.MemberService;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 //이메일
 //비밀번호
@@ -74,27 +72,14 @@ public class Member extends BaseTimeEntity {
     private boolean enabled;
 
     @JsonBackReference
-    private String idTag;
-    @JsonBackReference
     private String memberPosition;
     @JsonBackReference
     private Integer memberCareer;
     @JsonBackReference
     private List<String> interestedStack;
 
-    public Member(MemberSaveRequestDto memberSaveRequestDto) {
-        this.memberEmail = memberSaveRequestDto.getMemberEmail();
-        this.memberName = memberSaveRequestDto.getMemberName();
-        this.loginId = memberSaveRequestDto.getLoginId();
-        this.loginType = memberSaveRequestDto.getLoginType();
-        this.role = memberSaveRequestDto.getRole();
-        this.memberNickname = memberSaveRequestDto.getMemberNickname();
-        expired = false;
-        enabled = false;
-    }
-
-    public Member(MemberSaveRequestDto dto, OAuthAttributes oAuthAttributes) {
-        this.idTag = UUID.randomUUID().toString().substring(0,7);
+    public Member(MemberSaveRequestDto dto, MemberService memberService) {
+        this.id = memberService.createId();
         this.memberEmail = dto.getMemberEmail();
         this.memberName = dto.getMemberName();
         this.loginId = dto.getLoginId();

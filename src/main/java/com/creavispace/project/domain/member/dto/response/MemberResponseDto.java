@@ -15,24 +15,24 @@ import java.util.List;
  * */
 @Getter
 @ToString
-public class MemberResponseDto {
-    private String memberId;
-    private String profileUrl;
-    private String memberNickname;
-    private String idTag;
-    private Integer memberCareer;
-    private String memberPosition;
-    private String memberIntroduce;
-    private List<String> memberInterestedStack;
+public class MemberResponseDto  {
+    private final String memberId;
+    private final String profileUrl;
+    private final String memberNickname;
+    private final Integer memberCareer;
+    private final String memberPosition;
+    private final String memberIntroduce;
+    private final List<String> memberInterestedStack;
+    private final String message;
 
     public MemberResponseDto(Member member) {
         this.memberId = member.getId();
         this.profileUrl = member.getProfileUrl();
         this.memberNickname = member.getMemberNickname();
-        this.idTag = member.getIdTag();
         this.memberCareer = member.getMemberCareer();
         this.memberPosition = member.getMemberPosition();
         this.memberIntroduce = member.getMemberIntroduce();
         this.memberInterestedStack = member.getInterestedStack();
+        this.message = "데이터 조회 성공";
     }
 }

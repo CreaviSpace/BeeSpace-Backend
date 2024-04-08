@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,14 +43,14 @@ public class AdminController {
     private final CommunityService communityService;
 
     @PostMapping("/sanction")
-    public void sanctionMember(@RequestBody String memberIdTag, HttpServletRequest request) {
+    public void sanctionMember(@RequestBody String memberId, HttpServletRequest request) {
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
-        Member admin = memberRepository.findByIdTag(userInfo.memberIdTag()).orElseThrow();
+        Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
         if (!isAdmin(admin)) {
             return;
         }
-        Member member = memberRepository.findByIdTag(memberIdTag).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow();
         member.setExpired(true);
     }
 
@@ -100,7 +99,7 @@ public class AdminController {
     }
 
     private void deleteFactory(String category, Long id, MemberJwtResponseDto dto) {
-        Member member = memberRepository.findByIdTag(dto.memberIdTag()).orElseThrow();
+        Member member = memberRepository.findById(dto.memberId()).orElseThrow();
         boolean isAdmin = isAdmin(member);
         if (!isAdmin) {
             return;

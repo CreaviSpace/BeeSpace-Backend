@@ -10,6 +10,7 @@ import com.creavispace.project.domain.community.service.CommunityService;
 import com.creavispace.project.domain.feedback.service.FeedbackService;
 import com.creavispace.project.domain.member.dto.response.DataResponseDto;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
+import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.service.MemberService;
 import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
 import com.creavispace.project.domain.project.service.ProjectService;
@@ -46,10 +47,10 @@ public class MemberController {
 
     @GetMapping("/read/profile")
     @Operation(summary = "사용자 아이디로 사용자 프로필 조회")
-    public MemberResponseDto readMember(@RequestParam(MEMBER_ID) String memberId) {
+    public ResponseEntity<MemberResponseDto> readMember(@RequestParam(MEMBER_ID) String memberId) {
         System.out.println("MemberController.readMember");
-        MemberResponseDto member = memberService.findById(memberId);
-        return member;
+        Member member = memberService.findById(memberId);
+        return ResponseEntity.ok().body(new MemberResponseDto(member));
     }
 
     @GetMapping("/read/contents/project")
@@ -57,6 +58,7 @@ public class MemberController {
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readMemberProjectContents(
             @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam(SORT_TYPE) String sortType) {
+        System.out.println("MemberController.readMemberProjectContents");
         SuccessResponseDto<List<ProjectListReadResponseDto>> memberProjectContents = projectService.readMyProjectList(
                 memberId, size, page, sortType);
         return ResponseEntity.ok().body(memberProjectContents);
@@ -122,7 +124,7 @@ public class MemberController {
     @GetMapping("/search")
     @Operation(summary = "닉네임 또는 아이디 태그를 포함하는 사용자 검색")
     public DataResponseDto findMember(@RequestParam String search) {
-        List<MemberResponseDto> userData = memberService.findByMemberNicknameOrIdTagContaining(search);
+        List<MemberResponseDto> userData = memberService.findByMemberNicknameOrIdContaining(search);
 
         return new DataResponseDto(userData);
     }
