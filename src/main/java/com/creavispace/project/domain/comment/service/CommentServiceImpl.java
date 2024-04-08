@@ -343,7 +343,7 @@ public class CommentServiceImpl implements CommentService {
                 break;
 
             case "community":
-                List<CommunityComment> communityComments = communityCommentRepository.findByCommunityId(memberId, pageRequest);
+                List<CommunityComment> communityComments = communityCommentRepository.findByMemberId(memberId, pageRequest);
                 data = communityComments.stream()
                         .map(communityComment -> CommentResponseDto.builder()
                                 .contentsTitle(communityComment.getCommunity().getTitle())
@@ -358,7 +358,7 @@ public class CommentServiceImpl implements CommentService {
                 break;
 
             case "recruit":
-                List<RecruitComment> recruitComments = recruitCommentRepository.findByRecruitId(memberId, pageRequest);
+                List<RecruitComment> recruitComments = recruitCommentRepository.findByMemberId(memberId, pageRequest);
                 data = recruitComments.stream()
                         .map(recruitComment -> CommentResponseDto.builder()
                                 .contentsTitle(recruitComment.getRecruit().getTitle())

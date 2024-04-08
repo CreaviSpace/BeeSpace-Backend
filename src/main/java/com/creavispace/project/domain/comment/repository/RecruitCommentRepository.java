@@ -13,4 +13,6 @@ public interface RecruitCommentRepository extends JpaRepository<RecruitComment, 
     public List<RecruitComment> findByRecruitId(Long recruitId);
 
     List<RecruitComment> findByRecruitId(Long memberId, Pageable pageRequest);
+
+    List<RecruitComment> findByMemberId(Long memberId, Pageable pageRequest);
 }

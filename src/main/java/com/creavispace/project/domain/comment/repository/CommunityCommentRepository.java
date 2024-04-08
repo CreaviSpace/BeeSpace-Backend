@@ -13,4 +13,6 @@ public interface CommunityCommentRepository extends JpaRepository<CommunityComme
     public List<CommunityComment> findByCommunityId(Long communityId);
 
     List<CommunityComment> findByCommunityId(Long memberId, Pageable pageRequest);
+
+    List<CommunityComment> findByMemberId(Long memberId, Pageable pageRequest);
 }
