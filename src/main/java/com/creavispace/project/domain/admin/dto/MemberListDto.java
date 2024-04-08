@@ -6,16 +6,15 @@ import lombok.Getter;
 
 @Getter
 public class MemberListDto {
-    private String id;
-    private String loginId;
-    private String memberEmail;
-    private String memberName;
-    private String memberNickname;
-    private String loginType;
-    private Role role;
-    private String idTag;
-    private String memberPosition;
-    private Integer memberCareer;
+    private final String id;
+    private final String loginId;
+    private final String memberEmail;
+    private final String memberName;
+    private final String memberNickname;
+    private final String loginType;
+    private final Role role;
+    private final String memberPosition;
+    private final Integer memberCareer;
 
     public MemberListDto(Member member) {
         this.id = member.getId();
@@ -25,7 +24,6 @@ public class MemberListDto {
         this.memberNickname = member.getMemberNickname();
         this.loginType = member.getLoginType();
         this.role = member.getRole();
-        this.idTag = member.getIdTag();
         this.memberPosition = member.getMemberPosition();
         this.memberCareer = member.getMemberCareer();
     }

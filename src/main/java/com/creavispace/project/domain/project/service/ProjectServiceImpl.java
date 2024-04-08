@@ -537,8 +537,6 @@ public class ProjectServiceImpl implements ProjectService {
         Pageable pageRequest = PageRequest.of(page - 1, size);
         Page<Project> pageable = getProjects(member.getId(), sortType, pageRequest);
 
-
-
         if (!pageable.hasContent()) {
             throw new CreaviCodeException(GlobalErrorCode.NOT_PROJECT_CONTENT);
         }

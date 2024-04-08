@@ -3,8 +3,8 @@ package com.creavispace.project.config.auth.dto;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.dto.request.MemberSaveRequestDto;
 import com.creavispace.project.domain.member.entity.Member;
+import com.creavispace.project.domain.member.service.MemberService;
 import java.util.Map;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -69,7 +69,7 @@ public class OAuthAttributes {
                 .build();
     }
 
-    public Member toEntity() {
+    public Member toEntity(MemberService memberService) {
         MemberSaveRequestDto dto = MemberSaveRequestDto.builder()
                 .memberEmail(email)
                 .memberName(name)
@@ -79,6 +79,6 @@ public class OAuthAttributes {
                 .memberName(name)
                 .role(Role.MEMBER).build();
 
-        return new Member(dto, this);
+        return new Member(dto, memberService);
     }
 }

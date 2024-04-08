@@ -38,7 +38,7 @@ public class CustomOauth2Service implements OAuth2UserService<OAuth2UserRequest,
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         Member member = findOrSave(attributes);
-        httpSession.setAttribute("jwt", memberService.login(member.getMemberEmail(), member.getLoginType(), member.getIdTag()));
+        httpSession.setAttribute("jwt", memberService.login(member.getMemberEmail(), member.getLoginType(), member.getId()));
         httpSession.setMaxInactiveInterval(600);
 
 
@@ -63,7 +63,7 @@ public class CustomOauth2Service implements OAuth2UserService<OAuth2UserRequest,
         }
 
         System.out.println("-----------------------findOrSaveEnd : 새로운 아이디 생성------------------------");
-        Member member = memberService.save(attributes.toEntity());
+        Member member = memberService.save(attributes.toEntity(memberService));
 
         System.out.println("새로운 email = " + member.getMemberEmail());
         return member;

@@ -14,7 +14,7 @@ public interface MemberService {
 
     Optional<Member> findByEmail(String email);
 
-    MemberResponseDto findById(String memberId);
+    Member findById(String memberId);
 
     Optional<Member> findByEmailAndNameAndLoginId(String email, String name, String loginId);
 
@@ -22,14 +22,16 @@ public interface MemberService {
 
     List<Member> findAllMembers(Integer size, Integer page, String sortType);
 
-    String login(String memberEmail, String loginType, String memberIdTag);
+    String login(String memberEmail, String loginType, String memberId);
 
     Optional<Member> findByEmailAndLoginTypeAndMemberId(String memberEmail, String loginType, String memberId);
 
-    List<MemberResponseDto> findByMemberNicknameOrIdTagContaining(String search);
+    List<MemberResponseDto> findByMemberNicknameOrIdContaining(String search);
     Optional<Member> findByLoginId(String loginId);
 
     void expireMember(String jwt);
 
-    Optional<Member> findByMemberIdTag(String memberIdTag);
+    boolean existMemberId(String id);
+
+    String createId();
 }

@@ -1,7 +1,6 @@
 package com.creavispace.project.domain.project.service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.project.dto.request.ProjectLinkRequestDto;
@@ -41,7 +40,7 @@ class ProjectServiceImplTest {
 
         ProjectMemberRequestDto projectMemberRequestDto = ProjectMemberRequestDto.
                 builder().
-                memberId(1L).
+                memberId("").
                 position("")
                 .build();
 
@@ -60,7 +59,7 @@ class ProjectServiceImplTest {
                 .content("테스트 내용")
                 .build();
 
-        projectService.createProject(1L, projectRequestDto);
+        projectService.createProject("", projectRequestDto);
     }
 
     @Test
@@ -73,7 +72,7 @@ class ProjectServiceImplTest {
     @Test
     @Commit
     void readMyProject() {
-        Member member = memberRepository.findById(1L).orElseThrow();
+        Member member = memberRepository.findById("").orElseThrow();
 
         SuccessResponseDto<List<ProjectListReadResponseDto>> listSuccessResponseDto = projectService.readMyProjectList(
                 member, 6, 1, "asc");

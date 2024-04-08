@@ -14,7 +14,7 @@ public class MyPageProfileResponseDto {
      * 경력
      *
      */
-    private final String memberIdTag;
+    private final String memberId;
     private final String memberNickname;
     private final String introduce;
     private final Integer career;
@@ -24,18 +24,18 @@ public class MyPageProfileResponseDto {
     private final List<String> interestedStack;
 
     public MyPageProfileResponseDto(Member member) {
-        this.memberIdTag = member.getIdTag();
+        this.memberId = member.getId();
         this.memberNickname = member.getMemberNickname();
         this.introduce = member.getMemberIntroduce();
         this.career = member.getMemberCareer();
         this.position = member.getMemberPosition();
         this.interestedStack = member.getInterestedStack();
-        this.message = "인증 성공";
         this.profileUrl = member.getProfileUrl();
+        this.message = "인증 성공";
     }
 
     public MyPageProfileResponseDto() {
-        this.memberIdTag = null;
+        this.memberId = null;
         this.memberNickname = null;
         this.position = null;
         this.introduce = null;

@@ -14,7 +14,7 @@ class MemberServiceImplTest {
 
     @Test
     void findByMemberNicknameOrIdTagContaining() {
-        List<MemberResponseDto> data = memberService.findByMemberNicknameOrIdTagContaining("0");
+        List<MemberResponseDto> data = memberService.findByMemberNicknameOrIdContaining("0");
         System.out.println("data = " + data);
     }
 

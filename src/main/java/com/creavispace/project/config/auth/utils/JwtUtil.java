@@ -12,11 +12,11 @@ import java.util.Date;
 @Slf4j
 public class JwtUtil {
 
-    public static String createJwt(String memberEmail, String loginType, String memberIdTag, String secretKey, Long expiredTimeStampMs) {
+    public static String createJwt(String memberEmail, String loginType, String memberId, String secretKey, Long expiredTimeStampMs) {
         Claims claims = Jwts.claims();
         claims.put("memberEmail", memberEmail);
         claims.put("loginType", loginType);
-        claims.put("memberIdTag", memberIdTag);
+        claims.put("memberId", memberId);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -29,8 +29,8 @@ public class JwtUtil {
         Claims body = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         String memberEmail = body.get("memberEmail", String.class);
         String loginType = body.get("loginType", String.class);
-        String memberIdTag = body.get("memberIdTag", String.class);
-        return new MemberJwtResponseDto(memberEmail, loginType, memberIdTag);
+        String memberId = body.get("memberId", String.class);
+        return new MemberJwtResponseDto(memberEmail, loginType, memberId);
     }
 
     public static boolean isExpired(String token, String secretKey) {

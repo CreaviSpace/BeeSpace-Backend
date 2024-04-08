@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         Optional<Member> loginId = memberService.findByLoginId(authentication.getName());
         String randomTokenName;
         System.out.println("authentication = " + authentication.getName());
-        System.out.println("authentication = " + authentication.getAuthorities().stream().collect(Collectors.toList()));
+        System.out.println("authentication = " + authentication.getAuthorities().stream().toList());
         if (loginId.isPresent()) {
             randomTokenName = UUID.randomUUID().toString();
             log.info("JsonManager에 jwtDto 추가");
@@ -53,8 +52,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     private JwtDto loadJwt(Member member) {
-        String jwt = memberService.login(member.getMemberEmail(), member.getLoginType(), member.getIdTag());
-        String memberIdTag = member.getIdTag();
+        String jwt = memberService.login(member.getMemberEmail(), member.getLoginType(), member.getId());
+        String memberIdTag = member.getId();
 
         boolean enabled = member.isEnabled();
         return new JwtDto(jwt, memberIdTag, enabled);
