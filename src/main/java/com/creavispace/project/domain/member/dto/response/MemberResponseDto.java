@@ -15,7 +15,7 @@ import java.util.List;
  * */
 @Getter
 @ToString
-public class MemberResponseDto  {
+public class MemberResponseDto {
     private final String memberId;
     private final String profileUrl;
     private final String memberNickname;
