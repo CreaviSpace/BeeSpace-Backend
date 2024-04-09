@@ -133,7 +133,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 수정 권한이 있는지
-        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -313,7 +313,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Project project = projectRepository.findById(projectId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 피드백 분석 조회 권한이 있는지
-        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 

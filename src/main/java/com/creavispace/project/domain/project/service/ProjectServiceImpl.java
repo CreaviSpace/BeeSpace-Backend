@@ -211,7 +211,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 수정할 권한이 있는지
-        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -355,7 +355,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
         // 삭제할 권한이 있는지
-        if(memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 

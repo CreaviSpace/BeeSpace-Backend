@@ -199,7 +199,7 @@ public class CommentServiceImpl implements CommentService {
             case "PROJECT":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
-                if(memberId.equals(projectComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+                if(!memberId.equals(projectComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -219,7 +219,7 @@ public class CommentServiceImpl implements CommentService {
             case "RECRUIT":
                 RecruitComment recruitComment = recruitCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
-                if(memberId.equals(recruitComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+                if(!memberId.equals(recruitComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -239,7 +239,7 @@ public class CommentServiceImpl implements CommentService {
             case "COMMUNITY":
                 CommunityComment communityComment = communityCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
 
-                if(memberId.equals(communityComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+                if(!memberId.equals(communityComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -277,7 +277,7 @@ public class CommentServiceImpl implements CommentService {
             case "PROJECT":
                 ProjectComment projectComment = projectCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                 
-                if(memberId.equals(projectComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+                if(!memberId.equals(projectComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -288,7 +288,7 @@ public class CommentServiceImpl implements CommentService {
             case "RECRUIT":
                 RecruitComment recruitComment = recruitCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                 
-                if(memberId.equals(recruitComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+                if(!memberId.equals(recruitComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 
@@ -299,7 +299,7 @@ public class CommentServiceImpl implements CommentService {
             case "COMMUNITY":
                 CommunityComment communityComment = communityCommentRepository.findById(commentId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMENT_NOT_FOUND));
                     
-                if(memberId.equals(communityComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+                if(!memberId.equals(communityComment.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
                     throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
                 }
 

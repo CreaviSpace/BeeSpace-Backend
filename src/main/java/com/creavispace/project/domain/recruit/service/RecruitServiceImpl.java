@@ -1,32 +1,17 @@
 package com.creavispace.project.domain.recruit.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.creavispace.project.domain.member.Role;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.common.dto.type.RecruitContactWay;
 import com.creavispace.project.domain.common.dto.type.RecruitProceedWay;
+import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.recruit.dto.request.RecruitPositionRequestDto;
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
 import com.creavispace.project.domain.recruit.dto.request.RecruitTechStackRequestDto;
-import com.creavispace.project.domain.recruit.dto.response.DeadLineRecruitListReadResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitDeleteResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitListReadResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitPositionResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitReadResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitResponseDto;
-import com.creavispace.project.domain.recruit.dto.response.RecruitTechStackResponseDto;
+import com.creavispace.project.domain.recruit.dto.response.*;
 import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.recruit.entity.RecruitPosition;
 import com.creavispace.project.domain.recruit.entity.RecruitTechStack;
@@ -39,11 +24,18 @@ import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
 import com.creavispace.project.global.util.TimeUtil;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -185,7 +177,7 @@ public class RecruitServiceImpl implements RecruitService {
         Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
 
         // 수정 권한이 있는지
-        if(memberId.equals(recruit.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+        if(!memberId.equals(recruit.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -294,7 +286,7 @@ public class RecruitServiceImpl implements RecruitService {
         Recruit recruit = recruitRepository.findById(recruitId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
 
         // 삭제할 권한이 있는지
-        if(memberId.equals(recruit.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+        if(!memberId.equals(recruit.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 

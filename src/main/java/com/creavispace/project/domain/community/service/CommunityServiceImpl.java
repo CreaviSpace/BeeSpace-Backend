@@ -127,6 +127,7 @@ public class CommunityServiceImpl implements CommunityService{
     @Transactional
     public SuccessResponseDto<CommunityResponseDto> modifyCommunity(String memberId, Long communityId,
         CommunityRequestDto dto) {
+
         CommunityResponseDto data = null;
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
@@ -135,7 +136,7 @@ public class CommunityServiceImpl implements CommunityService{
         Community community = communityRepository.findById(communityId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
 
         // 수정 권한이 있는지
-        if(memberId.equals(community.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+        if(!memberId.equals(community.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -205,6 +206,7 @@ public class CommunityServiceImpl implements CommunityService{
     @Transactional
     public SuccessResponseDto<CommunityDeleteResponseDto> deleteCommunity(String memberId, Long communityId) {
         CommunityDeleteResponseDto data = null;
+
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -212,7 +214,7 @@ public class CommunityServiceImpl implements CommunityService{
         Community community = communityRepository.findById(communityId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
 
         // 삭제할 권한이 있는지
-        if(memberId.equals(community.getMember().getId()) && !member.getRole().equals("Administrator")){
+        if(!memberId.equals(community.getMember().getId()) && !member.getRole().equals("Administrator")){
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
