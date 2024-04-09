@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.community.repository;
 
+import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
 import org.springframework.data.domain.Page;
@@ -24,7 +25,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     "AND category = :category " +
     "AND status = true " +
     "ORDER BY created_date DESC ", nativeQuery = true)
-    public Page<Community> findAllByStatusTrueAndCategoryAndHashTagId(String category, Long hashTagId, Pageable pageable);
+    public Page<Community> findAllByStatusTrueAndCategoryAndHashTagId(CommunityCategory category, Long hashTagId, Pageable pageable);
 
     @Query(value = "SELECT * " +
     "FROM community " +
@@ -36,7 +37,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     "ORDER BY created_date DESC ", nativeQuery = true)
     public Page<Community> findAllByStatusTrueAndHashTagId(Long hashTagId, Pageable pageable);
 
-    public Page<Community> findAllByStatusTrueAndCategory(String category, Pageable pageable);
+    public Page<Community> findAllByStatusTrueAndCategory(CommunityCategory category, Pageable pageable);
 
     public Page<Community> findAllByStatusTrue(Pageable pageable);
 
@@ -55,7 +56,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     "AND c.category = :category " +
     "AND status = true " +
     "ORDER BY COALESCE(likeCount, 0) DESC ",nativeQuery = true)
-    public Page<Community> findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(String category, Long hashTagId, Pageable pageable);
+    public Page<Community> findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(CommunityCategory category, Long hashTagId, Pageable pageable);
 
     @Query(value = "SELECT c.id, c.member_id, c.category, c.title, c.content, c.view_count, c.status, c.created_date, c.modified_date " +
     "FROM community c " +
@@ -83,7 +84,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     "WHERE c.category = :category " +
     "AND status = true " +
     "ORDER BY COALESCE(likeCount, 0) DESC ",nativeQuery = true)
-    public Page<Community> findAllByStatusTrueAndCategoryOrderByLikeCountDesc(String category, Pageable pageable);
+    public Page<Community> findAllByStatusTrueAndCategoryOrderByLikeCountDesc(CommunityCategory category, Pageable pageable);
 
     @Query(value = "SELECT c.id, c.member_id, c.category, c.title, c.content, c.view_count, c.status, c.created_date, c.modified_date " +
     "FROM community c " +
@@ -117,7 +118,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     "ORDER BY view_count DESC ", nativeQuery = true)
     public Page<Community> findAllByStatusTrueAndHashTagIdOrderByViewCountDesc(Long hashTagId, Pageable pageable);
 
-    public Page<Community> findAllByStatusTrueAndCategoryOrderByViewCountDesc(String category, Pageable pageable);
+    public Page<Community> findAllByStatusTrueAndCategoryOrderByViewCountDesc(CommunityCategory category, Pageable pageable);
 
     public Page<Community> findAllByStatusTrueOrderByViewCountDesc(Pageable pageable);
 

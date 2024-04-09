@@ -313,7 +313,7 @@ public class RecruitServiceImpl implements RecruitService {
 
         // 카테고리가 존재한다면
         if(category != null){
-            pageable = recruitRepository.findAllByStatusTrueAndCategory(category.name(), pageRequest);
+            pageable = recruitRepository.findAllByStatusTrueAndCategory(category, pageRequest);
         }
         // 카테고리가 없다면
         else{
@@ -469,7 +469,7 @@ public class RecruitServiceImpl implements RecruitService {
 
     @Override
     public SuccessResponseDto<List<RecruitListReadResponseDto>> readMyRecruitList(Member member, Integer size,
-                                                                                  Integer page, String category,
+                                                                                  Integer page, RecruitCategory category,
                                                                                   String sortType) {
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<Recruit> pageable;

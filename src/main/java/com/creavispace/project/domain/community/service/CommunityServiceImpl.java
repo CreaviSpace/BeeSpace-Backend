@@ -308,7 +308,7 @@ public class CommunityServiceImpl implements CommunityService{
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
                         Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                        pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category.name(), hashTagId, pageRequest);
+                        pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category, hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -317,7 +317,7 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    pageable = communityRepository.findAllByStatusTrueAndCategory(category.name(), pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategory(category, pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -329,7 +329,7 @@ public class CommunityServiceImpl implements CommunityService{
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
                     Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(category.name(), hashTagId, pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(category, hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -338,7 +338,7 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByLikeCountDesc(category.name(), pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByLikeCountDesc(category, pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{
@@ -350,7 +350,7 @@ public class CommunityServiceImpl implements CommunityService{
                 // 카테고리와 해시태그 둘다 존재할 경우
                 if(category != null && hashTag != null){
                     Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category.name(), hashTagId, pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category, hashTagId, pageRequest);
                 }
                 // 해시태그만 존재할 경우
                 else if(category == null && hashTag != null){
@@ -359,7 +359,7 @@ public class CommunityServiceImpl implements CommunityService{
                 }
                 // 카테고리만 존재할 경우
                 else if(hashTag == null && category != null){
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByViewCountDesc(category.name(), pageRequest);
+                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByViewCountDesc(category, pageRequest);
                 }
                 // 카테고리,해시태그 둘다 null 일경우
                 else{

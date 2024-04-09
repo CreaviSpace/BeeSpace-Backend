@@ -403,11 +403,9 @@ public class ProjectServiceImpl implements ProjectService {
         Pageable pageRequest = PageRequest.of(page-1, size);
         Page<Project> pageable;
 
-        System.out.println(category);
-
         // 카테고리가 존재하면
         if(category != null){
-            pageable = projectRepository.findAllByStatusTrueAndCategory(category.name(), pageRequest);
+            pageable = projectRepository.findAllByStatusTrueAndCategory(category, pageRequest);
         }
         // 카테고리가 없다면
         else{

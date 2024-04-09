@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.recruit.repository;
 
+import com.creavispace.project.domain.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface RecruitRepository extends JpaRepository<Recruit, Long> {
-    public Page<Recruit> findAllByStatusTrueAndCategory(String category, Pageable pageRequest);
+    public Page<Recruit> findAllByStatusTrueAndCategory(RecruitCategory category, Pageable pageRequest);
     public Page<Recruit> findAllByStatusTrue(Pageable pageRequest);
     public Optional<Recruit> findByIdAndStatusTrue(Long recruitId);
     public boolean existsByIdAndMemberId(Long recruitId, String memberId);

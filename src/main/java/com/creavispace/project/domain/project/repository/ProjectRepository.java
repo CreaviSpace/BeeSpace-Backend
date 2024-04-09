@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.project.repository;
 
+import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
@@ -17,7 +18,7 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project, Long>{
     public List<Project> findTop6ByStatusTrueOrderByWeekViewCountDesc();
     public Page<Project> findAllByStatusTrue(Pageable pageable);
-    public Page<Project> findAllByStatusTrueAndCategory(String category, Pageable pageable);
+    public Page<Project> findAllByStatusTrueAndCategory(ProjectCategory category, Pageable pageable);
     public Optional<Project> findByIdAndStatusTrue(Long projectId);
     public Boolean existsByIdAndMemberId(Long projectId, String memberId);
 

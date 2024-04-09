@@ -18,6 +18,6 @@ public interface RecruitService {
     public SuccessResponseDto<List<DeadLineRecruitListReadResponseDto>> readDeadlineRecruitList();
 
     //ky
-    SuccessResponseDto<List<RecruitListReadResponseDto>> readMyRecruitList(Member member, Integer size, Integer page, String category, String sortType);
+    SuccessResponseDto<List<RecruitListReadResponseDto>> readMyRecruitList(Member member, Integer size, Integer page, RecruitCategory category, String sortType);
     SuccessResponseDto<List<RecruitListReadResponseDto>> readMyRecruitList(String memberId, Integer size, Integer page, String sortType);
 }
