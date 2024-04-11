@@ -89,6 +89,10 @@ public class AdminController {
     public void deleteContents(HttpServletRequest request, @RequestBody Long id, @RequestBody String category) {
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
+        Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
+        if (isAdmin(admin)) {
+          return;
+        };
         deleteFactory(category, id, userInfo);
     }
 
