@@ -15,6 +15,8 @@ import com.creavispace.project.domain.project.dto.response.ProjectListReadRespon
 import com.creavispace.project.domain.project.service.ProjectService;
 import com.creavispace.project.domain.recruit.dto.response.RecruitListReadResponseDto;
 import com.creavispace.project.domain.recruit.service.RecruitService;
+import com.creavispace.project.domain.report.entity.Report;
+import com.creavispace.project.domain.report.service.ReportService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import static com.creavispace.project.global.util.UsableConst.*;
 @RequestMapping("/admin")
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class AdminController {
     private final ProjectService projectService;
     private final RecruitService recruitService;
     private final CommunityService communityService;
+    private final ReportService reportService;
 
     @PostMapping("/sanction")
     public void sanctionMember(@RequestBody String memberId, HttpServletRequest request) {
@@ -90,12 +93,18 @@ public class AdminController {
     }
 
     @GetMapping("/member")
-    public List<MemberListDto> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam("sort-type") String sortType) {
+    public List<MemberListDto> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam(SORT_TYPE) String sortType) {
 
         List<Member> members = memberService.findAllMembers(size, page, sortType);
         List<MemberListDto> collect = members.stream().map(member -> new MemberListDto(member)).collect(Collectors.toList());
         return collect;
 
+    }
+
+    @GetMapping("/reports")
+    public List<Report> reportList(@RequestParam Integer page, @RequestParam Integer size,
+                                   @RequestParam(SORT_TYPE) String sortType) {
+        return reportService.readReportList(size, page, sortType);
     }
 
     private void deleteFactory(String category, Long id, MemberJwtResponseDto dto) {

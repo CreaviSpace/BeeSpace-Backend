@@ -1,5 +1,9 @@
 package com.creavispace.project.domain.report.service;
 
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
@@ -61,5 +65,21 @@ public class ReportServiceImpl implements ReportService{
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "신고를 완료했습니다.", data);
     }
-    
+
+    @Override
+    public List<Report> readReportList(Integer size, Integer page, String sortType) {
+        Pageable pageable = pageable(size, page, sortType);
+        return reportRepository.findBy(pageable);
+    }
+
+    private Pageable pageable(Integer size, Integer page, String sortType) {
+        if (sortType.toLowerCase().equals("asc")) {
+            return PageRequest.of(page - 1, size, Sort.by("createdDate").ascending());
+        }
+        if (sortType.toLowerCase().equals("desc")) {
+            return PageRequest.of(page - 1, size, Sort.by("createdDate").descending());
+        }
+        return PageRequest.of(page - 1, size, Sort.by("createdDate").descending());
+    }
+
 }

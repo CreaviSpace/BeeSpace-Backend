@@ -18,11 +18,11 @@ public class AdminControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private AdminController controller = new AdminController(null,null,null,null,null);
+    private AdminController controller = new AdminController(null,null,null,null,null, null);
 
     @Test
     void isAdminTest() {
-        Member member = memberRepository.findById(4L).get();
+        Member member = memberRepository.findById("").get();
         System.out.println("member.getRole() = " + member.getRole());
         assertThat(controller.isAdmin(member)).isTrue();
     }
