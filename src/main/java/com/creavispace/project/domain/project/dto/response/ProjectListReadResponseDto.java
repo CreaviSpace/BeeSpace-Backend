@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

@@ -23,7 +23,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @JsonSerialize

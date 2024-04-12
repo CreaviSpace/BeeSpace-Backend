@@ -6,7 +6,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RecruitPosition extends BaseTimeEntity {

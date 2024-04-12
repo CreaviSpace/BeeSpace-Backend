@@ -3,15 +3,15 @@ package com.creavispace.project.domain.bookmark.entity;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.recruit.entity.Recruit;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RecruitBookmark extends BaseTimeEntity implements Bookmark  {

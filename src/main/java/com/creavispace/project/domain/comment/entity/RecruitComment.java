@@ -10,7 +10,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RecruitComment extends BaseTimeEntity implements Comment {

@@ -30,7 +30,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

@@ -8,7 +8,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RecruitTechStack extends BaseTimeEntity {
