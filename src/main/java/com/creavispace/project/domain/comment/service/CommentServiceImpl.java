@@ -106,7 +106,7 @@ public class CommentServiceImpl implements CommentService {
         Pageable pageRequest = pageable(page, size, sortType);
         List<CommentResponseDto> data;
 
-        CommentStrategy strategy = strategyMap.get(PostType.valueOf(postType));
+        CommentStrategy strategy = strategyMap.get(PostType.valueOf(postType.toUpperCase()));
         if(strategy == null) throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_POST_TYPE);
 
         data = strategy.readMyContentsList(memberId, pageRequest);

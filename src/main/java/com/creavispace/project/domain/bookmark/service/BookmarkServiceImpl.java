@@ -74,7 +74,7 @@ public class BookmarkServiceImpl implements BookmarkService {
         Pageable pageRequest = pageable(page, size, sortType);
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        BookmarkStrategy strategy = strategyMap.get(PostType.valueOf(postType));
+        BookmarkStrategy strategy = strategyMap.get(PostType.valueOf(postType.toUpperCase()));
         if(strategy == null) throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_POST_TYPE);
 
         List<Bookmark> data = strategy.readMyBookmark(memberId, pageRequest);
