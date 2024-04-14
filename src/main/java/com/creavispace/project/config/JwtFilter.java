@@ -21,7 +21,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final MemberService memberService;
-
     private String jwtSecret;
 
 
@@ -36,9 +35,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        log.info("authorization = {}" , authorization);
+        log.info("authorization = {}", authorization);
         log.info("Headers.logintype = {}", request.getHeader("logintype"));
-
 
         //authorization 헤더가 비어있으면 바로 리턴
         //eyJhbGciOiJIUzI1NiJ9 -> HS256 으로 인코딩 된 토큰이 아니면 리턴
@@ -62,10 +60,11 @@ public class JwtFilter extends OncePerRequestFilter {
         String loginType = responseDto.loginType();
 
         Member member = memberService.findById(memberId);
-        log.info("로그인 한 사용자 = {}, 로그인 타입 = {}",memberEmail, loginType);
+        log.info("로그인 한 사용자 = {}, 로그인 타입 = {}", memberEmail, loginType);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(member.getId(), loginType, List.of(new SimpleGrantedAuthority(member.getRoleKey())));
+                new UsernamePasswordAuthenticationToken(member.getId(), loginType,
+                        List.of(new SimpleGrantedAuthority(member.getRoleKey())));
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);

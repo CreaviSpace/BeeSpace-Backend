@@ -82,8 +82,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public String login(String memberEmail, String loginType, String memberId) {
+        String jwt = JwtUtil.createJwt(memberEmail, loginType, memberId, jwtSecret, 1000 * 60 * 60L);
 
-        return JwtUtil.createJwt(memberEmail, loginType, memberId, jwtSecret, 1000 * 60 * 60L);
+        return jwt;
     }
 
     @Override

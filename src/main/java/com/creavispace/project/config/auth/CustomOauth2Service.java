@@ -3,7 +3,6 @@ package com.creavispace.project.config.auth;
 import com.creavispace.project.config.auth.dto.OAuthAttributes;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.service.MemberService;
-import jakarta.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomOauth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final MemberService memberService;
-    private final HttpSession httpSession;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -38,9 +36,6 @@ public class CustomOauth2Service implements OAuth2UserService<OAuth2UserRequest,
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         Member member = findOrSave(attributes);
-        httpSession.setAttribute("jwt", memberService.login(member.getMemberEmail(), member.getLoginType(), member.getId()));
-        httpSession.setMaxInactiveInterval(600);
-
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(member.getRoleKey())),

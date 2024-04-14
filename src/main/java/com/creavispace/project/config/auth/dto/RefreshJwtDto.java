@@ -3,16 +3,12 @@ package com.creavispace.project.config.auth.dto;
 import lombok.Getter;
 
 @Getter
-public class JwtDto {
+public class RefreshJwtDto {
     String jwt;
     String memberId;
-    boolean oldUser;
 
-    public JwtDto(String jwt, String memberId, boolean memberEnabled) {
+    public RefreshJwtDto(String jwt, String memberId) {
         this.jwt = jwt;
         this.memberId = memberId;
-        this.oldUser = memberEnabled;
     }
-
-
 }

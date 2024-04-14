@@ -1,5 +1,6 @@
 package com.creavispace.project.config.auth.utils;
 
+import com.creavispace.project.domain.jwt.Entity.Jwt;
 import com.creavispace.project.domain.member.dto.response.MemberJwtResponseDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,7 +13,8 @@ import java.util.Date;
 @Slf4j
 public class JwtUtil {
 
-    public static String createJwt(String memberEmail, String loginType, String memberId, String secretKey, Long expiredTimeStampMs) {
+    public static String createJwt(String memberEmail, String loginType, String memberId, String secretKey,
+                                   Long expiredTimeStampMs) {
         Claims claims = Jwts.claims();
         claims.put("memberEmail", memberEmail);
         claims.put("loginType", loginType);
@@ -20,9 +22,48 @@ public class JwtUtil {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiredTimeStampMs))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
+
+    //새로운 AccessToken 발급
+    public static String refreshJwt(Jwt refreshToken, String secretKey) {
+        MemberJwtResponseDto userInfo = getUserInfo(refreshToken.getRefreshToken(), secretKey);
+        String memberId = userInfo.memberId();
+        String loginType = userInfo.loginType();
+        String memberEmail = userInfo.memberEmail();
+
+        Claims claims = Jwts.claims();
+        claims.put("memberEmail", memberEmail);
+        claims.put("loginType", loginType);
+        claims.put("memberId", memberId);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60L))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
+    //리프레시 토큰 생성
+    public static String createRefreshToken(String jwt, String secretKey) {
+        MemberJwtResponseDto userInfo = getUserInfo(jwt, secretKey);
+        String memberId = userInfo.memberId();
+        String loginType = userInfo.loginType();
+        String memberEmail = userInfo.memberEmail();
+
+        Claims claims = Jwts.claims();
+        claims.put("memberEmail", memberEmail);
+        claims.put("loginType", loginType);
+        claims.put("memberId", memberId);
+        String refreshToken = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+        return refreshToken;
     }
 
     public static MemberJwtResponseDto getUserInfo(String token, String secretKey) {
@@ -34,7 +75,7 @@ public class JwtUtil {
     }
 
     public static boolean isExpired(String token, String secretKey) {
-        log.info("JwtUtils.isExpired");
+        log.info("JwtUtils.isExpired?");
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
         } catch (ExpiredJwtException e) {

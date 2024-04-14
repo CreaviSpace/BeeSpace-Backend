@@ -1,8 +1,10 @@
 package com.creavispace.project.config.auth;
 
 import com.creavispace.project.config.JwtFilter;
+import com.creavispace.project.domain.jwt.service.JwtService;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.service.MemberService;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -28,8 +30,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.Arrays;
-
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Configuration
@@ -50,6 +50,7 @@ public class SecurityConfig {
     private String jwtSecret;
 
     private final MemberService memberService;
+    private final JwtService jwtService;
 
     @Bean
     public static BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -60,7 +61,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .requestMatchers("/error","/favicon.ico");
+                .requestMatchers("/error", "/favicon.ico");
     }
 
     @Bean
@@ -84,14 +85,12 @@ public class SecurityConfig {
                                 .authenticated())
                 .logout(logout -> logout.logoutSuccessHandler(new LogoutHandler()).logoutUrl("/logout"))
                 .oauth2Login(login -> login.userInfoEndpoint(endPoint -> endPoint.userService(customOauth2Service))
-                        .successHandler(new LoginSuccessHandler(memberService)))
+                        .successHandler(new LoginSuccessHandler(memberService, jwtService)))
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtFilter(memberService, jwtSecret), UsernamePasswordAuthenticationFilter.class)
-                /*.exceptionHandling(exception -> exception
-                                .authenticationEntryPoint((request, response, authException) -> response.sendRedirect("/"))
-                        // 시작 페이지로 리디렉션
-                )*/;
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(
+                        new CustomAuthenticationEntryPoint(jwtService, jwtSecret)));
         System.out.println("SecurityConfig.filterChain");
 
         return httpSecurity.build();
