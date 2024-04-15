@@ -50,7 +50,7 @@ public class CommentServiceImpl implements CommentService {
         List<CommentResponseDto> data = strategy.readCommentList(postId);
 
         log.info("/comment/service : readCommentList success data = {}", data);
-        return new SuccessResponseDto<>(false, "댓글 리스트 조회가 완료되었습니다.", data);
+        return new SuccessResponseDto<>(true, "댓글 리스트 조회가 완료되었습니다.", data);
     }
 
     @Override
