@@ -70,7 +70,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     //생성일과 수정일이 같으면 신규 유저로 판단
     private boolean isOldUser(Member member) {
-        boolean isOldUser = member.getModifiedDate() == member.getCreatedDate();
+        boolean isOldUser = member.getModifiedDate() != member.getCreatedDate();
         if (!isOldUser) {
             member.setEnabled(true);
             memberService.save(member);
