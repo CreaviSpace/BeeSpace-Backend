@@ -38,7 +38,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String jsonString = objectMapper.writeValueAsString(refreshJwt);
 
         response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+        response.setCharacterEncoding("utf-8");
         response.getWriter().write(jsonString);
     }
 
