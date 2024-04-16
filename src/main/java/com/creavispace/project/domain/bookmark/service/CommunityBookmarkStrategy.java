@@ -1,7 +1,7 @@
 package com.creavispace.project.domain.bookmark.service;
 
+import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
-import com.creavispace.project.domain.bookmark.entity.Bookmark;
 import com.creavispace.project.domain.bookmark.entity.CommunityBookmark;
 import com.creavispace.project.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.creavispace.project.domain.community.entity.Community;
@@ -9,11 +9,11 @@ import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.UsableConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -59,7 +59,14 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
     }
 
     @Override
-    public List<Bookmark> readMyBookmark(String memberId, Pageable pageRequest) {
-        return new ArrayList<>(communityBookmarkRepository.findByMemberId(memberId, pageRequest));
+    public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
+        List<CommunityBookmark> bookmarks = communityBookmarkRepository.findByMemberId(memberId, pageRequest);
+        List<BookmarkContentsResponseDto> bookmarkDto = bookmarks.stream()
+                .map(bookmark -> BookmarkContentsResponseDto.builder()
+                        .bookmark(bookmark)
+                        .postId(bookmark.getCommunity().getId())
+                        .postType(UsableConst.typeIsName(bookmark.getCommunity()))
+                        .build()).toList();
+        return bookmarkDto;
     }
 }

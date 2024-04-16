@@ -1,16 +1,16 @@
 package com.creavispace.project.domain.bookmark.dto.response;
 
 import com.creavispace.project.domain.bookmark.entity.Bookmark;
-import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
+@Builder
 public class BookmarkContentsResponseDto {
-    List<Bookmark> bookmark;
+    private Bookmark bookmark;
+    private String postType;
+    private Long postId;
 
-    public BookmarkContentsResponseDto(List<Bookmark> bookmark) {
-        this.bookmark = bookmark;
-    }
 }

@@ -1,7 +1,7 @@
 package com.creavispace.project.domain.bookmark.service;
 
+import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
-import com.creavispace.project.domain.bookmark.entity.Bookmark;
 import com.creavispace.project.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.creavispace.project.domain.bookmark.repository.ProjectBookmarkRepository;
 import com.creavispace.project.domain.bookmark.repository.RecruitBookmarkRepository;
@@ -70,14 +70,14 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     @Override
-    public SuccessResponseDto<List<Bookmark>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType) {
+    public SuccessResponseDto<List<BookmarkContentsResponseDto>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType) {
         Pageable pageRequest = pageable(page, size, sortType);
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
         BookmarkStrategy strategy = strategyMap.get(PostType.valueOf(postType.toUpperCase()));
         if(strategy == null) throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_POST_TYPE);
 
-        List<Bookmark> data = strategy.readMyBookmark(memberId, pageRequest);
+        List<BookmarkContentsResponseDto> data = strategy.readMyBookmark(memberId, pageRequest);
 
         return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", data);
     }

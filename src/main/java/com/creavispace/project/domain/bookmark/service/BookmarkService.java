@@ -2,11 +2,9 @@ package com.creavispace.project.domain.bookmark.service;
 
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
-import com.creavispace.project.domain.bookmark.entity.Bookmark;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.creavispace.project.domain.common.dto.type.PostType;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 
 public interface BookmarkService {
@@ -15,6 +13,6 @@ public interface BookmarkService {
 
 
     //ky
-    public SuccessResponseDto<List<Bookmark>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType)
+    public SuccessResponseDto<List<BookmarkContentsResponseDto>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType)
             throws JsonProcessingException;
 }
