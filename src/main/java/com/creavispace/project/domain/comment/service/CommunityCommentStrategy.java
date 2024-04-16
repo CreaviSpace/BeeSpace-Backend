@@ -2,6 +2,7 @@ package com.creavispace.project.domain.comment.service;
 
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
+import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
 import com.creavispace.project.domain.comment.entity.CommunityComment;
 import com.creavispace.project.domain.comment.repository.CommunityCommentRepository;
 import com.creavispace.project.domain.community.entity.Community;
@@ -10,6 +11,7 @@ import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.UsableConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -99,11 +101,11 @@ public class CommunityCommentStrategy implements CommentStrategy{
     }
 
     @Override
-    public List<CommentResponseDto> readMyContentsList(String memberId, Pageable pageRequest) {
+    public List<MyPageCommentResponseDto> readMyContentsList(String memberId, Pageable pageRequest) {
         List<CommunityComment> communityComments = communityCommentRepository.findByMemberId(memberId, pageRequest);
 
         return communityComments.stream()
-                .map(communityComment -> CommentResponseDto.builder()
+                .map(communityComment -> MyPageCommentResponseDto.builder()
                         .contentsTitle(communityComment.getCommunity().getTitle())
                         .id(communityComment.getId())
                         .memberId(communityComment.getMember().getId())
@@ -111,6 +113,8 @@ public class CommunityCommentStrategy implements CommentStrategy{
                         .memberProfileUrl(communityComment.getMember().getProfileUrl())
                         .modifiedDate(communityComment.getModifiedDate())
                         .content(communityComment.getContent())
+                        .postId(communityComment.getCommunity().getId())
+                        .postType(UsableConst.typeIsName(communityComment.getCommunity()))
                         .build())
                 .collect(Collectors.toList());
     }

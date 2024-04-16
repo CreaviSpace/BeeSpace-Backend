@@ -3,6 +3,7 @@ package com.creavispace.project.domain.comment.service;
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
 import com.creavispace.project.domain.comment.dto.response.CommentDeleteResponseDto;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
+import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
 import com.creavispace.project.domain.comment.repository.CommunityCommentRepository;
 import com.creavispace.project.domain.comment.repository.ProjectCommentRepository;
 import com.creavispace.project.domain.comment.repository.RecruitCommentRepository;
@@ -101,10 +102,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public SuccessResponseDto<List<CommentResponseDto>> readMyContentsList(String memberId, Integer page, Integer size,
-                                                                           String postType, String sortType) {
+    public SuccessResponseDto<List<MyPageCommentResponseDto>> readMyContentsList(String memberId, Integer page, Integer size,
+                                                                                 String postType, String sortType) {
         Pageable pageRequest = pageable(page, size, sortType);
-        List<CommentResponseDto> data;
+        List<MyPageCommentResponseDto> data;
 
         CommentStrategy strategy = strategyMap.get(PostType.valueOf(postType.toUpperCase()));
         if(strategy == null) throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_POST_TYPE);

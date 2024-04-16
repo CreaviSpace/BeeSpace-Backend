@@ -2,6 +2,7 @@ package com.creavispace.project.domain.comment.service;
 
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
+import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
 import com.creavispace.project.domain.comment.entity.ProjectComment;
 import com.creavispace.project.domain.comment.repository.ProjectCommentRepository;
 import com.creavispace.project.domain.member.Role;
@@ -10,6 +11,7 @@ import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.project.repository.ProjectRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.UsableConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -100,11 +102,11 @@ public class ProjectCommentStrategy implements CommentStrategy {
     }
 
     @Override
-    public List<CommentResponseDto> readMyContentsList(String memberId, Pageable pageRequest) {
+    public List<MyPageCommentResponseDto> readMyContentsList(String memberId, Pageable pageRequest) {
         List<ProjectComment> projectComments = projectCommentRepository.findByMemberId(memberId, pageRequest);
 
         return projectComments.stream()
-                .map(projectComment -> CommentResponseDto.builder()
+                .map(projectComment -> MyPageCommentResponseDto.builder()
                         .contentsTitle(projectComment.getProject().getTitle())
                         .id(projectComment.getId())
                         .memberId(projectComment.getMember().getId())
@@ -112,6 +114,8 @@ public class ProjectCommentStrategy implements CommentStrategy {
                         .memberProfileUrl(projectComment.getMember().getProfileUrl())
                         .modifiedDate(projectComment.getModifiedDate())
                         .content(projectComment.getContent())
+                        .postId(projectComment.getProject().getId())
+                        .postType(UsableConst.typeIsName(projectComment.getProject()))
                         .build())
                 .collect(Collectors.toList());
     }

@@ -3,6 +3,7 @@ package com.creavispace.project.domain.comment.service;
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
 import com.creavispace.project.domain.comment.dto.response.CommentDeleteResponseDto;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
+import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 
@@ -15,6 +16,6 @@ public interface CommentService {
     public SuccessResponseDto<CommentDeleteResponseDto> deleteComment(String memberId, Long commentId, PostType postType);
 
     //ky
-    SuccessResponseDto<List<CommentResponseDto>> readMyContentsList(String memberId, Integer page, Integer size,
-                                                                    String postType, String sortType);
+    SuccessResponseDto<List<MyPageCommentResponseDto>> readMyContentsList(String memberId, Integer page, Integer size,
+                                                                          String postType, String sortType);
 }

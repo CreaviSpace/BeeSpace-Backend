@@ -2,7 +2,7 @@ package com.creavispace.project.domain.member.controller;
 
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
-import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
+import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
 import com.creavispace.project.domain.comment.service.CommentService;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
@@ -111,10 +111,10 @@ public class MemberController {
 
     @GetMapping("/read/comment")
     @Operation(summary = "사용자 아이디로 사용자 댓글 조회")
-    public ResponseEntity<SuccessResponseDto<List<CommentResponseDto>>> readMemberComment(
+    public ResponseEntity<SuccessResponseDto<List<MyPageCommentResponseDto>>> readMemberComment(
             @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
             @RequestParam String category, @RequestParam(SORT_TYPE) String sortType) {
-        SuccessResponseDto<List<CommentResponseDto>> listSuccessResponseDto = commentService.readMyContentsList(
+        SuccessResponseDto<List<MyPageCommentResponseDto>> listSuccessResponseDto = commentService.readMyContentsList(
                 memberId,
                 page, size, category, sortType);
 

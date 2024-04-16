@@ -2,6 +2,7 @@ package com.creavispace.project.domain.comment.service;
 
 import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
 import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
+import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
 import com.creavispace.project.domain.comment.entity.RecruitComment;
 import com.creavispace.project.domain.comment.repository.RecruitCommentRepository;
 import com.creavispace.project.domain.member.Role;
@@ -10,6 +11,7 @@ import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.recruit.repository.RecruitRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.UsableConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -99,11 +101,11 @@ public class RecruitCommentStrategy implements CommentStrategy{
     }
 
     @Override
-    public List<CommentResponseDto> readMyContentsList(String memberId, Pageable pageRequest) {
+    public List<MyPageCommentResponseDto> readMyContentsList(String memberId, Pageable pageRequest) {
         List<RecruitComment> recruitComments = recruitCommentRepository.findByMemberId(memberId, pageRequest);
 
         return recruitComments.stream()
-                .map(recruitComment -> CommentResponseDto.builder()
+                .map(recruitComment -> MyPageCommentResponseDto.builder()
                         .contentsTitle(recruitComment.getRecruit().getTitle())
                         .id(recruitComment.getId())
                         .memberId(recruitComment.getMember().getId())
@@ -111,6 +113,8 @@ public class RecruitCommentStrategy implements CommentStrategy{
                         .memberProfileUrl(recruitComment.getMember().getProfileUrl())
                         .modifiedDate(recruitComment.getModifiedDate())
                         .content(recruitComment.getContent())
+                        .postId(recruitComment.getRecruit().getId())
+                        .postType(UsableConst.typeIsName(recruitComment.getRecruit()))
                         .build())
                 .collect(Collectors.toList());
     }
