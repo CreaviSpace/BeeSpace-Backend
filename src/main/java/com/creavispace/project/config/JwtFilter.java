@@ -1,5 +1,6 @@
 package com.creavispace.project.config;
 
+import com.creavispace.project.config.auth.utils.JwtManager;
 import com.creavispace.project.config.auth.utils.JwtUtil;
 import com.creavispace.project.domain.member.dto.response.MemberJwtResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
@@ -48,6 +49,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (JwtUtil.isExpired(authorization, jwtSecret)) {
             log.info("만료된 토큰 입니다. = {}", authorization);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (JwtManager.isLogoutToken(authorization)) {
+            log.info("로그 아웃된 토큰입니다. = {}", authorization);
             filterChain.doFilter(request, response);
             return;
         }

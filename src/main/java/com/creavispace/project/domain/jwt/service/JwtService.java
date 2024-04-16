@@ -10,4 +10,6 @@ public interface JwtService {
 
     String createRefreshToken(String memberJwt);
 
+    void deleteById(String jwt);
+
 }

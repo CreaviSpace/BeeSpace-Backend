@@ -83,7 +83,7 @@ public class SecurityConfig {
                                         "/community/**", "/feedback/**", "/tackStack/**")
                                 .hasAnyRole(Role.MEMBER.name(), Role.ADMIN.name()).anyRequest()
                                 .authenticated())
-                .logout(logout -> logout.logoutSuccessHandler(new LogoutHandler()).logoutUrl("/logout"))
+                .logout(logout -> logout.logoutSuccessHandler(new LogoutHandler(jwtService)).logoutUrl("/logout"))
                 .oauth2Login(login -> login.userInfoEndpoint(endPoint -> endPoint.userService(customOauth2Service))
                         .successHandler(new LoginSuccessHandler(memberService, jwtService)))
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->

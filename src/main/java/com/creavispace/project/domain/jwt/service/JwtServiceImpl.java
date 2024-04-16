@@ -38,6 +38,11 @@ public class JwtServiceImpl implements JwtService  {
         return JwtUtil.createRefreshToken(memberJwt, jwtSecret);
     }
 
+    @Override
+    public void deleteById(String jwt) {
+        jwtRepository.deleteById(jwt);
+    }
+
     @Transactional
     private void initializeDB(String memberId) {
         System.out.println("JwtServiceImpl.initializeDB");
