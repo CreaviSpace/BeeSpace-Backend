@@ -12,4 +12,6 @@ public interface TechStackRepository extends JpaRepository<TechStack, Long>{
     public List<TechStack> findByTechStackContains(String techStack);
     public List<TechStack> findByTechStackStartingWith(String techStack);
     public List<TechStack> findByTechStack(String techStack);
+
+    List<TechStack> findByIdIn(List<Long> collect);
 }

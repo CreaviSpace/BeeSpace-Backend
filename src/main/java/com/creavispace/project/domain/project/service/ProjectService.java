@@ -21,4 +21,5 @@ public interface ProjectService {
     SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(String memberId, Integer size, Integer page, String sortType);
 
     SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectFeedBackList(String memberId, Integer size, Integer page, String sortType);
+    SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectListForAdmin(Integer size, Integer page, String status, String sortType);
 }

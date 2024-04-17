@@ -14,4 +14,6 @@ public interface RecruitPositionRepository extends JpaRepository<RecruitPosition
     public void deleteByRecruitId(Long recruitId);
     @Query(value = "SELECT SUM(now) FROM recruit_position WHERE recruit_id = :recruitId", nativeQuery = true)
     public Integer countByNow(Long recruitId);
+
+    List<RecruitPosition> findByRecruitIdIn(List<Long> recruitIds);
 }

@@ -23,5 +23,5 @@ public class ProjectListReadResponseDto implements SearchListReadResponseDto{
     private List<ProjectLinkResponseDto> links;
     private String thumbnail;
     private String bannerContent;
-
+    private boolean status;
 }

@@ -11,4 +11,6 @@ import com.creavispace.project.domain.recruit.entity.RecruitTechStack;
 public interface RecruitTechStackRepository extends JpaRepository<RecruitTechStack, Long> {
     public List<RecruitTechStack> findByRecruitId(Long recruitId);
     public void deleteByRecruitId(Long recruitId);
+
+    List<RecruitTechStack> findByRecruitIdIn(List<Long> recruitIds);
 }

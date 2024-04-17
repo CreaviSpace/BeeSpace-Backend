@@ -24,6 +24,7 @@ import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.global.util.UsableConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -578,6 +579,30 @@ public class ProjectServiceImpl implements ProjectService {
         return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", reads);
     }
 
+    @Override
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectListForAdmin(
+            Integer size, Integer page, String status, String sortType) {
+
+        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
+        Page<Project> pageable = findProject(status, pageRequest);
+        List<ProjectListReadResponseDto> projectListReadResponseDtos = getProjectListReadResponseDtos(pageable);
+
+        return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", projectListReadResponseDtos);
+    }
+
+    private Page<Project> findProject(String status, Pageable pageRequest) {
+        if (status.equalsIgnoreCase("all")) {
+            return projectRepository.findAll(pageRequest);
+        }
+        if (status.equalsIgnoreCase("false")) {
+             return projectRepository.findByStatusFalse(pageRequest);
+        }
+        if (status.equalsIgnoreCase("true")) {
+            return projectRepository.findAllByStatusTrue(pageRequest);
+        }
+        return projectRepository.findAll(pageRequest);
+    }
+
     private Page<Project> getProjects(String memberId, String sortType, Pageable pageRequest) {
         Page<Project> pageable;
         if (sortType.equalsIgnoreCase("asc")) {
@@ -591,7 +616,8 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(pageRequest, memberId);
     }
 
-    private static List<ProjectListReadResponseDto> getProjectListReadResponseDtos(List<Project> projects) {
+    private List<ProjectListReadResponseDto> getProjectListReadResponseDtos(List<Project> projects) {
+
         return projects.stream()
                 .map(project -> {
                     List<ProjectLinkResponseDto> links = project.getLinks().stream()
@@ -609,8 +635,53 @@ public class ProjectServiceImpl implements ProjectService {
                             .thumbnail(project.getThumbnail())
                             .bannerContent(project.getBannerContent())
                             .links(links)
+                            .status(project.isStatus())
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<ProjectListReadResponseDto> getProjectListReadResponseDtos(Page<Project> projects) {
+
+        System.out.println("ProjectServiceImpl.getProjectListReadResponseDtos");
+        List<Long> collect = projects.stream().map(Project::getId).collect(Collectors.toList());
+        List<ProjectLink> byProjectIdIn = projectLinkRepository.findByProjectIdIn(collect);
+
+        Map<Long, List<ProjectLinkResponseDto>> links = projectLinks(byProjectIdIn);
+
+        return projects.stream()
+                .map(project -> buildDto(project, links)
+                ).collect(Collectors.toList());
+    }
+
+    private Map<Long, List<ProjectLinkResponseDto>> projectLinks(List<ProjectLink> projectLinks) {
+        Map<Long, List<ProjectLinkResponseDto>> linkMap = new HashMap<>();
+        for (int i = 0; i < projectLinks.size(); i++) {
+            ProjectLink projectLink = projectLinks.get(i);
+            List<ProjectLinkResponseDto> links = linkMap.getOrDefault(projectLink.getProject().getId(),
+                    new ArrayList<>());
+            ProjectLinkResponseDto projectLinkResponseDto = ProjectLinkResponseDto.builder()
+                    .linkType(projectLink.getLinkType())
+                    .url(projectLink.getUrl())
+                    .build();
+            links.add(projectLinkResponseDto);
+            linkMap.put(projectLink.getProject().getId(), links);
+        }
+        return linkMap;
+    }
+
+    private ProjectListReadResponseDto buildDto(Project project, Map<Long, List<ProjectLinkResponseDto>> links) {
+
+        return ProjectListReadResponseDto.builder()
+                .id(project.getId())
+                .postType(PostType.PROJECT.name())
+                .category(project.getCategory().name())
+                .title(project.getTitle())
+                .thumbnail(project.getThumbnail())
+                .bannerContent(project.getBannerContent())
+                .links(links.get(project.getId()))
+                .status(project.isStatus())
+                .build();
+
     }
 }

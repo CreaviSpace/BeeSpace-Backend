@@ -1,5 +1,8 @@
 package com.creavispace.project.global.util;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 public class UsableConst {
     private UsableConst usableConst;
 
@@ -12,4 +15,11 @@ public class UsableConst {
     }
 
 
+
+    public static PageRequest getPageRequest(Integer size, Integer page, String sortType) {
+        if (sortType.equalsIgnoreCase("asc")) {
+            return PageRequest.of(page - 1, size, Sort.by("createdDate").ascending());
+        }
+        return PageRequest.of(page - 1, size, Sort.by("createdDate").descending());
+    }
 }

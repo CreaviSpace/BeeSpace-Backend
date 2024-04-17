@@ -30,10 +30,22 @@ class ProjectServiceImplTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Test
+    @Commit
+    void createRepeat() {
+        for (int i = 0; i < 10; i ++) {
+            createProject();
+        }
+    }
     @Test
     @Commit
     void createProject() {
         ProjectLinkRequestDto linkRequestDto = ProjectLinkRequestDto.builder()
+                .url("")
+                .linkType("")
+                .build();
+        ProjectLinkRequestDto linkRequestDto1 = ProjectLinkRequestDto.builder()
                 .url("")
                 .linkType("")
                 .build();
@@ -44,9 +56,9 @@ class ProjectServiceImplTest {
                 position("")
                 .build();
 
-        List<ProjectLinkRequestDto> projectLinkRequestDtos = List.of(linkRequestDto);
+        List<ProjectLinkRequestDto> projectLinkRequestDtos = List.of(linkRequestDto, linkRequestDto1);
 
-        ProjectTechStackRequestDto techStackRequestDto = new ProjectTechStackRequestDto(1L);
+        ProjectTechStackRequestDto techStackRequestDto = new ProjectTechStackRequestDto(2L);
 
         ProjectRequestDto projectRequestDto = ProjectRequestDto.builder().category("TEAM")
                 .linkDtos(projectLinkRequestDtos)
@@ -65,7 +77,7 @@ class ProjectServiceImplTest {
     @Test
     @Commit
     void techStack() {
-        TechStack techStack =TechStack.builder().techStack("백엔드").id(2L).iconUrl("").build();
+        TechStack techStack =TechStack.builder().techStack("프론트엔드").id(2L).iconUrl("").build();
         techStackRepository.save(techStack);
     }
 

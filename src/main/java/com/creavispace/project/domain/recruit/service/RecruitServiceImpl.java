@@ -24,8 +24,12 @@ import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
 import com.creavispace.project.global.util.TimeUtil;
+import com.creavispace.project.global.util.UsableConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -100,7 +104,7 @@ public class RecruitServiceImpl implements RecruitService {
             List<RecruitTechStack> techStacks = techStackDtos.stream()
                 .map(techStackDto -> {
                     TechStack techStack = techStackRepository.findById(techStackDto.getTechStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
-                    
+
                     return RecruitTechStack.builder()
                         .techStack(techStack)
                         .recruit(recruit)
@@ -235,7 +239,7 @@ public class RecruitServiceImpl implements RecruitService {
                 .now(recruitPosition.getNow())
                 .build())
             .collect(Collectors.toList());
-        
+
         // 가져온 기술스택 정보 DTO로 변환
         List<RecruitTechStackResponseDto> techStacks = recruitTechStacks.stream()
             .map(recruitTechStack -> RecruitTechStackResponseDto.builder()
@@ -271,7 +275,7 @@ public class RecruitServiceImpl implements RecruitService {
         log.info("/recruit/service : modifyRecruit success data = {}", data);
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "모집 게시글의 수정이 완료되었습니다.", data);
-            
+
     }
 
     @Override
@@ -299,7 +303,7 @@ public class RecruitServiceImpl implements RecruitService {
             .recruitId(recruit.getId())
             .postType(PostType.RECRUIT.name())
             .build();
-        
+
         log.info("/recruit/service : deleteRecruit success data = {}", data);
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "모집 게시글 삭제가 완료되었습니다.", data);
@@ -458,7 +462,7 @@ public class RecruitServiceImpl implements RecruitService {
                     .collect(Collectors.toList()))
                 .build())
             .collect(Collectors.toList());
-        
+
         log.info("/recruit/service : readDeadlineRecruitList success data = {}", data);
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "마감 모집 리스트 조회가 완료되었습니다.", data);
@@ -551,6 +555,54 @@ public class RecruitServiceImpl implements RecruitService {
         return new SuccessResponseDto<>(true,"모집 게시글 리스트 조회가 완료되었습니다.", reads);
     }
 
+
+
+    @Override
+    public SuccessResponseDto<List<RecruitListReadResponseDto>> readRecruitListForAdmin(Integer size, Integer page,
+                                                                                        String status, String sortType) {
+        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
+        Page<Recruit> pageable = findProject(status, pageRequest);
+
+        // 조회된 게시글이 있는지
+        if(!pageable.hasContent()) throw new CreaviCodeException(GlobalErrorCode.NOT_RECRUIT_CONTENT);
+        List<Recruit> recruits = pageable.getContent();
+        System.out.println("RecruitServiceImpl.readRecruitListForAdmin");
+
+        // 모집 게시글 리스트 DTO
+        List<RecruitListReadResponseDto> reads = getRecruitListReadResponseDtos(recruits);
+
+        // 성공 응답 반환
+        return new SuccessResponseDto<>(true,"모집 게시글 리스트 조회가 완료되었습니다.", reads);
+    }
+
+    private List<RecruitListReadResponseDto> getRecruitListReadResponseDtos(List<Recruit> recruits) {
+        List<Long> recruitIds = recruits.stream().map(Recruit::getId).toList();
+        List<RecruitTechStack> recruitTechStacks = recruitTechStackRepository.findByRecruitIdIn(recruitIds);
+        List<RecruitPosition> recruitPositions = recruitPositionRepository.findByRecruitIdIn(recruitIds);
+
+        Map<Long, List<RecruitTechStackResponseDto>> techStacks = techStacks(recruitTechStacks);
+        Map<Long, Integer> sumOfPositions = sumOfPositions(recruitPositions);
+
+        return recruits.stream()
+                .map(recruit -> buildDto(recruit, techStacks, sumOfPositions))
+                .collect(Collectors.toList());
+    }
+
+
+    private Page<Recruit> findProject(String status, Pageable pageRequest) {
+        if (status.equalsIgnoreCase("all")) {
+            return recruitRepository.findAll(pageRequest);
+        }
+        if (status.equalsIgnoreCase("false")) {
+            return recruitRepository.findByStatusFalse(pageRequest);
+        }
+        if (status.equalsIgnoreCase("true")) {
+            return recruitRepository.findAllByStatusTrue(pageRequest);
+        }
+        return recruitRepository.findAll(pageRequest);
+    }
+
+
     private Page<Recruit> getRecruit(String memberId, String sortType, Pageable pageRequest) {
         Page<Recruit> pageable = recruitRepository.findByMemberIdAndStatusTrueOrderByCreatedDateAsc(memberId, pageRequest);
         if (sortType.toLowerCase().equals("asc")) {
@@ -562,5 +614,50 @@ public class RecruitServiceImpl implements RecruitService {
         return pageable;
     }
 
+    private Map<Long, List<RecruitTechStackResponseDto>> techStacks(List<RecruitTechStack> recruitTechStacks) {
+        Map<Long, List<RecruitTechStackResponseDto>> techStackMap = new HashMap<>();
+            List<Long> collect = recruitTechStacks.stream().map(techStack -> techStack.getTechStack().getId())
+                    .distinct().toList();
+            techStackRepository.findByIdIn(collect);
+        for (int i = 0; i < recruitTechStacks.size(); i++) {
+            RecruitTechStack recruitTechStack = recruitTechStacks.get(i);
+            List<RecruitTechStackResponseDto> links = techStackMap.getOrDefault(recruitTechStack.getRecruit().getId(),
+                    new ArrayList<>());
+            RecruitTechStackResponseDto recruitTechStackResponseDto = RecruitTechStackResponseDto.builder()
+                    .techStackId(recruitTechStack.getTechStack().getId())
+                    .techStack(recruitTechStack.getTechStack().getTechStack())
+                    .iconUrl(recruitTechStack.getTechStack().getIconUrl())
+                    .build();
+            links.add(recruitTechStackResponseDto);
+            techStackMap.put(recruitTechStack.getRecruit().getId(), links);
+        }
+        return techStackMap;
+    }
 
+    private Map<Long, Integer> sumOfPositions(List<RecruitPosition> recruitPositions) {
+        Map<Long, Integer> sumMap = new HashMap<>();
+
+        for (int i = 0; i < recruitPositions.size(); i++) {
+            RecruitPosition recruitPosition = recruitPositions.get(i);
+            Integer sum = sumMap.getOrDefault(recruitPosition.getRecruit().getId(), 0);
+            sum += recruitPosition.getNow();
+            sumMap.put(recruitPosition.getRecruit().getId(), sum);
+        }
+        return sumMap;
+    }
+
+    private RecruitListReadResponseDto buildDto(Recruit recruit,
+                                                Map<Long, List<RecruitTechStackResponseDto>> techStacks,
+                                                Map<Long, Integer> sumOfPositions) {
+       return RecruitListReadResponseDto.builder()
+                .id(recruit.getId())
+                .postType(PostType.RECRUIT.name())
+                .category(recruit.getCategory().name())
+                .title(recruit.getTitle())
+                .content(recruit.getContent())
+                .amount(recruit.getAmount())
+                .now(sumOfPositions.get(recruit.getId()))
+                .techStacks(techStacks.get(recruit.getId()))
+                .build();
+    }
 }

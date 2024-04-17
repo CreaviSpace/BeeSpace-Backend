@@ -57,31 +57,37 @@ public class AdminController {
         member.setExpired(true);
     }
 
-    @GetMapping("/contents/project")
+    @GetMapping("/contents/project")//
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> projectContentsList(
-            @RequestParam Integer size,
-            @RequestParam Integer page) {
+            @RequestParam(name = "size") Integer size,
+            @RequestParam(name = "page") Integer page,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = SORT_TYPE) String sortType) {
         System.out.println("AdminController.projectContentsList");
-        SuccessResponseDto<List<ProjectListReadResponseDto>> projectList = projectService.readProjectList(size, page,
-                null);
+        SuccessResponseDto<List<ProjectListReadResponseDto>> projectList = projectService.readProjectListForAdmin(size, page, status, sortType);
         return ResponseEntity.ok().body(projectList);
     }
 
-    @GetMapping("/contents/recruit")
+    @GetMapping("/contents/recruit")//
     public ResponseEntity<SuccessResponseDto<List<RecruitListReadResponseDto>>> recruitContentsList(
-            @RequestParam Integer size,
-            @RequestParam Integer page) {
-        SuccessResponseDto<List<RecruitListReadResponseDto>> recruitList = recruitService.readRecruitList(size, page,
-                null);
+            @RequestParam(name = "size") Integer size,
+            @RequestParam(name = "page") Integer page,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = SORT_TYPE) String sortType) {
+        System.out.println("AdminController.recruitContentsList");
+        SuccessResponseDto<List<RecruitListReadResponseDto>> recruitList = recruitService.readRecruitListForAdmin(size, page,
+                status, sortType);
         return ResponseEntity.ok().body(recruitList);
     }
 
     @GetMapping("/contents/community")
     public ResponseEntity<SuccessResponseDto<List<CommunityResponseDto>>> communityContentsList(
-            @RequestParam Integer size,
-            @RequestParam Integer page) {
-        SuccessResponseDto<List<CommunityResponseDto>> recruitList = communityService.readCommunityList(size, page,
-                null, null, null);
+            @RequestParam(name = "size") Integer size,
+            @RequestParam(name = "page") Integer page,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = SORT_TYPE) String sortType) {
+        SuccessResponseDto<List<CommunityResponseDto>> recruitList = communityService.readCommunityListForAdmin(size, page,
+                status, sortType);
         return ResponseEntity.ok().body(recruitList);
     }
 
@@ -92,7 +98,7 @@ public class AdminController {
         Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
         if (isAdmin(admin)) {
           return;
-        };
+        }
         deleteFactory(category, id, userInfo);
     }
 

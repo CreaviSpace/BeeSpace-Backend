@@ -32,4 +32,6 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
 
     @Query(value = "SELECT 'RECRUIT' AS postType, r.id AS postId, r.created_date AS createdDate FROM recruit r WHERE (r.content LIKE %:text% OR r.title LIKE %:text%) AND r.status = true AND r.category = :searchType ORDER BY created_date DESC", nativeQuery = true)
     public Page<SearchResultSet> findRecruitCategorySearchData(String text, String searchType, Pageable pageable);
+
+    Page<Recruit> findByStatusFalse(Pageable pageRequest);
 }

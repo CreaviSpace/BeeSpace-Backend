@@ -21,8 +21,12 @@ import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.global.util.UsableConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -403,8 +407,30 @@ public class CommunityServiceImpl implements CommunityService{
     }
 
     @Override
-    public SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(String memberId, Integer size, Integer page,
-                                                                              String orderby) {
+    public SuccessResponseDto<List<CommunityResponseDto>> readCommunityListForAdmin(
+            Integer size, Integer page, String status, String sortType) {
+        System.out.println("CommunityServiceImpl.readCommunityListForAdmin");
+        List<CommunityResponseDto> data;
+        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
+        Page<Community> pageable = getRecruit(status, pageRequest);
+
+        if(!pageable.hasContent()) throw new CreaviCodeException(GlobalErrorCode.NOT_COMMUNITY_CONTENT);
+
+        List<Community> communities = pageable.getContent();
+        List<Long> communityIds = communities.stream().map(Community::getId).toList();
+        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityIdIn(communityIds);
+
+        Map<Long, List<CommunityHashTagDto>> hashTags = hashTags(communityHashTags);
+
+        data = buildDto(communities, hashTags);
+
+        log.info("/community/service : readCommunityList success data = {}", data);
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
+    }
+
+    @Override
+    public SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(
+            String memberId, Integer size, Integer page, String orderby) {
         Pageable pageRequest = PageRequest.of(page-1, size);
 
         Page<Community> pageable = getCommunities(memberId, orderby, pageRequest);
@@ -441,8 +467,8 @@ public class CommunityServiceImpl implements CommunityService{
     }
 
     @Override
-    public SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(Member member, Integer size, Integer page,
-                                                                              String orderby) {
+    public SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(
+            Member member, Integer size, Integer page, String orderby) {
         return null;
     }
 
@@ -457,4 +483,53 @@ public class CommunityServiceImpl implements CommunityService{
         return pageable;
     }
 
+
+    private Page<Community> getRecruit(String status, Pageable pageRequest) {
+        if (status.equalsIgnoreCase("true")) {
+            return communityRepository.findAllByStatusTrue(pageRequest);
+        }
+        if (status.equalsIgnoreCase("false")) {
+            return communityRepository.findByStatusFalse(pageRequest);
+        }
+        if (status.equalsIgnoreCase("all")) {
+            return communityRepository.findAll(pageRequest);
+        }
+        return communityRepository.findAll(pageRequest);
+    }
+
+    private Map<Long, List<CommunityHashTagDto>> hashTags(List<CommunityHashTag> communityHashTags) {
+        System.out.println("CommunityServiceImpl.hashTags");
+        Map<Long, List<CommunityHashTagDto>> hashTags = new HashMap<>();
+        List<Long> collect = communityHashTags.stream().map(hashTag -> hashTag.getHashTag().getId()).distinct().toList();
+        hashTagRepository.findByIdIn(collect);
+        for (int i = 0; i < communityHashTags.size(); i++) {
+            CommunityHashTag communityHashTag = communityHashTags.get(i);
+            List<CommunityHashTagDto> hashTag = hashTags.getOrDefault(communityHashTag.getCommunity().getId(), new ArrayList<>());
+            CommunityHashTagDto communityHashTagDto = CommunityHashTagDto.builder()
+                    .hashTagId(communityHashTag.getHashTag().getId())
+                    .hashTag(communityHashTag.getHashTag().getHashTag())
+                    .build();
+            hashTag.add(communityHashTagDto);
+            hashTags.put(communityHashTag.getCommunity().getId(), hashTag);
+        }
+        return hashTags;
+    }
+
+    private List<CommunityResponseDto> buildDto(
+            List<Community> communities, Map<Long, List<CommunityHashTagDto>> hashTags) {
+        return communities.stream()
+                .map(community -> CommunityResponseDto.builder()
+                        .id(community.getId())
+                        .postType(PostType.COMMUNITY.name())
+                        .category(community.getCategory().name())
+                        .memberId(community.getMember().getId())
+                        .viewCount(community.getViewCount())
+                        .createdDate(community.getCreatedDate())
+                        .modifiedDate(community.getModifiedDate())
+                        .title(community.getTitle())
+                        .content(community.getContent())
+                        .hashTags(hashTags.get(community.getId()))
+                        .build())
+                .collect(Collectors.toList());
+    }
 }

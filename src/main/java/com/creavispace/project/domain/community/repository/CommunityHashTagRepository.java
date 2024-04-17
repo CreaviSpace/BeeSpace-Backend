@@ -26,4 +26,6 @@ public interface CommunityHashTagRepository extends JpaRepository<CommunityHashT
     "ORDER BY count DESC " +
     "LIMIT 10", nativeQuery = true)
     public List<CommunityHashTagResult> findTop10HashTag();
+
+    List<CommunityHashTag> findByCommunityIdIn(List<Long> communityIds);
 }
