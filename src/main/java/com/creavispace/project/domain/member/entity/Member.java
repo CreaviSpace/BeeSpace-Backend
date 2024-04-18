@@ -47,7 +47,6 @@ public class Member extends BaseTimeEntity {
     @JsonBackReference
     private String memberName;
 
-    @Column(nullable = false, unique = true)
     private String memberNickname;
 
     @JsonBackReference

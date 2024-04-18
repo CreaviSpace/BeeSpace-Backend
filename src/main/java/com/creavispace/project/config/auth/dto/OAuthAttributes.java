@@ -4,9 +4,10 @@ import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.dto.request.MemberSaveRequestDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.service.MemberService;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.Map;
 
 @Getter
 public class OAuthAttributes {
@@ -32,8 +33,11 @@ public class OAuthAttributes {
 
     public static OAuthAttributes of(String registrationId, String memberNameAttributeName,
                                      Map<String, Object> attributes) {
+        System.out.println(memberNameAttributeName);
         if ("google".equals(registrationId)) {
             return ofGoogle(memberNameAttributeName, attributes, registrationId);
+        }else if("kakao".equalsIgnoreCase(registrationId)){
+            return ofKakao("id",attributes,registrationId);
         }
         return ofNaver("id", attributes, registrationId);
     }
@@ -68,6 +72,26 @@ public class OAuthAttributes {
                 .nameAttributeKey(memberNameAttributeName)
                 .build();
     }
+
+    private static OAuthAttributes ofKakao(String memberNameAttributeName, Map<String, Object> attributes,
+                                            String registrationId) {
+        System.out.println("------------------------카카오 로그인----------------------------");
+        System.out.println("attributes = " + attributes);
+        System.out.println(attributes.get("id"));
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+        Map<String, Object> kakao_account = (Map<String, Object>) attributes.get("kakao_account");
+        return OAuthAttributes.builder()
+                .name((String) kakao_account.get("name"))
+                .email((String) kakao_account.get("email"))
+                .loginId(String.valueOf(attributes.get("id")))
+                .nickName((String) properties.get("nickname"))
+                .loginType(registrationId)
+                .attributes(attributes)
+                .nameAttributeKey(memberNameAttributeName)
+                .build();
+    }
+
+
 
     public Member toEntity(MemberService memberService) {
         MemberSaveRequestDto dto = MemberSaveRequestDto.builder()

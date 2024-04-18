@@ -4,7 +4,6 @@ import com.creavispace.project.config.JwtFilter;
 import com.creavispace.project.domain.jwt.service.JwtService;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.service.MemberService;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -30,6 +29,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
+
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Configuration
@@ -45,6 +46,10 @@ public class SecurityConfig {
     private String naverClientId;
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String naverClientSecret;
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String kakaoClientId;
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String kakaoClientSecret;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -118,7 +123,7 @@ public class SecurityConfig {
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
         return new InMemoryClientRegistrationRepository(this.googleClientRegistration(),
-                this.naverClientRegistration());
+                this.naverClientRegistration(), this.kakaoClientRegistration());
     }
 
     private ClientRegistration naverClientRegistration() {
@@ -152,6 +157,23 @@ public class SecurityConfig {
                 .userNameAttributeName(IdTokenClaimNames.SUB)
                 .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
                 .clientName("Google")
+                .build();
+    }
+
+    private ClientRegistration kakaoClientRegistration() {
+
+        return ClientRegistration.withRegistrationId("kakao")
+                .clientId(kakaoClientId)
+                .clientSecret(kakaoClientSecret)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                .scope("profile_nickname","profile_image","account_email","name")
+                .authorizationUri("https://kauth.kakao.com/oauth/authorize")
+                .tokenUri("https://kauth.kakao.com/oauth/token")
+                .userInfoUri("https://kapi.kakao.com/v2/user/me")
+                .userNameAttributeName("id")
+                .clientName("kakao")
                 .build();
     }
 }
