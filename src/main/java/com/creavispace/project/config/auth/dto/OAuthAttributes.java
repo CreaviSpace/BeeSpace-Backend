@@ -33,11 +33,12 @@ public class OAuthAttributes {
 
     public static OAuthAttributes of(String registrationId, String memberNameAttributeName,
                                      Map<String, Object> attributes) {
-        System.out.println(memberNameAttributeName);
         if ("google".equals(registrationId)) {
             return ofGoogle(memberNameAttributeName, attributes, registrationId);
         }else if("kakao".equalsIgnoreCase(registrationId)){
             return ofKakao("id",attributes,registrationId);
+        }else if("github".equalsIgnoreCase(registrationId)){
+            return ofGithub("id",attributes,registrationId);
         }
         return ofNaver("id", attributes, registrationId);
     }
@@ -85,6 +86,22 @@ public class OAuthAttributes {
                 .email((String) kakao_account.get("email"))
                 .loginId(String.valueOf(attributes.get("id")))
                 .nickName((String) properties.get("nickname"))
+                .loginType(registrationId)
+                .attributes(attributes)
+                .nameAttributeKey(memberNameAttributeName)
+                .build();
+    }
+
+    private static OAuthAttributes ofGithub(String memberNameAttributeName, Map<String, Object> attributes,
+                                            String registrationId) {
+        System.out.println("------------------------깃헙 로그인----------------------------");
+        System.out.println("attributes = " + attributes);
+        System.out.println(attributes.get("id"));
+        return OAuthAttributes.builder()
+                .name((String) attributes.get("name"))
+                .email((String) attributes.get("email"))
+                .loginId(String.valueOf(attributes.get("id")))
+                .nickName((String) attributes.get("login"))
                 .loginType(registrationId)
                 .attributes(attributes)
                 .nameAttributeKey(memberNameAttributeName)

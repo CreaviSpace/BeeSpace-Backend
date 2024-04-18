@@ -50,6 +50,10 @@ public class SecurityConfig {
     private String kakaoClientId;
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
     private String kakaoClientSecret;
+    @Value("${spring.security.oauth2.client.registration.github.client-id}")
+    private String githubClientId;
+    @Value("${spring.security.oauth2.client.registration.github.client-secret}")
+    private String githubClientSecret;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -123,7 +127,7 @@ public class SecurityConfig {
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
         return new InMemoryClientRegistrationRepository(this.googleClientRegistration(),
-                this.naverClientRegistration(), this.kakaoClientRegistration());
+                this.naverClientRegistration(), this.kakaoClientRegistration(), this.githubClientRegistration());
     }
 
     private ClientRegistration naverClientRegistration() {
@@ -174,6 +178,23 @@ public class SecurityConfig {
                 .userInfoUri("https://kapi.kakao.com/v2/user/me")
                 .userNameAttributeName("id")
                 .clientName("kakao")
+                .build();
+    }
+
+    private ClientRegistration githubClientRegistration() {
+
+        return ClientRegistration.withRegistrationId("github")
+                .clientId(githubClientId)
+                .clientSecret(githubClientSecret)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                .scope("user")
+                .authorizationUri("https://github.com/login/oauth/authorize")
+                .tokenUri("https://github.com/login/oauth/access_token")
+                .userInfoUri("https://api.github.com/user")
+                .userNameAttributeName("id")
+                .clientName("github")
                 .build();
     }
 }
