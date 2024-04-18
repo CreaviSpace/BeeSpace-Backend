@@ -25,7 +25,7 @@ public class RecruitServiceImplTest {
     @Test
     void recruitServiceWriteContent() {
         for (int i = 0; i < 10; i++) {
-            List<RecruitTechStackRequestDto> techStack = new ArrayList(Arrays.asList(RecruitTechStackRequestDto.builder().techStackId(2L).build()));
+            List<RecruitTechStackRequestDto> techStack = new ArrayList(Arrays.asList(RecruitTechStackRequestDto.builder().techStack("Spring").build()));
             List<RecruitPositionRequestDto> positions = new ArrayList<>(Arrays.asList(RecruitPositionRequestDto.builder().position("프론트엔드").now(0).amount(5).build()));
             RecruitRequestDto recruitRequestDto = RecruitRequestDto.builder().content("테스트 모집 게시물").category("PROJECT_RECRUIT")
                     .contactWay("EMAIL")

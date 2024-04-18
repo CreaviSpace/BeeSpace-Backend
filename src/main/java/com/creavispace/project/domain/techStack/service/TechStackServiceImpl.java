@@ -1,17 +1,15 @@
 package com.creavispace.project.domain.techStack.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.techStack.dto.response.TechStackListReadResponseDto;
 import com.creavispace.project.domain.techStack.entity.TechStack;
 import com.creavispace.project.domain.techStack.repository.TechStackRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,17 +26,15 @@ public class TechStackServiceImpl implements TechStackService{
         if(text == null){
             techStacks = techStackRepository.findAll();
         }else{
-            // techStacks = techStackRepository.findByTechStackContains(text);
             techStacks = techStackRepository.findByTechStackStartingWith(text);
         }
 
         if(techStacks.isEmpty()){ // 등록된 기술스택이 없을때
-            techStacks.add(techStackRepository.findById(1L).get()); // 기타 etc
+            techStacks.add(techStackRepository.findById("기타").get()); // 기타 etc
         }
 
         data = techStacks.stream()
             .map(techStack-> TechStackListReadResponseDto.builder()
-                .techStackId(techStack.getId())
                 .techStack(techStack.getTechStack())
                 .techStackIcon(techStack.getIconUrl())
                 .build())

@@ -99,7 +99,7 @@ public class ProjectServiceImpl implements ProjectService {
         if(techStackDtos != null && !techStackDtos.isEmpty()){
             List<ProjectTechStack> projectTechStacks = techStackDtos.stream()
                     .map(techStackDto ->{
-                        TechStack projectTechStack = techStackRepository.findById(techStackDto.getTechStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
+                        TechStack projectTechStack = techStackRepository.findById(techStackDto.getTechStack()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
                         return ProjectTechStack.builder()
                                 .techStack(projectTechStack)
                                 .project(project)
@@ -163,7 +163,6 @@ public class ProjectServiceImpl implements ProjectService {
         // 기술스택 결과를 DTO로 변환
         List<ProjectTechStackResponseDto> techStacks = projectTechStacks.stream()
                 .map(projectTechStack -> ProjectTechStackResponseDto.builder()
-                        .techStackId(projectTechStack.getTechStack().getId())
                         .techStack(projectTechStack.getTechStack().getTechStack())
                         .iconUrl(projectTechStack.getTechStack().getIconUrl())
                         .build())
@@ -246,7 +245,7 @@ public class ProjectServiceImpl implements ProjectService {
         if(techStackDtos != null && !techStackDtos.isEmpty()){
             List<ProjectTechStack> projectTechStacks = techStackDtos.stream()
                     .map(techStackDto ->{
-                        TechStack projectTechStack = techStackRepository.findById(techStackDto.getTechStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
+                        TechStack projectTechStack = techStackRepository.findById(techStackDto.getTechStack()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
                         return ProjectTechStack.builder()
                                 .techStack(projectTechStack)
                                 .project(project)
@@ -311,7 +310,6 @@ public class ProjectServiceImpl implements ProjectService {
         // 기술스택 결과를 DTO로 변환
         List<ProjectTechStackResponseDto> techStacks = projectTechStacks.stream()
                 .map(projectTechStack -> ProjectTechStackResponseDto.builder()
-                        .techStackId(projectTechStack.getTechStack().getId())
                         .techStack(projectTechStack.getTechStack().getTechStack())
                         .iconUrl(projectTechStack.getTechStack().getIconUrl())
                         .build())
@@ -495,7 +493,6 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트의 기술스택을 DTO로 변환
         List<ProjectTechStackResponseDto> techStacks = project.getTechStacks().stream()
                 .map(projectTechStack -> ProjectTechStackResponseDto.builder()
-                        .techStackId(projectTechStack.getTechStack().getId())
                         .techStack(projectTechStack.getTechStack().getTechStack())
                         .iconUrl(projectTechStack.getTechStack().getIconUrl())
                         .build())

@@ -27,9 +27,6 @@ import com.creavispace.project.global.util.TimeUtil;
 import com.creavispace.project.global.util.UsableConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,8 +34,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -103,7 +99,7 @@ public class RecruitServiceImpl implements RecruitService {
         if(techStackDtos != null && !techStackDtos.isEmpty()){
             List<RecruitTechStack> techStacks = techStackDtos.stream()
                 .map(techStackDto -> {
-                    TechStack techStack = techStackRepository.findById(techStackDto.getTechStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
+                    TechStack techStack = techStackRepository.findById(techStackDto.getTechStack()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.TECHSTACK_NOT_FOUND));
 
                     return RecruitTechStack.builder()
                         .techStack(techStack)
@@ -133,7 +129,6 @@ public class RecruitServiceImpl implements RecruitService {
         // 가져온 기술스택 정보 DTO 변환
         List<RecruitTechStackResponseDto> techStacks = recruitTechStacks.stream()
             .map(recruitTechStack -> RecruitTechStackResponseDto.builder()
-                .techStackId(recruitTechStack.getTechStack().getId())
                 .techStack(recruitTechStack.getTechStack().getTechStack())
                 .iconUrl(recruitTechStack.getTechStack().getIconUrl())
                 .build())
@@ -214,7 +209,7 @@ public class RecruitServiceImpl implements RecruitService {
         if(techStackDtos != null && !techStackDtos.isEmpty()){
             List<RecruitTechStack> recruitTechStacks = techStackDtos.stream()
                 .map(techStackDto -> {
-                    TechStack recruitTechStack = techStackRepository.findById(techStackDto.getTechStackId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
+                    TechStack recruitTechStack = techStackRepository.findById(techStackDto.getTechStack()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
 
                     return RecruitTechStack.builder()
                         .techStack(recruitTechStack)
@@ -243,7 +238,6 @@ public class RecruitServiceImpl implements RecruitService {
         // 가져온 기술스택 정보 DTO로 변환
         List<RecruitTechStackResponseDto> techStacks = recruitTechStacks.stream()
             .map(recruitTechStack -> RecruitTechStackResponseDto.builder()
-                .techStackId(recruitTechStack.getTechStack().getId())
                 .techStack(recruitTechStack.getTechStack().getTechStack())
                 .iconUrl(recruitTechStack.getTechStack().getIconUrl())
                 .build())
@@ -342,7 +336,6 @@ public class RecruitServiceImpl implements RecruitService {
                         .sum())
                     .techStacks(recruit.getTechStacks().stream()
                         .map(techStack -> RecruitTechStackResponseDto.builder()
-                            .techStackId(techStack.getTechStack().getId())
                             .techStack(techStack.getTechStack().getTechStack())
                             .iconUrl(techStack.getTechStack().getIconUrl())
                             .build())
@@ -423,7 +416,6 @@ public class RecruitServiceImpl implements RecruitService {
                 .collect(Collectors.toList()))
             .techStacks(recruit.getTechStacks().stream()
                 .map(techStack -> RecruitTechStackResponseDto.builder()
-                    .techStackId(techStack.getTechStack().getId())
                     .techStack(techStack.getTechStack().getTechStack())
                     .iconUrl(techStack.getTechStack().getIconUrl())
                     .build())
@@ -455,7 +447,6 @@ public class RecruitServiceImpl implements RecruitService {
                 .modifiedDate(recruit.getModifiedDate())
                 .techStacks(recruit.getTechStacks().stream()
                     .map(techStack -> RecruitTechStackResponseDto.builder()
-                        .techStackId(techStack.getTechStack().getId())
                         .techStack(techStack.getTechStack().getTechStack())
                         .iconUrl(techStack.getTechStack().getIconUrl())
                         .build())
@@ -505,7 +496,6 @@ public class RecruitServiceImpl implements RecruitService {
                                 .sum())
                         .techStacks(recruit.getTechStacks().stream()
                                 .map(techStack -> RecruitTechStackResponseDto.builder()
-                                        .techStackId(techStack.getTechStack().getId())
                                         .techStack(techStack.getTechStack().getTechStack())
                                         .iconUrl(techStack.getTechStack().getIconUrl())
                                         .build())
@@ -543,7 +533,6 @@ public class RecruitServiceImpl implements RecruitService {
                                 .sum())
                         .techStacks(recruit.getTechStacks().stream()
                                 .map(techStack -> RecruitTechStackResponseDto.builder()
-                                        .techStackId(techStack.getTechStack().getId())
                                         .techStack(techStack.getTechStack().getTechStack())
                                         .iconUrl(techStack.getTechStack().getIconUrl())
                                         .build())
@@ -616,15 +605,14 @@ public class RecruitServiceImpl implements RecruitService {
 
     private Map<Long, List<RecruitTechStackResponseDto>> techStacks(List<RecruitTechStack> recruitTechStacks) {
         Map<Long, List<RecruitTechStackResponseDto>> techStackMap = new HashMap<>();
-            List<Long> collect = recruitTechStacks.stream().map(techStack -> techStack.getTechStack().getId())
+            List<String> collect = recruitTechStacks.stream().map(techStack -> techStack.getTechStack().getTechStack())
                     .distinct().toList();
-            techStackRepository.findByIdIn(collect);
+            techStackRepository.findByTechStackIn(collect);
         for (int i = 0; i < recruitTechStacks.size(); i++) {
             RecruitTechStack recruitTechStack = recruitTechStacks.get(i);
             List<RecruitTechStackResponseDto> links = techStackMap.getOrDefault(recruitTechStack.getRecruit().getId(),
                     new ArrayList<>());
             RecruitTechStackResponseDto recruitTechStackResponseDto = RecruitTechStackResponseDto.builder()
-                    .techStackId(recruitTechStack.getTechStack().getId())
                     .techStack(recruitTechStack.getTechStack().getTechStack())
                     .iconUrl(recruitTechStack.getTechStack().getIconUrl())
                     .build();

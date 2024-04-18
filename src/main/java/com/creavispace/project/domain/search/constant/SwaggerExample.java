@@ -47,7 +47,6 @@ public class SwaggerExample {
     "      \"now\": 1," +
     "      \"techStacks\": [" +
     "        {" +
-    "          \"techStackId\": 1," +
     "          \"techStack\": \"string\"," +
     "          \"iconUrl\": \"string\"" +
     "        }" +

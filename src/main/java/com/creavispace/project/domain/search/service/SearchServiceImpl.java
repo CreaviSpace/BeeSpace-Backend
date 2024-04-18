@@ -134,7 +134,6 @@ public class SearchServiceImpl implements SearchService{
                                 .sum())
                             .techStacks(recruit.getTechStacks().stream()
                                 .map(techstack -> RecruitTechStackResponseDto.builder()
-                                    .techStackId(techstack.getTechStack().getId())
                                     .techStack(techstack.getTechStack().getTechStack())
                                     .iconUrl(techstack.getTechStack().getIconUrl())
                                     .build())

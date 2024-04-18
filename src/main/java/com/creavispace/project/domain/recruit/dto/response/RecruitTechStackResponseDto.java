@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecruitTechStackResponseDto {
-    private Long techStackId;
     private String techStack;
     private String iconUrl;
 }

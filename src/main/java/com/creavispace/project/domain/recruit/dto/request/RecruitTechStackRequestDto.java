@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecruitTechStackRequestDto {
-    private Long techStackId;
+    private String techStack;
 }
