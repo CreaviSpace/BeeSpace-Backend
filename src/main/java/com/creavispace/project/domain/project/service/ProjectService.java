@@ -17,8 +17,7 @@ public interface ProjectService {
     public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Integer size, Integer page, ProjectCategory category);
     public SuccessResponseDto<ProjectReadResponseDto> readProject(String memberId, Long projectId, HttpServletRequest request);
 
-    SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(Member member, Integer size, Integer page, String sortType);
-    SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(String memberId, Integer size, Integer page, String sortType);
+    SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(String memberId, Integer size, Integer page, String category, String sortType);
 
     SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectFeedBackList(String memberId, Integer size, Integer page, String sortType);
     SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectListForAdmin(Integer size, Integer page, String status, String sortType);
