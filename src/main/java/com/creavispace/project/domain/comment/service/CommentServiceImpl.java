@@ -16,11 +16,10 @@ import com.creavispace.project.domain.project.repository.ProjectRepository;
 import com.creavispace.project.domain.recruit.repository.RecruitRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.UsableConst;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -104,7 +103,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public SuccessResponseDto<List<MyPageCommentResponseDto>> readMyContentsList(String memberId, Integer page, Integer size,
                                                                                  String postType, String sortType) {
-        Pageable pageRequest = pageable(page, size, sortType);
+        Pageable pageRequest = UsableConst.getPageRequest(page, size, sortType);
         List<MyPageCommentResponseDto> data;
 
         CommentStrategy strategy = strategyMap.get(PostType.valueOf(postType.toUpperCase()));
@@ -113,12 +112,5 @@ public class CommentServiceImpl implements CommentService {
         data = strategy.readMyContentsList(memberId, pageRequest);
 
         return new SuccessResponseDto<>(true, "댓글 리스트 조회가 완료되었습니다.", data);
-    }
-
-    private static PageRequest pageable(Integer page, Integer size, String sortType) {
-        if (sortType.equalsIgnoreCase("asc")) {
-            return PageRequest.of(page - 1, size, Sort.by("createdDate").ascending());
-        }
-        return PageRequest.of(page - 1, size, Sort.by("createdDate").descending());
     }
 }
