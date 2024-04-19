@@ -7,7 +7,6 @@ import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
-import com.creavispace.project.domain.member.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -21,6 +20,5 @@ public interface CommunityService {
 
     //ky
      SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(String memberId, Integer size, Integer page, String orderby);
-     SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(Member member, Integer size, Integer page, String orderby);
      SuccessResponseDto<List<CommunityResponseDto>> readCommunityListForAdmin(Integer size, Integer page, String status, String sortType);
 }
