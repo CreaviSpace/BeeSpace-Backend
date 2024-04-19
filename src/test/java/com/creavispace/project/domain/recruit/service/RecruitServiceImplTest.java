@@ -25,14 +25,14 @@ public class RecruitServiceImplTest {
     @Test
     void recruitServiceWriteContent() {
         for (int i = 0; i < 10; i++) {
-            List<RecruitTechStackRequestDto> techStack = new ArrayList(Arrays.asList(RecruitTechStackRequestDto.builder().techStack("Spring").build()));
-            List<RecruitPositionRequestDto> positions = new ArrayList<>(Arrays.asList(RecruitPositionRequestDto.builder().position("프론트엔드").now(0).amount(5).build()));
+            List<RecruitTechStackRequestDto> techStack = new ArrayList(Arrays.asList(RecruitTechStackRequestDto.builder().techStack("프론트엔드").build()));
+            List<RecruitPositionRequestDto> positions = new ArrayList<>(Arrays.asList(RecruitPositionRequestDto.builder().position("백엔드").now(0).amount(5).build()));
             RecruitRequestDto recruitRequestDto = RecruitRequestDto.builder().content("테스트 모집 게시물").category("PROJECT_RECRUIT")
                     .contactWay("EMAIL")
                     .proceedWay("OFFLINE").amount(1).workDay(30).contact("kyuyoungk@naver.com").end("2030,03,03")
                     .endFormat("yyyy,MM,dd")
                     .title("테스트 모집 타이틀").techStacks(techStack).positions(positions).build();
-            recruitService.createRecruit("80c78372", recruitRequestDto);
+            recruitService.createRecruit("1d5919d8", recruitRequestDto);
         }
     }
 

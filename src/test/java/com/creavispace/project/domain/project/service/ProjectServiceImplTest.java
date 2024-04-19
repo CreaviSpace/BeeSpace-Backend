@@ -1,6 +1,7 @@
 package com.creavispace.project.domain.project.service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.project.dto.request.ProjectLinkRequestDto;
@@ -52,13 +53,13 @@ class ProjectServiceImplTest {
 
         ProjectMemberRequestDto projectMemberRequestDto = ProjectMemberRequestDto.
                 builder().
-                memberId("80c78372").
+                memberId("1d5919d8").
                 position("")
                 .build();
 
         List<ProjectLinkRequestDto> projectLinkRequestDtos = List.of(linkRequestDto, linkRequestDto1);
 
-        ProjectTechStackRequestDto techStackRequestDto = new ProjectTechStackRequestDto(2L);
+        ProjectTechStackRequestDto techStackRequestDto = new ProjectTechStackRequestDto("프론트엔드");
 
         ProjectRequestDto projectRequestDto = ProjectRequestDto.builder().category("TEAM")
                 .linkDtos(projectLinkRequestDtos)
@@ -71,13 +72,13 @@ class ProjectServiceImplTest {
                 .content("테스트 내용")
                 .build();
 
-        projectService.createProject("80c78372", projectRequestDto);
+        projectService.createProject("1d5919d8", projectRequestDto);
     }
 
     @Test
     @Commit
     void techStack() {
-        TechStack techStack =TechStack.builder().techStack("프론트엔드").id(2L).iconUrl("").build();
+        TechStack techStack =TechStack.builder().techStack("프론트엔드").iconUrl("").build();
         techStackRepository.save(techStack);
     }
 
@@ -87,7 +88,7 @@ class ProjectServiceImplTest {
         Member member = memberRepository.findById("").orElseThrow();
 
         SuccessResponseDto<List<ProjectListReadResponseDto>> listSuccessResponseDto = projectService.readMyProjectList(
-                member, 6, 1, "asc");
+                member.getId(), 6, 1, ProjectCategory.TEAM.name(), "asc");
 
         listSuccessResponseDto.getData().forEach(System.out::println);
     }

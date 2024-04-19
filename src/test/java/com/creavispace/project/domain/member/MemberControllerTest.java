@@ -2,6 +2,7 @@ package com.creavispace.project.domain.member;
 
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.service.MemberService;
 import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
@@ -26,7 +27,7 @@ public class MemberControllerTest {
         MemberResponseDto member = new MemberResponseDto(memberService.findById(""));
         System.out.println("member = " + member);
         SuccessResponseDto<List<ProjectListReadResponseDto>> listSuccessResponseDto = projectService.readMyProjectList(
-                member.getMemberId(), 2, 1, "asc");
+                member.getMemberId(), 2, 1, ProjectCategory.INDIVIDUAL.name(), "asc");
         listSuccessResponseDto.getData().forEach(a -> System.out.println("a = " + a));
     }
 
