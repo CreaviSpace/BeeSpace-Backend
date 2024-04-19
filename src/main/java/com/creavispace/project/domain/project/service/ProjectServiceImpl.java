@@ -416,7 +416,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<Project> projects = pageable.getContent();
 
         // 프로젝트 리스트 결과 DTO
-        data = getProjectListReadResponseDtos(projects);
+        data = getProjectListReadResponseDtos(pageable);
 
         log.info("/project/service : readProjectList success data = {}", data);
         // 성공 응답 반환
@@ -525,52 +525,35 @@ public class ProjectServiceImpl implements ProjectService {
         return new SuccessResponseDto<>(true, "프로젝트 게시글 상세조회가 완료되었습니다.", data);
     }
 
+
     //ky
 
     @Override
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(Member member, Integer size,
-                                                                                  Integer page, String sortType) {
-        Pageable pageRequest = PageRequest.of(page - 1, size);
-        Page<Project> pageable = getProjects(member.getId(), sortType, pageRequest);
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(
+            String memberId, Integer size, Integer page, String projectCategory, String sortType) {
+        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
+        Page<Project> pageable = findByProjectCategory(memberId, projectCategory, pageRequest);
 
         if (!pageable.hasContent()) {
             throw new CreaviCodeException(GlobalErrorCode.NOT_PROJECT_CONTENT);
         }
-        List<Project> projects = pageable.getContent();
 
-        List<ProjectListReadResponseDto> reads = getProjectListReadResponseDtos(projects);
-
-        return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", reads);
-    }
-    @Override
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(String memberId, Integer size,
-                                                                                  Integer page, String sortType) {
-        Pageable pageRequest = PageRequest.of(page - 1, size);
-        Page<Project> pageable = getProjects(memberId, sortType, pageRequest);
-
-        if (!pageable.hasContent()) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PROJECT_CONTENT);
-        }
-        List<Project> projects = pageable.getContent();
-
-        List<ProjectListReadResponseDto> reads = getProjectListReadResponseDtos(projects);
+        List<ProjectListReadResponseDto> reads = getProjectListReadResponseDtos(pageable);
 
         return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", reads);
     }
 
     @Override
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectFeedBackList(String memberId, Integer size,
-                                                                                          Integer page,
-                                                                                          String sortType) {
-        Pageable pageRequest = PageRequest.of(page - 1, size);
-        Page<Project> pageable = getProjects(memberId, sortType, pageRequest);
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectFeedBackList(
+            String memberId, Integer size, Integer page, String sortType) {
+        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
+        Page<Project> pageable = findByProjectCategory(memberId, null, pageRequest);
 
         if (!pageable.hasContent()) {
             throw new CreaviCodeException(GlobalErrorCode.NOT_PROJECT_CONTENT);
         }
-        List<Project> projects = pageable.getContent().stream().filter(Project::isFeedback).collect(
-                Collectors.toList());
 
+        List<Project> projects = pageable.stream().filter(Project::isFeedback).collect(Collectors.toList());
         List<ProjectListReadResponseDto> reads = getProjectListReadResponseDtos(projects);
 
         return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", reads);
@@ -588,6 +571,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private Page<Project> findProject(String status, Pageable pageRequest) {
+        System.out.println("ProjectServiceImpl.findProject");
         if (status.equalsIgnoreCase("all")) {
             return projectRepository.findAll(pageRequest);
         }
@@ -600,49 +584,37 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.findAll(pageRequest);
     }
 
-    private Page<Project> getProjects(String memberId, String sortType, Pageable pageRequest) {
-        Page<Project> pageable;
-        if (sortType.equalsIgnoreCase("asc")) {
-            pageable = projectRepository.findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(pageRequest, memberId);
-            return pageable;
+    private Page<Project> findByProjectCategory(String memberId, String category, Pageable pageRequest) {
+        ProjectCategory projectCategory = ProjectCategory.getProjectCategory(category);
+        if (projectCategory != null) {
+            return projectRepository.findAllByStatusTrueAndCategoryAndMemberId(projectCategory, memberId, pageRequest);
         }
-        if (sortType.equalsIgnoreCase("desc")) {
-            pageable = projectRepository.findAllByStatusTrueAndMemberIdOrderByCreatedDateDesc(pageRequest, memberId);
-            return pageable;
-        }
-        return projectRepository.findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(pageRequest, memberId);
+        return projectRepository.findAllByStatusTrueAndMemberId(memberId, pageRequest);
     }
 
     private List<ProjectListReadResponseDto> getProjectListReadResponseDtos(List<Project> projects) {
+        System.out.println("ProjectServiceImpl.getProjectListReadResponseDtos");
+        List<String> memberIds = projects.stream().map(project -> project.getMember().getId()).toList();
+        List<Long> projectIds = projects.stream().map(Project::getId).collect(Collectors.toList());
+
+        memberRepository.findByIdIn(memberIds);
+        List<ProjectLink> byProjectIdIn = projectLinkRepository.findByProjectIdIn(projectIds);
+
+        Map<Long, List<ProjectLinkResponseDto>> links = projectLinks(byProjectIdIn);
 
         return projects.stream()
-                .map(project -> {
-                    List<ProjectLinkResponseDto> links = project.getLinks().stream()
-                            .map(link -> ProjectLinkResponseDto.builder()
-                                    .linkType(link.getLinkType())
-                                    .url(link.getUrl())
-                                    .build())
-                            .collect(Collectors.toList());
-
-                    return ProjectListReadResponseDto.builder()
-                            .id(project.getId())
-                            .postType(PostType.PROJECT.name())
-                            .category(project.getCategory().name())
-                            .title(project.getTitle())
-                            .thumbnail(project.getThumbnail())
-                            .bannerContent(project.getBannerContent())
-                            .links(links)
-                            .status(project.isStatus())
-                            .build();
-                })
-                .collect(Collectors.toList());
+                .map(project -> buildDto(project, links)
+                ).collect(Collectors.toList());
     }
 
     private List<ProjectListReadResponseDto> getProjectListReadResponseDtos(Page<Project> projects) {
 
         System.out.println("ProjectServiceImpl.getProjectListReadResponseDtos");
-        List<Long> collect = projects.stream().map(Project::getId).collect(Collectors.toList());
-        List<ProjectLink> byProjectIdIn = projectLinkRepository.findByProjectIdIn(collect);
+        List<String> memberIds = projects.stream().map(project -> project.getMember().getId()).toList();
+        List<Long> projectIds = projects.stream().map(Project::getId).collect(Collectors.toList());
+
+        memberRepository.findByIdIn(memberIds);
+        List<ProjectLink> byProjectIdIn = projectLinkRepository.findByProjectIdIn(projectIds);
 
         Map<Long, List<ProjectLinkResponseDto>> links = projectLinks(byProjectIdIn);
 
@@ -668,8 +640,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private ProjectListReadResponseDto buildDto(Project project, Map<Long, List<ProjectLinkResponseDto>> links) {
-
         return ProjectListReadResponseDto.builder()
+                .memberProfile(project.getMember().getProfileUrl())
+                .memberNickname(project.getMember().getMemberNickname())
                 .id(project.getId())
                 .postType(PostType.PROJECT.name())
                 .category(project.getCategory().name())
@@ -678,6 +651,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .bannerContent(project.getBannerContent())
                 .links(links.get(project.getId()))
                 .status(project.isStatus())
+                .createdDate(project.getCreatedDate())
                 .build();
 
     }
