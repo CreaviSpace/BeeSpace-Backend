@@ -10,4 +10,14 @@ public enum ProjectCategory {
     INDIVIDUAL("개인");
 
     private String subName;
+
+    public static ProjectCategory getProjectCategory(String category) {
+        if (TEAM.name().equalsIgnoreCase(category)) {
+            return TEAM;
+        }
+        if (INDIVIDUAL.name().equalsIgnoreCase(category)) {
+            return INDIVIDUAL;
+        }
+        return null;
+    }
 }
