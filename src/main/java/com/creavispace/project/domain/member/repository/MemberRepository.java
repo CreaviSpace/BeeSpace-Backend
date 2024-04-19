@@ -22,4 +22,5 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     List<Member> findBy(Pageable pageable);
 
+    List<Member> findByIdIn(List<String> collect);
 }
