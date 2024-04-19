@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.project.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
@@ -24,4 +25,7 @@ public class ProjectListReadResponseDto implements SearchListReadResponseDto{
     private String thumbnail;
     private String bannerContent;
     private boolean status;
+    private LocalDateTime createdDate;
+    private String memberNickname;
+    private String memberProfile;
 }
