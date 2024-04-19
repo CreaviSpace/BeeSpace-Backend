@@ -137,4 +137,6 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     public Page<SearchResultSet> findCommunityCategorySearchData(String text, String searchType, Pageable pageable);
 
     Page<Community> findByStatusFalse(Pageable pageRequest);
+
+    Page<Community> findByMemberIdAndStatusTrue(String memberId, Pageable pageRequest);
 }
