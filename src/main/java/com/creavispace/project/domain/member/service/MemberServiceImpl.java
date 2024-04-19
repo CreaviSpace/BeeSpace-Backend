@@ -126,6 +126,11 @@ public class MemberServiceImpl implements MemberService {
         return createdId;
     }
 
+    @Override
+    public Optional<Member> findByLoginIdAndLoginType(String loginId, String loginType) {
+        return memberRepository.findByLoginIdAndLoginType(loginId, loginType);
+    }
+
     private Member findMember(String memberId) {
         Optional<Member> memberOptional = memberRepository.findById(memberId);
         if (memberOptional.isPresent()) {

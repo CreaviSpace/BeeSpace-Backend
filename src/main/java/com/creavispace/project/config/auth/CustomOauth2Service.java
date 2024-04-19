@@ -45,11 +45,7 @@ public class CustomOauth2Service implements OAuth2UserService<OAuth2UserRequest,
 
     private Member findOrSave(OAuthAttributes attributes) {
         System.out.println("-----------------------findOrSave------------------------");
-        Optional<Member> memberOptional = memberService
-                .findByEmailAndNameAndLoginId(
-                        attributes.getEmail(),
-                        attributes.getName(),
-                        attributes.getLoginId());
+        Optional<Member> memberOptional = memberService.findByLoginIdAndLoginType(attributes.getLoginId(), attributes.getLoginType());
 
         if (memberOptional.isPresent()) {
             System.out.println("-----------------------findOrSaveEnd : 존재하는 아이디------------------------");

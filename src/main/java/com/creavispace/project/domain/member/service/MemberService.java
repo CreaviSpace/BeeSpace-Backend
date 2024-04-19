@@ -34,4 +34,6 @@ public interface MemberService {
     boolean existMemberId(String id);
 
     String createId();
+
+    Optional<Member> findByLoginIdAndLoginType(String loginId, String loginType);
 }
