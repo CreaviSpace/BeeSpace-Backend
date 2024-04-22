@@ -20,7 +20,7 @@ public class Alarm extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String alarmType;
+    private String alarmMessage;
 
     @Enumerated(EnumType.STRING)
     private PostType postType;

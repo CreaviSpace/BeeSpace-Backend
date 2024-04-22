@@ -29,8 +29,9 @@ public class AlarmServiceImpl implements AlarmService{
         AlarmResponseDto data = null;
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
+        String message = postType.name()+" "+postId+"번 게시글에 새로운 "+alarmType+"이 등록되었습니다.";
         Alarm alarm = Alarm.builder()
-                .alarmType(alarmType)
+                .alarmMessage(message)
                 .postType(postType)
                 .postId(postId)
                 .member(member)
@@ -41,7 +42,7 @@ public class AlarmServiceImpl implements AlarmService{
 
         data = AlarmResponseDto.builder()
                 .id(alarm.getId())
-                .alarmType(alarmType)
+                .alarmMessage(alarm.getAlarmMessage())
                 .postType(postType.name())
                 .postId(postId)
                 .readStatus(alarm.getReadStatus())
@@ -60,7 +61,7 @@ public class AlarmServiceImpl implements AlarmService{
         data = alarms.stream()
                 .map(alarm -> AlarmResponseDto.builder()
                         .id(alarm.getId())
-                        .alarmType(alarm.getAlarmType())
+                        .alarmMessage(alarm.getAlarmMessage())
                         .postType(alarm.getPostType().name())
                         .postId(alarm.getPostId())
                         .readStatus(alarm.getReadStatus())
@@ -84,7 +85,7 @@ public class AlarmServiceImpl implements AlarmService{
 
         data = AlarmResponseDto.builder()
                 .id(alarm.getId())
-                .alarmType(alarm.getAlarmType())
+                .alarmMessage(alarm.getAlarmMessage())
                 .postId(alarm.getPostId())
                 .postType(alarm.getPostType().name())
                 .readStatus(alarm.getReadStatus())
