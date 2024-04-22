@@ -54,7 +54,7 @@ public class CommentController {
         log.info("/comment/controller : 댓글 등록");
         PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
         SuccessResponseDto<CommentResponseDto> response = commentService.createComment(memberId, postId, postTypeEnum, requestBody);
-        alarmService.createAlarm(memberId,"comment", postTypeEnum, postId);
+        alarmService.createAlarm(memberId,"댓글", postTypeEnum, postId);
         return ResponseEntity.ok().body(response);
     }
 

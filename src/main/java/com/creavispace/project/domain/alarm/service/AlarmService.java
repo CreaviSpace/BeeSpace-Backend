@@ -7,9 +7,17 @@ import com.creavispace.project.domain.common.dto.type.PostType;
 import java.util.List;
 
 public interface AlarmService {
-    public SuccessResponseDto<AlarmResponseDto> createAlarm(String memberId, String alarmType, PostType postType, Long postId);
+    public void createAlarm(String memberId, String alarmType, PostType postType, Long postId);
 
     public SuccessResponseDto<List<AlarmResponseDto>> readAlarmList(String memberId);
 
-    public SuccessResponseDto<AlarmResponseDto> modifyAlarm(String memberId, Long alarmId);
+    public SuccessResponseDto<Void> modifyAlarm(String memberId, Long alarmId);
+
+    SuccessResponseDto<Void> modifyAllAlarm(String memberId);
+
+    SuccessResponseDto<Void> deleteAlarm(String memberId, Long alarmId);
+
+    SuccessResponseDto<Void> deleteAllAlarm(String memberId);
+
+    SuccessResponseDto<Integer> countUnReadAlarm(String memberId);
 }

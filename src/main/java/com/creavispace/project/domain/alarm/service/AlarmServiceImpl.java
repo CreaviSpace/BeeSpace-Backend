@@ -9,6 +9,7 @@ import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class AlarmServiceImpl implements AlarmService{
     private final MemberRepository memberRepository;
 
     @Override
-    public SuccessResponseDto<AlarmResponseDto> createAlarm(String memberId, String alarmType, PostType postType, Long postId) {
+    public void createAlarm(String memberId, String alarmType, PostType postType, Long postId) {
         AlarmResponseDto data = null;
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
@@ -40,21 +41,12 @@ public class AlarmServiceImpl implements AlarmService{
 
         alarmRepository.save(alarm);
 
-        data = AlarmResponseDto.builder()
-                .id(alarm.getId())
-                .alarmMessage(alarm.getAlarmMessage())
-                .postType(postType.name())
-                .postId(postId)
-                .readStatus(alarm.getReadStatus())
-                .build();
-        log.info("/alarm/service : createAlarm success data ={}", data);
-        return new SuccessResponseDto<>(true, "알림이 저장되었습니다.", data);
+        log.info("/alarm/service : 알림 생성 Service - data ={}", alarm);
     }
 
     @Override
     public SuccessResponseDto<List<AlarmResponseDto>> readAlarmList(String memberId) {
         List<AlarmResponseDto> data = null;
-        if(!memberRepository.existsById(memberId)) throw new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND);
 
         List<Alarm> alarms = alarmRepository.findByMemberId(memberId);
 
@@ -68,30 +60,54 @@ public class AlarmServiceImpl implements AlarmService{
                         .build())
                 .collect(Collectors.toList());
 
-        log.info("/alarm/service : readAlarmList success data ={}", data);
+        log.info("/alarm/service : 알림 리스트 조회 Service - data = {}", data);
         return new SuccessResponseDto<>(true, "알림 리스트 조회가 완료되었습니다.", data);
     }
 
+    @Transactional
     @Override
-    public SuccessResponseDto<AlarmResponseDto> modifyAlarm(String memberId, Long alarmId) {
-        AlarmResponseDto data = null;
+    public SuccessResponseDto<Void> modifyAlarm(String memberId, Long alarmId) {
 
-        if(!memberRepository.existsById(memberId)) throw new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND);
+        int count = alarmRepository.updateReadStatusToReadByIdAndMemberId(alarmId,memberId);
 
-        Alarm alarm = alarmRepository.findById(alarmId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.NOT_FOUND_ALARM));
+        log.info("/alarm/service : 알림 읽음 Service - alarmId = {}", alarmId);
+        return new SuccessResponseDto<>(true, "알림 읽음 처리가 완료되었습니다.", null);
+    }
 
-        alarm.updateViewed();
-        alarmRepository.save(alarm);
+    @Transactional
+    @Override
+    public SuccessResponseDto<Void> modifyAllAlarm(String memberId) {
 
-        data = AlarmResponseDto.builder()
-                .id(alarm.getId())
-                .alarmMessage(alarm.getAlarmMessage())
-                .postId(alarm.getPostId())
-                .postType(alarm.getPostType().name())
-                .readStatus(alarm.getReadStatus())
-                .build();
+        int count = alarmRepository.updateReadStatusToReadByMemberId(memberId);
 
-        log.info("/alarm/service : modifyAlarm success data = {}", data);
-        return new SuccessResponseDto<>(true, "알림 읽음 처리가 완료되었습니다.", data);
+        log.info("/alarm/service : 알림 전체 읽음 Service - {}개의 알림 읽음 처리", count);
+        return new SuccessResponseDto<>(true, "알림 전체 읽음 처리가 완료되었습니다.", null);
+    }
+
+    @Override
+    public SuccessResponseDto<Void> deleteAlarm(String memberId, Long alarmId) {
+
+        alarmRepository.deleteByIdAndMemberId(alarmId, memberId);
+
+        log.info("/alarm/service : 알림 삭제 Service - alarmId = {}", alarmId);
+        return new SuccessResponseDto<>(true, "알림 삭제가 완료되었습니다.",null);
+    }
+
+    @Override
+    public SuccessResponseDto<Void> deleteAllAlarm(String memberId) {
+
+        alarmRepository.deleteByMemberId(memberId);
+
+        log.info("/alarm/service : 알림 전체 삭제 Service");
+        return new SuccessResponseDto<>(true, "알림 전체 삭제가 완료되었습니다.", null);
+    }
+
+    @Override
+    public SuccessResponseDto<Integer> countUnReadAlarm(String memberId) {
+
+        int count = alarmRepository.countByMemberIdAndReadStatus(memberId, Alarm.readStatus.UNREAD);
+
+        log.info("/alarm/srevice : 읽지 않은 알림 수 조회 Service - count ={}", count);
+        return new SuccessResponseDto<>(true, "읽지 않은 알림 수 조회가 완료되었습니다.", count);
     }
 }
