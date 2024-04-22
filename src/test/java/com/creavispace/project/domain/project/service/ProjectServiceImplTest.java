@@ -53,7 +53,7 @@ class ProjectServiceImplTest {
 
         ProjectMemberRequestDto projectMemberRequestDto = ProjectMemberRequestDto.
                 builder().
-                memberId("1d5919d8").
+                memberId("6861d93b").
                 position("")
                 .build();
 
@@ -72,7 +72,7 @@ class ProjectServiceImplTest {
                 .content("테스트 내용")
                 .build();
 
-        projectService.createProject("1d5919d8", projectRequestDto);
+        projectService.createProject("6861d93b", projectRequestDto);
     }
 
     @Test

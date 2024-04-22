@@ -56,4 +56,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     Page<Project> findAllByStatusTrueAndCategoryAndMemberId(ProjectCategory projectCategory, String memberId, Pageable pageRequest);
 
     Page<Project> findAllByStatusTrueAndMemberId(String memberId, Pageable pageRequest);
+
+    List<Project> findByIdIn(List<Long> projectIds);
 }

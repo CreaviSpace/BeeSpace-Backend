@@ -2,14 +2,21 @@ package com.creavispace.project.domain.bookmark.service;
 
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
+import com.creavispace.project.domain.bookmark.dto.response.ProjectBookmarkResponseDto;
 import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
 import com.creavispace.project.domain.bookmark.repository.ProjectBookmarkRepository;
+import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.member.entity.Member;
+import com.creavispace.project.domain.project.dto.response.ProjectLinkResponseDto;
 import com.creavispace.project.domain.project.entity.Project;
+import com.creavispace.project.domain.project.entity.ProjectLink;
+import com.creavispace.project.domain.project.repository.ProjectLinkRepository;
 import com.creavispace.project.domain.project.repository.ProjectRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.UsableConst;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -22,6 +29,7 @@ public class ProjectBookmarkStrategy implements BookmarkStrategy {
 
     private final ProjectRepository projectRepository;
     private final ProjectBookmarkRepository projectBookmarkRepository;
+    private final ProjectLinkRepository projectLinkRepository;
 
     @Override
     public BookmarkResponseDto bookmarkToggle(Long postId, Member member) {
@@ -61,13 +69,54 @@ public class ProjectBookmarkStrategy implements BookmarkStrategy {
 
     @Override
     public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
-        List<ProjectBookmark> bookmarks = projectBookmarkRepository.findByMemberId(memberId, pageRequest);
-        List<BookmarkContentsResponseDto> bookmarkDto = bookmarks.stream()
-                .map(bookmark -> BookmarkContentsResponseDto.builder()
-                        .bookmark(bookmark)
-                        .postId(bookmark.getProject().getId())
-                        .postType(UsableConst.typeIsName(bookmark.getProject()))
-                        .build()).toList();
-        return bookmarkDto;
+        System.out.println("ProjectBookmarkStrategy.readMyBookmark");
+        List<ProjectBookmark> projectBookmarks = projectBookmarkRepository.findByMemberId(memberId, pageRequest);
+        List<Long> projectIds = projectBookmarks.stream().map(projectBookmark -> projectBookmark.getProject().getId())
+                .toList();
+        projectBookmarkRepository.findByProjectIdIn(projectIds);
+        projectRepository.findByIdIn(projectIds);
+        List<ProjectLink> projectLinks = projectLinkRepository.findByProjectIdIn(projectIds);
+        Map<Long, List<ProjectLinkResponseDto>> links = projectLinks(projectLinks);
+        return getBookmarkContentsResponseDtos(
+                projectBookmarks, links);
     }
+
+    private static List<BookmarkContentsResponseDto> getBookmarkContentsResponseDtos(
+            List<ProjectBookmark> projectBookmarks, Map<Long, List<ProjectLinkResponseDto>> links) {
+        List<BookmarkContentsResponseDto> bookmarks = new ArrayList<>();
+        for (int i = 0; i < projectBookmarks.size(); i++) {
+            ProjectBookmark bookmark = projectBookmarks.get(i);
+            ProjectBookmarkResponseDto build = ProjectBookmarkResponseDto.builder()
+                    .thumbnail(bookmark.getProject().getThumbnail())
+                    .links(links.get(bookmark.getProject().getId()))
+                    .postId(bookmark.getProject().getId())
+                    .postType(PostType.PROJECT.name())
+                    .category(bookmark.getProject().getCategory().name())
+                    .title(bookmark.getProject().getTitle())
+                    .contents(bookmark.getProject().getContent())
+                    .createdDate(bookmark.getProject().getCreatedDate())
+                    .modifiedDate(bookmark.getProject().getModifiedDate())
+                    .viewCount(bookmark.getProject().getViewCount())
+                    .build();
+            bookmarks.add(build);
+        }
+        return bookmarks;
+    }
+
+    private Map<Long, List<ProjectLinkResponseDto>> projectLinks(List<ProjectLink> projectLinks) {
+        Map<Long, List<ProjectLinkResponseDto>> linkMap = new HashMap<>();
+        for (int i = 0; i < projectLinks.size(); i++) {
+            ProjectLink projectLink = projectLinks.get(i);
+            List<ProjectLinkResponseDto> links = linkMap.getOrDefault(projectLink.getProject().getId(),
+                    new ArrayList<>());
+            ProjectLinkResponseDto projectLinkResponseDto = ProjectLinkResponseDto.builder()
+                    .linkType(projectLink.getLinkType())
+                    .url(projectLink.getUrl())
+                    .build();
+            links.add(projectLinkResponseDto);
+            linkMap.put(projectLink.getProject().getId(), links);
+        }
+        return linkMap;
+    }
+
 }

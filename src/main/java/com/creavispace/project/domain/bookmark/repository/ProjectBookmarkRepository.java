@@ -18,4 +18,7 @@ public interface ProjectBookmarkRepository extends JpaRepository<ProjectBookmark
 
     List<ProjectBookmark> findByMemberIdOrderByContentsCreatedDateAsc(Long memberId, Pageable pageRequest);
     List<ProjectBookmark> findByMemberIdOrderByContentsCreatedDateDesc(Long memberId, Pageable pageRequest);
+
+
+    List<ProjectBookmark> findByProjectIdIn(List<Long> projectIds);
 }

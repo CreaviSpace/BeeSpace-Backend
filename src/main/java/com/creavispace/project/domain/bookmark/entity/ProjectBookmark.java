@@ -33,7 +33,7 @@ public class ProjectBookmark extends BaseTimeEntity implements Bookmark {
     @JsonBackReference
     private Member member;
 
-    @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Project.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 

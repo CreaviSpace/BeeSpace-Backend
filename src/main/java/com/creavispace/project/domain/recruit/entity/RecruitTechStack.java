@@ -3,6 +3,7 @@ package com.creavispace.project.domain.recruit.entity;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.techStack.entity.TechStack;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString
 public class RecruitTechStack extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,5 +24,6 @@ public class RecruitTechStack extends BaseTimeEntity {
 
     @ManyToOne(targetEntity = Recruit.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id", nullable = false)
+    @JsonBackReference
     private Recruit recruit;
 }

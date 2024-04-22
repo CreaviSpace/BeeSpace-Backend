@@ -3,6 +3,7 @@ package com.creavispace.project.domain.community.entity;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.hashTag.entity.HashTag;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +28,7 @@ public class CommunityHashTag extends BaseTimeEntity{
 
     @ManyToOne(targetEntity = Community.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", nullable = false)
+    @JsonBackReference
     private Community community;
 
     @ManyToOne(targetEntity = HashTag.class, fetch = FetchType.LAZY)

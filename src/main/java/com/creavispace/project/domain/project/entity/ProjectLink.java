@@ -2,6 +2,7 @@ package com.creavispace.project.domain.project.entity;
 
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,10 +24,12 @@ import lombok.NoArgsConstructor;
 public class ProjectLink extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonBackReference
     private Long id;
 
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
+    @JsonBackReference
     private Project project;
 
     @Column(nullable = false)

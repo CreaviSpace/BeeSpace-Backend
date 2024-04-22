@@ -33,7 +33,7 @@ public class CommunityBookmark extends BaseTimeEntity implements Bookmark {
     @JsonBackReference
     private Member member;
 
-    @ManyToOne(targetEntity = Community.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Community.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", nullable = false)
     private Community community;
 

@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.hashTag.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.List;
 
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
@@ -32,5 +33,6 @@ public class HashTag extends BaseTimeEntity{
     private String hashTag;
 
     @OneToMany(mappedBy = "hashTag")
+    @JsonBackReference
     private List<CommunityHashTag> communityHashTags;
 }

@@ -19,7 +19,7 @@ public class RecruitBookmark extends BaseTimeEntity implements Bookmark  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(targetEntity = Recruit.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Recruit.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id", nullable = false)
     private Recruit recruit;
 

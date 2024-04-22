@@ -3,6 +3,7 @@ package com.creavispace.project.domain.community.repository;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -139,4 +140,6 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     Page<Community> findByStatusFalse(Pageable pageRequest);
 
     Page<Community> findByMemberIdAndStatusTrue(String memberId, Pageable pageRequest);
+
+    List<Community> findByIdIn(List<Long> communityIds);
 }

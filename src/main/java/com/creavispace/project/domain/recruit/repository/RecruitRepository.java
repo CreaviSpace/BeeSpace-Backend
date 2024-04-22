@@ -34,4 +34,6 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
     public Page<SearchResultSet> findRecruitCategorySearchData(String text, String searchType, Pageable pageable);
 
     Page<Recruit> findByStatusFalse(Pageable pageRequest);
+
+    List<Recruit> findByIdIn(List<Long> recruitIds);
 }

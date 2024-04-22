@@ -2,14 +2,22 @@ package com.creavispace.project.domain.bookmark.service;
 
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
+import com.creavispace.project.domain.bookmark.dto.response.CommunityBookmarkResponseDto;
 import com.creavispace.project.domain.bookmark.entity.CommunityBookmark;
 import com.creavispace.project.domain.bookmark.repository.CommunityBookmarkRepository;
+import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.entity.Community;
+import com.creavispace.project.domain.community.entity.CommunityHashTag;
+import com.creavispace.project.domain.community.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.hashTag.repository.HashTagRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.UsableConst;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -22,6 +30,8 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
 
     private final CommunityRepository communityRepository;
     private final CommunityBookmarkRepository communityBookmarkRepository;
+    private final HashTagRepository hashTagRepository;
+    private final CommunityHashTagRepository communityHashTagRepository;
 
     @Override
     public BookmarkResponseDto bookmarkToggle(Long postId, Member member) {
@@ -60,13 +70,50 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
 
     @Override
     public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
-        List<CommunityBookmark> bookmarks = communityBookmarkRepository.findByMemberId(memberId, pageRequest);
-        List<BookmarkContentsResponseDto> bookmarkDto = bookmarks.stream()
-                .map(bookmark -> BookmarkContentsResponseDto.builder()
-                        .bookmark(bookmark)
-                        .postId(bookmark.getCommunity().getId())
-                        .postType(UsableConst.typeIsName(bookmark.getCommunity()))
-                        .build()).toList();
-        return bookmarkDto;
+        System.out.println("CommunityBookmarkStrategy.readMyBookmark");
+        List<CommunityBookmark> communityBookmarks = communityBookmarkRepository.findByMemberId(memberId, pageRequest);
+        List<BookmarkContentsResponseDto> bookmarks = new ArrayList<>();
+        List<Long> communityIds = communityBookmarks.stream().map(bookmark -> bookmark.getCommunity().getId()).toList();
+        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityIdIn(communityIds);
+        List<Community> communities = communityRepository.findByIdIn(communityIds);
+
+        Map<Long, List<CommunityHashTagDto>> hashTags = hashTags(communityHashTags);
+        for (int i = 0; i < communityBookmarks.size(); i++) {
+            CommunityBookmark bookmark = communityBookmarks.get(i);
+            CommunityBookmarkResponseDto build = CommunityBookmarkResponseDto.builder()
+                    .postId(bookmark.getCommunity().getId())
+                    .postType(PostType.COMMUNITY.name())
+                    .category(bookmark.getCommunity().getCategory().name())
+                    .title(bookmark.getCommunity().getTitle())
+                    .contents(bookmark.getCommunity().getContent())
+                    .viewCount(bookmark.getCommunity().getViewCount())
+                    .createdDate(bookmark.getCommunity().getCreatedDate())
+                    .modifiedDate(bookmark.getCommunity().getModifiedDate())
+                    .hashTags(hashTags.get(bookmark.getCommunity().getId()))
+                    .build();
+            bookmarks.add(build);
+        }
+        return bookmarks;
     }
+
+    private Map<Long, List<CommunityHashTagDto>> hashTags(List<CommunityHashTag> communityHashTags) {
+        System.out.println("CommunityServiceImpl.hashTags");
+        Map<Long, List<CommunityHashTagDto>> hashTags = new HashMap<>();
+        List<Long> collect = communityHashTags.stream().map(hashTag -> hashTag.getHashTag().getId()).distinct()
+                .toList();
+        hashTagRepository.findByIdIn(collect);
+        for (int i = 0; i < communityHashTags.size(); i++) {
+            CommunityHashTag communityHashTag = communityHashTags.get(i);
+            List<CommunityHashTagDto> hashTag = hashTags.getOrDefault(communityHashTag.getCommunity().getId(),
+                    new ArrayList<>());
+            CommunityHashTagDto communityHashTagDto = CommunityHashTagDto.builder()
+                    .hashTagId(communityHashTag.getHashTag().getId())
+                    .hashTag(communityHashTag.getHashTag().getHashTag())
+                    .build();
+            hashTag.add(communityHashTagDto);
+            hashTags.put(communityHashTag.getCommunity().getId(), hashTag);
+        }
+        return hashTags;
+    }
+
 }

@@ -32,7 +32,7 @@ public class RecruitServiceImplTest {
                     .proceedWay("OFFLINE").amount(1).workDay(30).contact("kyuyoungk@naver.com").end("2030,03,03")
                     .endFormat("yyyy,MM,dd")
                     .title("테스트 모집 타이틀").techStacks(techStack).positions(positions).build();
-            recruitService.createRecruit("1d5919d8", recruitRequestDto);
+            recruitService.createRecruit("6861d93b", recruitRequestDto);
         }
     }
 

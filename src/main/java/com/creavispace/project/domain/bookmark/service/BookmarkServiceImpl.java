@@ -7,13 +7,19 @@ import com.creavispace.project.domain.bookmark.repository.ProjectBookmarkReposit
 import com.creavispace.project.domain.bookmark.repository.RecruitBookmarkRepository;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.community.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.hashTag.repository.HashTagRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
+import com.creavispace.project.domain.project.repository.ProjectLinkRepository;
 import com.creavispace.project.domain.project.repository.ProjectRepository;
 import com.creavispace.project.domain.recruit.repository.RecruitRepository;
+import com.creavispace.project.domain.recruit.repository.RecruitTechStackRepository;
+import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.global.util.UsableConst;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -30,16 +36,27 @@ import java.util.Optional;
 public class BookmarkServiceImpl implements BookmarkService {
 
     private final MemberRepository memberRepository;
-    private final Map<PostType, BookmarkStrategy> strategyMap;
-
-    public BookmarkServiceImpl(ProjectBookmarkRepository projectBookmarkRepository, RecruitBookmarkRepository recruitBookmarkRepository, CommunityBookmarkRepository communityBookmarkRepository, MemberRepository memberRepository, ProjectRepository projectRepository, RecruitRepository recruitRepository, CommunityRepository communityRepository) {
+    public BookmarkServiceImpl(ProjectBookmarkRepository projectBookmarkRepository,
+                               RecruitBookmarkRepository recruitBookmarkRepository,
+                               CommunityBookmarkRepository communityBookmarkRepository,
+                               MemberRepository memberRepository,
+                               ProjectRepository projectRepository,
+                               RecruitRepository recruitRepository,
+                               CommunityRepository communityRepository,
+                               ProjectLinkRepository projectLinkRepository,
+                               RecruitTechStackRepository recruitTechStackRepository,
+                               TechStackRepository techStackRepository,
+                               HashTagRepository hashTagRepository,
+                               CommunityHashTagRepository communityHashTagRepository) {
         this.memberRepository = memberRepository;
         this.strategyMap = Map.of(
-                PostType.PROJECT, new ProjectBookmarkStrategy(projectRepository, projectBookmarkRepository),
-                PostType.COMMUNITY, new CommunityBookmarkStrategy(communityRepository, communityBookmarkRepository),
-                PostType.RECRUIT, new RecruitBookmarkStrategy(recruitRepository, recruitBookmarkRepository)
+                PostType.PROJECT, new ProjectBookmarkStrategy(projectRepository, projectBookmarkRepository, projectLinkRepository),
+                PostType.COMMUNITY, new CommunityBookmarkStrategy(communityRepository, communityBookmarkRepository, hashTagRepository, communityHashTagRepository),
+                PostType.RECRUIT, new RecruitBookmarkStrategy(recruitRepository, recruitBookmarkRepository, recruitTechStackRepository, techStackRepository)
         );
     }
+
+    private final Map<PostType, BookmarkStrategy> strategyMap;
 
     @Override
     @Transactional
@@ -71,7 +88,7 @@ public class BookmarkServiceImpl implements BookmarkService {
 
     @Override
     public SuccessResponseDto<List<BookmarkContentsResponseDto>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType) {
-        Pageable pageRequest = pageable(page, size, sortType);
+        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
         memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
         BookmarkStrategy strategy = strategyMap.get(PostType.valueOf(postType.toUpperCase()));
