@@ -67,6 +67,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .member(member)
                 .category(categoryEnum)
                 .title(dto.getTitle())
+                .field(dto.getField())
                 .content(dto.getContent())
                 .thumbnail(dto.getThumbnail())
                 .bannerContent(dto.getBannerContent())
