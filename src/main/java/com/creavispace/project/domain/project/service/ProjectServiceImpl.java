@@ -346,6 +346,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public SuccessResponseDto<ProjectDeleteResponseDto> deleteProject(String memberId, Long projectId) {
         ProjectDeleteResponseDto data = null;
+        System.out.println("ProjectServiceImpl.deleteProject");
         // JWT에 저장된 회원이 존재하는지
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));

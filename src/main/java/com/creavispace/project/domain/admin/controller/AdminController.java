@@ -3,6 +3,7 @@ package com.creavispace.project.domain.admin.controller;
 
 import com.creavispace.project.config.auth.utils.JwtUtil;
 import com.creavispace.project.domain.admin.dto.MemberListDto;
+import com.creavispace.project.domain.admin.dto.request.DeleteRequestDto;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
@@ -17,6 +18,9 @@ import com.creavispace.project.domain.recruit.dto.response.RecruitListReadRespon
 import com.creavispace.project.domain.recruit.service.RecruitService;
 import com.creavispace.project.domain.report.entity.Report;
 import com.creavispace.project.domain.report.service.ReportService;
+import com.creavispace.project.global.dto.DeleteResponseDto;
+import com.creavispace.project.global.exception.CreaviCodeException;
+import com.creavispace.project.global.exception.GlobalErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,14 +96,18 @@ public class AdminController {
     }
 
     @PostMapping("/contents/delete")
-    public void deleteContents(HttpServletRequest request, @RequestBody Long id, @RequestBody String category) {
+    public SuccessResponseDto<DeleteResponseDto> deleteContents(HttpServletRequest request, @RequestBody DeleteRequestDto deleteRequestDto) {
+        System.out.println("AdminController.deleteContents");
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
         Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
-        if (isAdmin(admin)) {
-          return;
+        if (!isAdmin(admin)) {
+             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
-        deleteFactory(category, id, userInfo);
+        System.out.println("admin = " + admin);
+        SuccessResponseDto<DeleteResponseDto> successResponseDto = deleteFactory(deleteRequestDto.getCategory(),
+                deleteRequestDto.getId(), userInfo);
+        return successResponseDto;
     }
 
     @GetMapping("/member")
@@ -117,24 +125,40 @@ public class AdminController {
         return reportService.readReportList(size, page, sortType);
     }
 
-    private void deleteFactory(String category, Long id, MemberJwtResponseDto dto) {
+    private SuccessResponseDto<DeleteResponseDto> deleteFactory(String category, Long id, MemberJwtResponseDto dto) {
         Member member = memberRepository.findById(dto.memberId()).orElseThrow();
         boolean isAdmin = isAdmin(member);
         if (!isAdmin) {
-            return;
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
+        SuccessResponseDto<DeleteResponseDto> successResponseDto = new SuccessResponseDto<>();
 
         if (category.equals("project")) {
-            projectService.deleteProject(member.getId(), id);
+            DeleteResponseDto data = projectService.deleteProject(
+                    member.getId(), id).getData();
+            successResponseDto.setData(data);
+            successResponseDto.setMessage("프로젝트 게시글 삭제가 완료되었습니다");
+            successResponseDto.setSuccess(true);
+            return successResponseDto;
         }
 
         if (category.equals("recruit")) {
-            recruitService.deleteRecruit(member.getId(), id);
+            DeleteResponseDto data = recruitService.deleteRecruit(member.getId(), id).getData();
+            successResponseDto.setData(data);
+            successResponseDto.setMessage("모집 게시글 삭제가 완료되었습니다");
+            successResponseDto.setSuccess(true);
+            return successResponseDto;
+
         }
 
         if (category.equals("community")) {
-            communityService.deleteCommunity(member.getId(), id);
+            DeleteResponseDto data = communityService.deleteCommunity(member.getId(), id).getData();
+            successResponseDto.setData(data);
+            successResponseDto.setMessage("커뮤니티 게시글 삭제가 완료되었습니다");
+            successResponseDto.setSuccess(true);
+            return successResponseDto;
         }
+        return null;
     }
 
     public boolean isAdmin(Member member) {
