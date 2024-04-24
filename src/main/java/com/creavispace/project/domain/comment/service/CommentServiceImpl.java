@@ -103,7 +103,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public SuccessResponseDto<List<MyPageCommentResponseDto>> readMyContentsList(String memberId, Integer page, Integer size,
                                                                                  String postType, String sortType) {
-        Pageable pageRequest = UsableConst.getPageRequest(page, size, sortType);
+        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
         List<MyPageCommentResponseDto> data;
 
         CommentStrategy strategy = strategyMap.get(PostType.valueOf(postType.toUpperCase()));
