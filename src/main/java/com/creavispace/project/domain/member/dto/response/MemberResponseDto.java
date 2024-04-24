@@ -22,7 +22,7 @@ public class MemberResponseDto {
     private final Integer memberCareer;
     private final String memberPosition;
     private final String memberIntroduce;
-    private final List<String> memberInterestedStack;
+    private final List<MemberInterestedStackResponseDto> memberInterestedStack;
     private final String message;
 
     public MemberResponseDto(Member member) {
@@ -32,7 +32,11 @@ public class MemberResponseDto {
         this.memberCareer = member.getMemberCareer();
         this.memberPosition = member.getMemberPosition();
         this.memberIntroduce = member.getMemberIntroduce();
-        this.memberInterestedStack = member.getInterestedStack();
+        this.memberInterestedStack = convertStack(member.getInterestedStack());
         this.message = "데이터 조회 성공";
+    }
+
+    private static List<MemberInterestedStackResponseDto> convertStack(List<String> memberInterestedStack) {
+        return memberInterestedStack.stream().map(stack -> new MemberInterestedStackResponseDto(stack)).toList();
     }
 }
