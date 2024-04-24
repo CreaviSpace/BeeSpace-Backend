@@ -57,7 +57,7 @@ public class MemberController {
     @Operation(summary = "사용자 아이디와 일치하는 프로젝트 게시물 조회")
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readMemberProjectContents(
             @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
-            @RequestParam("category") String category,
+            @RequestParam(value = "category", required = false) String category,
             @RequestParam(SORT_TYPE) String sortType) {
         System.out.println("MemberController.readMemberProjectContents");
         SuccessResponseDto<List<ProjectListReadResponseDto>> memberProjectContents = projectService.readMyProjectList(
