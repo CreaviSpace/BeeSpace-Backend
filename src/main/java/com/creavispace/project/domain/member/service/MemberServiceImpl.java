@@ -5,6 +5,7 @@ import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.mypage.dto.request.MyPageModifyRequestDto;
+import com.creavispace.project.domain.techStack.dto.response.TechStackListReadResponseDto;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
+
     @Transactional
     @Override
     public Member save(Member member) {
@@ -42,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
         member.setMemberIntroduce(updateParam.introduce());
         member.setMemberPosition(updateParam.position());
         member.setMemberCareer(updateParam.career());
-        member.setInterestedStack(updateParam.interestedStack());
+        member.setInterestedStack(convertTechStack(updateParam.interestedStack()));
         member.setProfileUrl(updateParam.profileUrl());
 
         if (!member.isEnabled()) {
@@ -58,7 +60,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member findById(String memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
         return member;
     }
 
@@ -97,6 +100,7 @@ public class MemberServiceImpl implements MemberService {
         List<Member> searchData = memberRepository.findByMemberNicknameOrIdTagContaining(search);
         return searchData.stream().map(MemberResponseDto::new).collect(Collectors.toList());
     }
+
     @Override
     public Optional<Member> findByLoginId(String loginId) {
         return memberRepository.findByLoginId(loginId);
@@ -137,5 +141,9 @@ public class MemberServiceImpl implements MemberService {
             return memberOptional.get();
         }
         throw new IllegalStateException();
+    }
+
+    private List<String> convertTechStack(List<TechStackListReadResponseDto> techStack) {
+        return techStack.stream().map(stack -> stack.getTechStack()).toList();
     }
 }
