@@ -14,16 +14,16 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     public List<Alarm> findByMemberId(String memberId);
 
     @Modifying
-    @Query(value = "update Alarm a SET a.read_status = 'READ' where a.id = :alarmId and a.member_id = :memberId and a.read_status = 'UNREAD'",nativeQuery = true)
+    @Query(value = "update alarm a SET a.read_status = 'READ' where a.id = :alarmId and a.member_id = :memberId and a.read_status = 'UNREAD'",nativeQuery = true)
     int updateReadStatusToReadByIdAndMemberId(Long alarmId, String memberId);
 
     @Modifying
-    @Query(value = "update Alarm a SET a.read_status = 'READ' WHERE a.member_id = :memberId AND a.read_status = 'UNREAD'", nativeQuery = true)
+    @Query(value = "update alarm a SET a.read_status = 'READ' WHERE a.member_id = :memberId AND a.read_status = 'UNREAD'", nativeQuery = true)
     int updateReadStatusToReadByMemberId(String memberId);
 
     @Modifying
     @Transactional
-    @Query(value = "delete from Alarm a where a.member_id = :memberId", nativeQuery = true)
+    @Query(value = "delete from alarm where member_id = :memberId", nativeQuery = true)
     void deleteByMemberId(String memberId);
 
     @Transactional
