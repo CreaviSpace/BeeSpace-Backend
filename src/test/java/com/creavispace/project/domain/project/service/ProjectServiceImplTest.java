@@ -53,13 +53,13 @@ class ProjectServiceImplTest {
 
         ProjectMemberRequestDto projectMemberRequestDto = ProjectMemberRequestDto.
                 builder().
-                memberId("6861d93b").
+                memberId("71c37a9f").
                 position("")
                 .build();
 
         List<ProjectLinkRequestDto> projectLinkRequestDtos = List.of(linkRequestDto, linkRequestDto1);
 
-        ProjectTechStackRequestDto techStackRequestDto = new ProjectTechStackRequestDto("프론트엔드");
+        ProjectTechStackRequestDto techStackRequestDto = new ProjectTechStackRequestDto("자바");
 
         ProjectRequestDto projectRequestDto = ProjectRequestDto.builder().category("TEAM")
                 .linkDtos(projectLinkRequestDtos)
@@ -72,14 +72,18 @@ class ProjectServiceImplTest {
                 .content("테스트 내용")
                 .build();
 
-        projectService.createProject("6861d93b", projectRequestDto);
+        projectService.createProject("71c37a9f", projectRequestDto);
     }
 
     @Test
     @Commit
     void techStack() {
-        TechStack techStack =TechStack.builder().techStack("프론트엔드").iconUrl("").build();
+        TechStack techStack =TechStack.builder().techStack("자바").iconUrl("").build();
         techStackRepository.save(techStack);
+        TechStack techStack1 =TechStack.builder().techStack("자바스크립트").iconUrl("").build();
+        techStackRepository.save(techStack1);
+        TechStack techStack2 =TechStack.builder().techStack("C#").iconUrl("").build();
+        techStackRepository.save(techStack2);
     }
 
     @Test
