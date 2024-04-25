@@ -10,10 +10,10 @@ import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
-import com.creavispace.project.domain.community.entity.CommunityHashTag;
-import com.creavispace.project.domain.community.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.hashTag.entity.CommunityHashTag;
 import com.creavispace.project.domain.hashTag.entity.HashTag;
+import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.hashTag.repository.HashTagRepository;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
@@ -24,18 +24,18 @@ import com.creavispace.project.global.util.CustomValueOf;
 import com.creavispace.project.global.util.UsableConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,28 +72,15 @@ public class CommunityServiceImpl implements CommunityService {
         // 커뮤니티 게시글 저장
         communityRepository.save(community);
 
-        List<String> hashTagDtos = dto.getHashTags();
-        // 커뮤니티 해시태그 정보가 있는지
-        if (hashTagDtos != null && !hashTagDtos.isEmpty()) {
-            List<CommunityHashTag> communityHashTags = dto.getHashTags().stream()
-                    .map(hashTagDto -> {
-                        Boolean hasHashTag = hashTagRepository.existsByHashTag(hashTagDto);
-                        HashTag hashTag;
-                        if (hasHashTag) {
-                            hashTag = hashTagRepository.findByHashTag(hashTagDto);
-                        } else {
-                            hashTag = hashTagRepository.save(HashTag.builder().hashTag(hashTagDto).build());
-                        }
-                        return CommunityHashTag.builder()
-                                .community(community)
-                                .hashTag(hashTag)
-                                .build();
-                    })
-                    .collect(Collectors.toList());
+        dto.getHashTags()
+                .forEach(hashTagDto -> {
+                            HashTag hashTag = hashTagRepository.findByHashTag(hashTagDto).orElse(HashTag.builder().hashTag(hashTagDto).build());
+                            hashTag.plusUsageCount();
+                            hashTagRepository.save(hashTag);
 
-            // 커뮤니티 해시태그 정보 저장
-            communityHashTagRepository.saveAll(communityHashTags);
-        }
+                            CommunityHashTag communityHashTag = CommunityHashTag.builder().community(community).hashTag(hashTag).build();
+                            communityHashTagRepository.save(communityHashTag);
+                        });
 
         // 저장한 커뮤니티 해시태그 정보 가져오기
         List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityId(community.getId());
@@ -101,7 +88,6 @@ public class CommunityServiceImpl implements CommunityService {
         // 가져온 커뮤니티 해시태그 정보 DTO 변환
         List<CommunityHashTagDto> communityHashTagDtos = communityHashTags.stream()
                 .map(communityHashTag -> CommunityHashTagDto.builder()
-                        .hashTagId(communityHashTag.getHashTag().getId())
                         .hashTag(communityHashTag.getHashTag().getHashTag())
                         .build())
                 .collect(Collectors.toList());
@@ -134,18 +120,10 @@ public class CommunityServiceImpl implements CommunityService {
                                                                     CommunityRequestDto dto) {
 
         CommunityResponseDto data = null;
-        // JWT에 저장된 회원이 존재하는지
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
         // 수정할 커뮤니티 게시글이 존재하는지
-        Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
-
-        // 수정 권한이 있는지
-        if (!memberId.equals(community.getMember().getId()) && !member.getRole().equals(Role.ADMIN)) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
-        }
+        Community community = communityRepository.findByIdAndMemberId(communityId, memberId)
+                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION));
 
         // 커뮤니티 게시글 수정 및 저장
         community.modify(dto);
@@ -154,35 +132,23 @@ public class CommunityServiceImpl implements CommunityService {
         // 기존 커뮤니티 해시태그 삭제
         communityHashTagRepository.deleteByCommunityId(communityId);
 
-        List<String> hashTagDtos = dto.getHashTags();
-        // 수정 DTO에 해시태그 정보가 있는지
-        if (hashTagDtos != null && !hashTagDtos.isEmpty()) {
-            List<CommunityHashTag> communityHashTags = hashTagDtos.stream()
-                    .map(hashTagDto -> {
-                        Boolean hasHashTag = hashTagRepository.existsByHashTag(hashTagDto);
-                        HashTag hashTag;
-                        if (hasHashTag) {
-                            hashTag = hashTagRepository.findByHashTag(hashTagDto);
-                        } else {
-                            hashTag = hashTagRepository.save(HashTag.builder().hashTag(hashTagDto).build());
-                        }
-                        return CommunityHashTag.builder()
-                                .community(community)
-                                .hashTag(hashTag)
-                                .build();
-                    })
-                    .collect(Collectors.toList());
-            // 수정 DTO의 해시태그 정보 저장
-            communityHashTagRepository.saveAll(communityHashTags);
-        }
+        List<CommunityHashTag> communityHashTags = dto.getHashTags().stream()
+                .map(hashTagDto -> {
+                    HashTag hashTag = hashTagRepository.findByHashTag(hashTagDto).orElse(HashTag.builder().hashTag(hashTagDto).build());
+                    hashTagRepository.save(hashTag);
 
-        // 저장한 커뮤니티 해시태그 가져오기
-        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityId(communityId);
+                    return CommunityHashTag.builder()
+                            .community(community)
+                            .hashTag(hashTag)
+                            .build();
+                }).toList();
+
+        // 수정 DTO의 해시태그 정보 저장
+        communityHashTagRepository.saveAll(communityHashTags);
 
         // 가져온 커뮤니티 해시태그 정보를 DTO 변환
         List<CommunityHashTagDto> hashTags = communityHashTags.stream()
                 .map(communityHashTag -> CommunityHashTagDto.builder()
-                        .hashTagId(communityHashTag.getHashTag().getId())
                         .hashTag(communityHashTag.getHashTag().getHashTag())
                         .build())
                 .collect(Collectors.toList());
@@ -223,7 +189,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
 
         // 삭제할 권한이 있는지
-        if (!memberId.equals(community.getMember().getId()) && !member.getRole().equals("Administrator")) {
+        if (!memberId.equals(community.getMember().getId()) && !member.getRole().equals(Role.ADMIN)) {
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
 
@@ -247,20 +213,11 @@ public class CommunityServiceImpl implements CommunityService {
     public SuccessResponseDto<CommunityReadResponseDto> readCommunity(String memberId, Long communityId,
                                                                       HttpServletRequest request) {
         CommunityReadResponseDto data = null;
-        Optional<Community> optionalCommunity;
-        // JWT 회원과 커뮤니티 게시글 작성자와 일치하는지
-        boolean isWriter = communityRepository.existsByIdAndMemberId(communityId, memberId);
-        // 일치하면 비활성화 커뮤니티 게시글도 조회가능
-        if (isWriter) {
-            optionalCommunity = communityRepository.findById(communityId);
-        }
-        // 일치하지 않으면 활성화된 커뮤니티 게시글만 조회가능
-        else {
-            optionalCommunity = communityRepository.findByIdAndStatusTrue(communityId);
-        }
 
-        Community community = optionalCommunity.orElseThrow(
-                () -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
+        Community community = communityRepository.findById(communityId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
+        if(!community.isStatus() && !community.getMember().getId().equals(memberId)){
+            throw new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND);
+        }
 
         // 조회수 증가
         String communityViewLogHeader = request.getHeader("communityViewLog");
@@ -280,6 +237,8 @@ public class CommunityServiceImpl implements CommunityService {
             }
         }
 
+        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityId(communityId);
+
         // 커뮤니티 디테일 DTO변환
         data = CommunityReadResponseDto.builder()
                 .id(community.getId())
@@ -293,9 +252,8 @@ public class CommunityServiceImpl implements CommunityService {
                 .modifiedDate(community.getModifiedDate())
                 .title(community.getTitle())
                 .content(community.getContent())
-                .hashTags(community.getCommunityHashTags().stream()
+                .hashTags(communityHashTags.stream()
                         .map(hashTag -> CommunityHashTagDto.builder()
-                                .hashTagId(hashTag.getHashTag().getId())
                                 .hashTag(hashTag.getHashTag().getHashTag())
                                 .build())
                         .collect(Collectors.toList()))
@@ -312,83 +270,11 @@ public class CommunityServiceImpl implements CommunityService {
                                                                             CommunityCategory category, String hashTag,
                                                                             OrderBy orderby) {
         List<CommunityResponseDto> data = null;
-        Pageable pageRequest = PageRequest.of(page - 1, size);
+        Pageable pageRequest = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, orderby.getColumnName()));
         Page<Community> pageable;
 
-        // 정렬 조건
-        switch (orderby.name()) {
-            case "LATEST_ACTIVITY":
-                // 카테고리와 해시태그 둘다 존재할 경우
-                if (category != null && hashTag != null) {
-                    Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category, hashTagId,
-                            pageRequest);
-                }
-                // 해시태그만 존재할 경우
-                else if (category == null && hashTag != null) {
-                    Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndHashTagId(hashTagId, pageRequest);
-                }
-                // 카테고리만 존재할 경우
-                else if (hashTag == null && category != null) {
-                    pageable = communityRepository.findAllByStatusTrueAndCategory(category, pageRequest);
-                }
-                // 카테고리,해시태그 둘다 null 일경우
-                else {
-                    pageable = communityRepository.findAllByStatusTrue(pageRequest);
-                }
-                break;
-
-            case "RECOMMENDED":
-                // 카테고리와 해시태그 둘다 존재할 경우
-                if (category != null && hashTag != null) {
-                    Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagIdOrderByLikeCountDesc(
-                            category, hashTagId, pageRequest);
-                }
-                // 해시태그만 존재할 경우
-                else if (category == null && hashTag != null) {
-                    Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndHashTagIdOrderByLikeCountDesc(hashTagId,
-                            pageRequest);
-                }
-                // 카테고리만 존재할 경우
-                else if (hashTag == null && category != null) {
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByLikeCountDesc(category,
-                            pageRequest);
-                }
-                // 카테고리,해시태그 둘다 null 일경우
-                else {
-                    pageable = communityRepository.findAllByStatusTrueOrderByLikeCountDesc(pageRequest);
-                }
-                break;
-
-            case "MOST_VIEWED":
-                // 카테고리와 해시태그 둘다 존재할 경우
-                if (category != null && hashTag != null) {
-                    Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryAndHashTagId(category, hashTagId,
-                            pageRequest);
-                }
-                // 해시태그만 존재할 경우
-                else if (category == null && hashTag != null) {
-                    Long hashTagId = hashTagRepository.findByHashTag(hashTag).getId();
-                    pageable = communityRepository.findAllByStatusTrueAndHashTagId(hashTagId, pageRequest);
-                }
-                // 카테고리만 존재할 경우
-                else if (hashTag == null && category != null) {
-                    pageable = communityRepository.findAllByStatusTrueAndCategoryOrderByViewCountDesc(category,
-                            pageRequest);
-                }
-                // 카테고리,해시태그 둘다 null 일경우
-                else {
-                    pageable = communityRepository.findAllByStatusTrueOrderByViewCountDesc(pageRequest);
-                }
-                break;
-
-            default:
-                throw new CreaviCodeException(GlobalErrorCode.ORDERBY_NOT_FOUND);
-        }
+        String categoryStr = category == null ? null : category.name();
+        pageable = communityRepository.findByCategoryAndHashTagAndStatusTrue(categoryStr, hashTag, pageRequest);
 
         // 조건에 맞는 커뮤니티 게시글이 존재하는지
         if (!pageable.hasContent()) {
@@ -465,15 +351,14 @@ public class CommunityServiceImpl implements CommunityService {
     private Map<Long, List<CommunityHashTagDto>> hashTags(List<CommunityHashTag> communityHashTags) {
         System.out.println("CommunityServiceImpl.hashTags");
         Map<Long, List<CommunityHashTagDto>> hashTags = new HashMap<>();
-        List<Long> collect = communityHashTags.stream().map(hashTag -> hashTag.getHashTag().getId()).distinct()
+        List<String> collect = communityHashTags.stream().map(hashTag -> hashTag.getHashTag().getHashTag()).distinct()
                 .toList();
-        hashTagRepository.findByIdIn(collect);
+        hashTagRepository.findByHashTagIn(collect);
         for (int i = 0; i < communityHashTags.size(); i++) {
             CommunityHashTag communityHashTag = communityHashTags.get(i);
             List<CommunityHashTagDto> hashTag = hashTags.getOrDefault(communityHashTag.getCommunity().getId(),
                     new ArrayList<>());
             CommunityHashTagDto communityHashTagDto = CommunityHashTagDto.builder()
-                    .hashTagId(communityHashTag.getHashTag().getId())
                     .hashTag(communityHashTag.getHashTag().getHashTag())
                     .build();
             hashTag.add(communityHashTagDto);

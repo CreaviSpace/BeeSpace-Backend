@@ -351,14 +351,8 @@ public class ProjectServiceImpl implements ProjectService {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        // 삭제할 프로젝트가 존재하는지
-        Optional<Project> optionalProject = projectRepository.findByIdAndStatusTrue(projectId);
-        Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
-
-        // 삭제할 권한이 있는지
-        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
-        }
+        Project project = projectRepository.findByIdAndMemberId(projectId,memberId)
+                .orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION));
 
         // 비활성화 변경 및 저장
         project.disable();
@@ -402,20 +396,13 @@ public class ProjectServiceImpl implements ProjectService {
     public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Integer size, Integer page, ProjectCategory category) {
         List<ProjectListReadResponseDto> data = null;
         Pageable pageRequest = PageRequest.of(page-1, size);
-        Page<Project> pageable;
 
-        // 카테고리가 존재하면
-        if(category != null){
-            pageable = projectRepository.findAllByStatusTrueAndCategory(category, pageRequest);
-        }
-        // 카테고리가 없다면
-        else{
-            pageable = projectRepository.findAllByStatusTrue(pageRequest);
-        }
+        String categoryStr = category == null ? null : category.name();
+
+        Page<Project> pageable = projectRepository.findAllByStatusTrueAndCategory(categoryStr, pageRequest);
 
         // 해당 페이지에 게시글이 있는지
         if(!pageable.hasContent()) throw new CreaviCodeException(GlobalErrorCode.NOT_PROJECT_CONTENT);
-        List<Project> projects = pageable.getContent();
 
         // 프로젝트 리스트 결과 DTO
         data = getProjectListReadResponseDtos(pageable);
@@ -431,18 +418,11 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectReadResponseDto data = null;
         Optional<Project> optionalProject;
 
-        // JWT 회원과 프로젝트 게시글 작성자와 일치하는지
-        boolean isWriter = projectRepository.existsByIdAndMemberId(projectId, memberId);
-        // 일치하면 비활성화 프로젝트도 조회가능
-        if(isWriter){
-            optionalProject = projectRepository.findById(projectId);
-        }
-        // 일치하지 않으면 활성화된 프로젝트만 조회가능
-        else{
-            optionalProject = projectRepository.findByIdAndStatusTrue(projectId);
-        }
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
 
-        Project project = optionalProject.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+        if(!project.isStatus() && !project.getMember().getId().equals(memberId)){
+            throw new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND);
+        }
 
         // 조회수 증가
         String projectViewLogHeader = request.getHeader("projectViewLog");

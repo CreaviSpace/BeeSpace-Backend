@@ -10,5 +10,5 @@ public enum PostType {
     COMMUNITY("커뮤니티"),
     RECRUIT("모집");
 
-    private String subName;
+    private final String subName;
 }

@@ -1,8 +1,5 @@
 package com.creavispace.project.domain.project.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import java.util.List;
-
 import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
 import com.creavispace.project.domain.comment.entity.ProjectComment;
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
@@ -12,22 +9,14 @@ import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -60,6 +49,8 @@ public class Project extends BaseTimeEntity{
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String bannerContent;
+
+    private int likeCount;
 
     private int viewCount;
 
@@ -115,6 +106,14 @@ public class Project extends BaseTimeEntity{
 
     public void resetWeekViewCount(){
         this.weekViewCount = 0;
+    }
+
+    public void pulsLikeCount(){
+        this.likeCount++;
+    }
+
+    public void minusLikeCount(){
+        this.likeCount--;
     }
 
 }

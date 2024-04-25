@@ -8,21 +8,21 @@ import com.creavispace.project.domain.bookmark.repository.CommunityBookmarkRepos
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.entity.Community;
-import com.creavispace.project.domain.community.entity.CommunityHashTag;
-import com.creavispace.project.domain.community.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.hashTag.entity.CommunityHashTag;
+import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.hashTag.repository.HashTagRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -99,15 +99,14 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
     private Map<Long, List<CommunityHashTagDto>> hashTags(List<CommunityHashTag> communityHashTags) {
         System.out.println("CommunityServiceImpl.hashTags");
         Map<Long, List<CommunityHashTagDto>> hashTags = new HashMap<>();
-        List<Long> collect = communityHashTags.stream().map(hashTag -> hashTag.getHashTag().getId()).distinct()
+        List<String> collect = communityHashTags.stream().map(hashTag -> hashTag.getHashTag().getHashTag()).distinct()
                 .toList();
-        hashTagRepository.findByIdIn(collect);
+        hashTagRepository.findByHashTagIn(collect);
         for (int i = 0; i < communityHashTags.size(); i++) {
             CommunityHashTag communityHashTag = communityHashTags.get(i);
             List<CommunityHashTagDto> hashTag = hashTags.getOrDefault(communityHashTag.getCommunity().getId(),
                     new ArrayList<>());
             CommunityHashTagDto communityHashTagDto = CommunityHashTagDto.builder()
-                    .hashTagId(communityHashTag.getHashTag().getId())
                     .hashTag(communityHashTag.getHashTag().getHashTag())
                     .build();
             hashTag.add(communityHashTagDto);

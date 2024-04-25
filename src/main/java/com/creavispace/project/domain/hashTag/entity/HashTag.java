@@ -1,22 +1,14 @@
 package com.creavispace.project.domain.hashTag.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import java.util.List;
-
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
-import com.creavispace.project.domain.community.entity.CommunityHashTag;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.domain.Persistable;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import java.util.List;
 
 @Getter
 @Builder
@@ -24,15 +16,29 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class HashTag extends BaseTimeEntity{
+public class HashTag extends BaseTimeEntity implements Persistable<String> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
     private String hashTag;
+
+    @Builder.Default
+    private int usageCount = 0;
 
     @OneToMany(mappedBy = "hashTag")
     @JsonBackReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<CommunityHashTag> communityHashTags;
+
+    public void plusUsageCount(){
+        this.usageCount++;
+    }
+
+    @Override
+    public String getId() {
+        return this.hashTag;
+    }
+
+    @Override
+    public boolean isNew() {
+        return super.getCreatedDate() == null;
+    }
 }

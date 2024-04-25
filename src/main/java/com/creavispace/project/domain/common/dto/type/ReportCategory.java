@@ -13,5 +13,5 @@ public enum ReportCategory {
     PERSONAL_INFORMATION_DISCLOSURE("개인정보유출"),
     INAPPROPRIATE_CONTENT("부적절한 콘텐츠");
 
-    private String subName;
+    private final String subName;
 }

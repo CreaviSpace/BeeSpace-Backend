@@ -1,32 +1,14 @@
 package com.creavispace.project.domain.community.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.util.List;
-
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
-import com.creavispace.project.domain.like.entity.CommunityLike;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Builder
@@ -34,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonSerialize
+@ToString
 public class Community extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,15 +38,9 @@ public class Community extends BaseTimeEntity {
 
     private int viewCount;
 
-    private Boolean status;
+    private int likeCount;
 
-    @OneToMany(mappedBy = "community")
-    @JsonBackReference
-    private List<CommunityHashTag> communityHashTags;
-
-    @OneToMany(mappedBy = "community")
-    @JsonBackReference
-    private List<CommunityLike> communityLikes;
+    private boolean status;
 
     public void modify(CommunityRequestDto dto){
         this.category = CustomValueOf.valueOf(CommunityCategory.class,dto.getCategory(),GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
@@ -77,5 +54,13 @@ public class Community extends BaseTimeEntity {
 
     public void plusViewCount(){
         this.viewCount++;
+    }
+
+    public void plusLikeCount() {
+        this.likeCount++;
+    }
+
+    public void minusLikeCount() {
+        this.likeCount--;
     }
 }

@@ -7,8 +7,8 @@ import com.creavispace.project.domain.bookmark.repository.ProjectBookmarkReposit
 import com.creavispace.project.domain.bookmark.repository.RecruitBookmarkRepository;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
-import com.creavispace.project.domain.community.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.hashTag.repository.HashTagRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;

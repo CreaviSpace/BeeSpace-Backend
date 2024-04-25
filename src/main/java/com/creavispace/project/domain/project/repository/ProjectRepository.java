@@ -1,7 +1,6 @@
 package com.creavispace.project.domain.project.repository;
 
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
-import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
 import org.springframework.data.domain.Page;
@@ -17,9 +16,14 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>{
     public List<Project> findTop6ByStatusTrueOrderByWeekViewCountDesc();
+
     public Page<Project> findAllByStatusTrue(Pageable pageable);
-    public Page<Project> findAllByStatusTrueAndCategory(ProjectCategory category, Pageable pageable);
+
+    @Query(value = "select * from project where status = true and (:category is null or category = :category)", nativeQuery = true)
+    public Page<Project> findAllByStatusTrueAndCategory(String category, Pageable pageable);
+
     public Optional<Project> findByIdAndStatusTrue(Long projectId);
+
     public Boolean existsByIdAndMemberId(Long projectId, String memberId);
 
     @Query(value = "SELECT 'PROJECT' AS postType, p.id AS postId, p.created_date AS createdDate FROM project p WHERE (p.content LIKE %:text% OR p.title LIKE %:text%) AND p.status = true ORDER BY createdDate DESC", nativeQuery = true)
@@ -46,11 +50,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
             nativeQuery = true)
     public Page<SearchResultSet> findIntegratedSearchData(@Param("text") String text, Pageable pageable);
 
-    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(Pageable pageRequest, Member member);
-    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateDesc(Pageable pageRequest, Member member);
-    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateAsc(Pageable pageRequest, String memberId);
-    Page<Project> findAllByStatusTrueAndMemberIdOrderByCreatedDateDesc(Pageable pageRequest, String memberId);
-
     Page<Project> findByStatusFalse(Pageable pageable);
 
     Page<Project> findAllByStatusTrueAndCategoryAndMemberId(ProjectCategory projectCategory, String memberId, Pageable pageRequest);
@@ -58,4 +57,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     Page<Project> findAllByStatusTrueAndMemberId(String memberId, Pageable pageRequest);
 
     List<Project> findByIdIn(List<Long> projectIds);
+
+    Optional<Project> findByIdAndMemberId(Long projectId, String memberId);
 }

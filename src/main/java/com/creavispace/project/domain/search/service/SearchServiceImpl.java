@@ -1,13 +1,5 @@
 package com.creavispace.project.domain.search.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.dto.type.SearchType;
@@ -15,6 +7,8 @@ import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.hashTag.entity.CommunityHashTag;
+import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.project.dto.response.ProjectLinkResponseDto;
 import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
 import com.creavispace.project.domain.project.entity.Project;
@@ -27,9 +21,15 @@ import com.creavispace.project.domain.search.dto.response.SearchListReadResponse
 import com.creavispace.project.domain.search.entity.SearchResultSet;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,6 +39,7 @@ public class SearchServiceImpl implements SearchService{
     private final ProjectRepository projectRepository;
     private final CommunityRepository communityRepository;
     private final RecruitRepository recruitRepository;
+    private final CommunityHashTagRepository communityHashTagRepository;
 
     @Override
     public SuccessResponseDto<List<SearchListReadResponseDto>> readSearchList(Integer size, Integer page, String text,
@@ -141,6 +142,7 @@ public class SearchServiceImpl implements SearchService{
                             .build();
                     case "COMMUNITY":
                         Community community = communityRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
+                        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityIdFetch(community.getId());
                         return CommunityResponseDto.builder()
                             .id(community.getId())
                             .postType(PostType.COMMUNITY.name())
@@ -153,9 +155,8 @@ public class SearchServiceImpl implements SearchService{
                             .modifiedDate(community.getModifiedDate())
                             .title(community.getTitle())
                             .content(community.getContent())
-                            .hashTags(community.getCommunityHashTags().stream()
+                            .hashTags(communityHashTags.stream()
                                 .map(hashTag -> CommunityHashTagDto.builder()
-                                    .hashTagId(hashTag.getHashTag().getId())
                                     .hashTag(hashTag.getHashTag().getHashTag())
                                     .build())
                                 .collect(Collectors.toList()))

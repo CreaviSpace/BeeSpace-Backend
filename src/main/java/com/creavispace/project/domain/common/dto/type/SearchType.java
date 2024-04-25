@@ -17,5 +17,5 @@ public enum SearchType {
     PROJECT_RECRUIT("프로젝트 모집"),
     STUDY("스터디");
 
-    private String subName;
+    private final String subName;
 }

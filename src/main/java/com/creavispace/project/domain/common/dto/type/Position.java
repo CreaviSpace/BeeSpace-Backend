@@ -17,5 +17,5 @@ public enum Position {
     DEVOPS_ENGINEER("운영 엔지니어"),
     PLANNER("기획자");
 
-    private String subName;
+    private final String subName;
 }

@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommunityHashTagDto {
-    private Long hashTagId;
     private String hashTag;
 }

@@ -1,27 +1,22 @@
-package com.creavispace.project.domain.community.entity;
+package com.creavispace.project.domain.hashTag.entity;
 
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
-import com.creavispace.project.domain.hashTag.entity.HashTag;
-
+import com.creavispace.project.domain.community.entity.Community;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommunityHashTag extends BaseTimeEntity{
+public class CommunityHashTag extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +24,7 @@ public class CommunityHashTag extends BaseTimeEntity{
     @ManyToOne(targetEntity = Community.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", nullable = false)
     @JsonBackReference
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Community community;
 
     @ManyToOne(targetEntity = HashTag.class, fetch = FetchType.LAZY)

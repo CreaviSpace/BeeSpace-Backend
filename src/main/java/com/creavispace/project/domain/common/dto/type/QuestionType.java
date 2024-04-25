@@ -10,5 +10,5 @@ public enum QuestionType {
     OBJECTIVE("객관식"),
     CHECKBOX("체크박스");
 
-    private String subName;
+    private final String subName;
 }

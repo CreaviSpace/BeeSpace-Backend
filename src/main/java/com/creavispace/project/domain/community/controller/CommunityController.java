@@ -1,19 +1,5 @@
 package com.creavispace.project.domain.community.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.common.dto.type.OrderBy;
@@ -24,11 +10,15 @@ import com.creavispace.project.domain.community.dto.response.CommunityResponseDt
 import com.creavispace.project.domain.community.service.CommunityService;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
-
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -93,16 +83,13 @@ public class CommunityController {
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
         @RequestParam(value = "category", required = false) String category,
         @RequestParam(value = "hashTag", required = false) String hashTag,
-        @RequestParam(value = "orderby", required = false, defaultValue = "LATEST_ACTIVITY") String orderby
+        @RequestParam(value = "orderBy", required = false, defaultValue = "LATEST_ACTIVITY") String orderBy
 
     ){
         log.info("/community/controller : 커뮤니티 게시글 리스트 조회 / 인기 태그 게시글 조회");
-        CommunityCategory CategoryEnum = null;
-        if(category != null){
-            CategoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
-        } 
-        OrderBy orderByEnum = CustomValueOf.valueOf(OrderBy.class, orderby, GlobalErrorCode.NOT_FOUND_ORDERBY);
-        return ResponseEntity.ok().body(communityService.readCommunityList(size, page, CategoryEnum, hashTag, orderByEnum));
+        CommunityCategory categoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
+        OrderBy orderByEnum = CustomValueOf.valueOf(OrderBy.class, orderBy, GlobalErrorCode.NOT_FOUND_ORDERBY);
+        return ResponseEntity.ok().body(communityService.readCommunityList(size, page, categoryEnum, hashTag, orderByEnum));
     }
 
 

@@ -10,5 +10,5 @@ public enum RecruitContactWay {
     EMAIL("이메일"),
     GOOGLE_FORM("구글폼");
 
-    private String subName;
+    private final String subName;
 }

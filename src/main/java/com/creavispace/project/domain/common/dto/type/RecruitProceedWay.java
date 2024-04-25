@@ -10,5 +10,5 @@ public enum RecruitProceedWay {
     OFFLINE("오프라인"),
     ON_OFFLINE("온/오프라인");
 
-    private String subName;
+    private final String subName;
 }

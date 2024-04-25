@@ -1,17 +1,15 @@
 package com.creavispace.project.domain.hashTag.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.community.repository.CommunityHashTagRepository;
 import com.creavispace.project.domain.hashTag.dto.response.PopularHashTagReadResponseDto;
 import com.creavispace.project.domain.hashTag.entity.CommunityHashTagResult;
-
+import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,7 +28,6 @@ public class HashTagServiceImpl implements HashTagService {
         // 해시태그 DTO
         data = communityHashTags.stream()
             .map(communityHashTag -> PopularHashTagReadResponseDto.builder()
-                .hashTagId(communityHashTag.getHashTagId())
                 .hashTag(communityHashTag.getHashTag())
                 .build())
             .collect(Collectors.toList());

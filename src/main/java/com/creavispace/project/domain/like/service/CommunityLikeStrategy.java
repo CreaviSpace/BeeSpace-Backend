@@ -32,11 +32,14 @@ public class CommunityLikeStrategy implements LikeStrategy {
                     .community(community)
                     .build();
             communityLikeRepository.save(saveLike);
+            community.plusLikeCount();
             data = new LikeResponseDto(true);
         }else{
             communityLikeRepository.deleteById(communityLike.getId());
+            community.minusLikeCount();
             data = new LikeResponseDto(false);
         }
+        communityRepository.save(community);
         return data;
     }
 

@@ -33,11 +33,14 @@ public class ProjectLikeStrategy implements LikeStrategy {
                     .project(project)
                     .build();
             projectLikeRepository.save(saveLike);
+            project.pulsLikeCount();
             data = new LikeResponseDto(true);
         }else{
             projectLikeRepository.deleteById(projectLike.getId());
+            project.minusLikeCount();
             data = new LikeResponseDto(false);
         }
+        projectRepository.save(project);
         return data;
     }
 

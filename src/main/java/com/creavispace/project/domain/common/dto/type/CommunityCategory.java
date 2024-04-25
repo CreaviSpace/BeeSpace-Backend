@@ -10,5 +10,6 @@ public enum CommunityCategory {
     CHAT("수다"), 
     CONCERN("고민");
 
-    private String subName;
+    private final String subName;
+
 }
