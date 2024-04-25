@@ -83,7 +83,7 @@ public class RecruitBookmarkStrategy implements BookmarkStrategy {
             RecruitBookmark bookmark = recruitBookmarks.get(i);
             RecruitBookmarkResponseDto build = RecruitBookmarkResponseDto.builder()
                     .techStacks(techStacks.get(bookmark.getRecruit().getId()))
-                    .postId(bookmark.getRecruit().getId())
+                    .id(bookmark.getRecruit().getId())
                     .postType(PostType.RECRUIT.name())
                     .category(bookmark.getRecruit().getCategory().name())
                     .title(bookmark.getRecruit().getTitle())

@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class BookmarkContentsResponseDto {
     private String postType;
-    private Long postId;
+    private Long id;
     private String category;
     private String title;
     private String contents;

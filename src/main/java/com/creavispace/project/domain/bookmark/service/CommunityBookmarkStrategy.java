@@ -81,7 +81,7 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
         for (int i = 0; i < communityBookmarks.size(); i++) {
             CommunityBookmark bookmark = communityBookmarks.get(i);
             CommunityBookmarkResponseDto build = CommunityBookmarkResponseDto.builder()
-                    .postId(bookmark.getCommunity().getId())
+                    .id(bookmark.getCommunity().getId())
                     .postType(PostType.COMMUNITY.name())
                     .category(bookmark.getCommunity().getCategory().name())
                     .title(bookmark.getCommunity().getTitle())

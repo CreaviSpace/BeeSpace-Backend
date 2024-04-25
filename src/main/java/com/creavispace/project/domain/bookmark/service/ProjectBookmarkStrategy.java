@@ -89,7 +89,7 @@ public class ProjectBookmarkStrategy implements BookmarkStrategy {
             ProjectBookmarkResponseDto build = ProjectBookmarkResponseDto.builder()
                     .thumbnail(bookmark.getProject().getThumbnail())
                     .links(links.get(bookmark.getProject().getId()))
-                    .postId(bookmark.getProject().getId())
+                    .id(bookmark.getProject().getId())
                     .postType(PostType.PROJECT.name())
                     .category(bookmark.getProject().getCategory().name())
                     .title(bookmark.getProject().getTitle())

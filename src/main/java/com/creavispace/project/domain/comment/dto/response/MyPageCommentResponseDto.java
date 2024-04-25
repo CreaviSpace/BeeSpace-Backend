@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class MyPageCommentResponseDto {
-    private Long id;
     private String memberId;
     private String memberNickName;
     private String memberProfileUrl;
@@ -20,5 +19,5 @@ public class MyPageCommentResponseDto {
     private String content;
     private String contentsTitle;
     private String postType;
-    private Long postId;
+    private Long id;
 }
