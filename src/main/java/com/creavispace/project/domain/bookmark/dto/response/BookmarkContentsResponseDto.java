@@ -13,7 +13,7 @@ public class BookmarkContentsResponseDto {
     private Long postId;
     private String category;
     private String title;
-    private String contents;
+    private String content;
     private Integer viewCount;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
