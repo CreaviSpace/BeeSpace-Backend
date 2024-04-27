@@ -133,7 +133,7 @@ public class AdminController {
         }
         SuccessResponseDto<DeleteResponseDto> successResponseDto = new SuccessResponseDto<>();
 
-        if (category.equals("project")) {
+        if (category.equalsIgnoreCase("project")) {
             DeleteResponseDto data = projectService.deleteProject(
                     member.getId(), id).getData();
             successResponseDto.setData(data);
@@ -142,7 +142,7 @@ public class AdminController {
             return successResponseDto;
         }
 
-        if (category.equals("recruit")) {
+        if (category.equalsIgnoreCase("recruit")) {
             DeleteResponseDto data = recruitService.deleteRecruit(member.getId(), id).getData();
             successResponseDto.setData(data);
             successResponseDto.setMessage("모집 게시글 삭제가 완료되었습니다");
@@ -151,7 +151,7 @@ public class AdminController {
 
         }
 
-        if (category.equals("community")) {
+        if (category.equalsIgnoreCase("community")) {
             DeleteResponseDto data = communityService.deleteCommunity(member.getId(), id).getData();
             successResponseDto.setData(data);
             successResponseDto.setMessage("커뮤니티 게시글 삭제가 완료되었습니다");
