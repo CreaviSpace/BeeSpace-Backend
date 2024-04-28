@@ -93,7 +93,7 @@ public class ProjectBookmarkStrategy implements BookmarkStrategy {
                     .postType(PostType.PROJECT.name())
                     .category(bookmark.getProject().getCategory().name())
                     .title(bookmark.getProject().getTitle())
-                    .contents(bookmark.getProject().getContent())
+                    .content(bookmark.getProject().getContent())
                     .createdDate(bookmark.getProject().getCreatedDate())
                     .modifiedDate(bookmark.getProject().getModifiedDate())
                     .viewCount(bookmark.getProject().getViewCount())

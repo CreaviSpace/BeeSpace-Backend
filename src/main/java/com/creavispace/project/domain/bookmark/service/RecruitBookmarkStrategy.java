@@ -87,7 +87,7 @@ public class RecruitBookmarkStrategy implements BookmarkStrategy {
                     .postType(PostType.RECRUIT.name())
                     .category(bookmark.getRecruit().getCategory().name())
                     .title(bookmark.getRecruit().getTitle())
-                    .contents(bookmark.getRecruit().getContent())
+                    .content(bookmark.getRecruit().getContent())
                     .viewCount(bookmark.getRecruit().getViewCount())
                     .createdDate(bookmark.getRecruit().getCreatedDate())
                     .modifiedDate(bookmark.getRecruit().getModifiedDate())

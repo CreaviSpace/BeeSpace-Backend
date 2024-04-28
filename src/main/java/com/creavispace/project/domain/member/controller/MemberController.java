@@ -16,6 +16,8 @@ import com.creavispace.project.domain.project.dto.response.ProjectListReadRespon
 import com.creavispace.project.domain.project.service.ProjectService;
 import com.creavispace.project.domain.recruit.dto.response.RecruitListReadResponseDto;
 import com.creavispace.project.domain.recruit.service.RecruitService;
+import com.creavispace.project.domain.techStack.entity.TechStack;
+import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -44,13 +46,15 @@ public class MemberController {
     private final BookmarkService bookmarkService;
     private final CommentService commentService;
     private final FeedbackService feedbackService;
+    private final TechStackRepository techStackRepository;
 
     @GetMapping("/read/profile")
     @Operation(summary = "사용자 아이디로 사용자 프로필 조회")
     public ResponseEntity<MemberResponseDto> readMember(@RequestParam(MEMBER_ID) String memberId) {
         System.out.println("MemberController.readMember");
         Member member = memberService.findById(memberId);
-        return ResponseEntity.ok().body(new MemberResponseDto(member));
+        List<TechStack> techStacks = techStackRepository.findByTechStackIn(member.getInterestedStack());
+        return ResponseEntity.ok().body(new MemberResponseDto(member, techStacks));
     }
 
     @GetMapping("/read/contents/project")

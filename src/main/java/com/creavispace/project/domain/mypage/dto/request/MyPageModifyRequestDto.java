@@ -1,8 +1,7 @@
 package com.creavispace.project.domain.mypage.dto.request;
 
-import com.creavispace.project.domain.techStack.dto.response.TechStackListReadResponseDto;
+import com.creavispace.project.domain.mypage.dto.response.MyPageTechStackRequestDto;
 import java.util.List;
-import lombok.Getter;
 
 
 /*
@@ -13,6 +12,6 @@ import lombok.Getter;
  * 관심 스택
  * */
 public record MyPageModifyRequestDto(String nickName, String introduce, String position, Integer career,
-                                     List<TechStackListReadResponseDto> interestedStack, String profileUrl) {
+                                     List<MyPageTechStackRequestDto> interestedStack, String profileUrl) {
 
 }

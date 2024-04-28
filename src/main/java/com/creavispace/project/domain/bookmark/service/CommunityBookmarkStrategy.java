@@ -85,7 +85,7 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
                     .postType(PostType.COMMUNITY.name())
                     .category(bookmark.getCommunity().getCategory().name())
                     .title(bookmark.getCommunity().getTitle())
-                    .contents(bookmark.getCommunity().getContent())
+                    .content(bookmark.getCommunity().getContent())
                     .viewCount(bookmark.getCommunity().getViewCount())
                     .createdDate(bookmark.getCommunity().getCreatedDate())
                     .modifiedDate(bookmark.getCommunity().getModifiedDate())

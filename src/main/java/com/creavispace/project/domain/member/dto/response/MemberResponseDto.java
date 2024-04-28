@@ -1,6 +1,8 @@
 package com.creavispace.project.domain.member.dto.response;
 
 import com.creavispace.project.domain.member.entity.Member;
+import com.creavispace.project.domain.techStack.dto.response.TechStackListReadResponseDto;
+import com.creavispace.project.domain.techStack.entity.TechStack;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -22,7 +24,7 @@ public class MemberResponseDto {
     private final Integer memberCareer;
     private final String memberPosition;
     private final String memberIntroduce;
-    private final List<MemberInterestedStackResponseDto> memberInterestedStack;
+    private final List<TechStackListReadResponseDto> memberInterestedStack;
     private final String message;
 
     public MemberResponseDto(Member member) {
@@ -31,12 +33,23 @@ public class MemberResponseDto {
         this.memberNickname = member.getMemberNickname();
         this.memberCareer = member.getMemberCareer();
         this.memberPosition = member.getMemberPosition();
+        memberIntroduce = null;
+        memberInterestedStack = null;
+        this.message = "데이터 조회 성공";
+    }
+    public MemberResponseDto(Member member, List<TechStack> techStacks) {
+        this.memberId = member.getId();
+        this.profileUrl = member.getProfileUrl();
+        this.memberNickname = member.getMemberNickname();
+        this.memberCareer = member.getMemberCareer();
+        this.memberPosition = member.getMemberPosition();
         this.memberIntroduce = member.getMemberIntroduce();
-        this.memberInterestedStack = convertStack(member.getInterestedStack());
+        this.memberInterestedStack = convertStack(techStacks);
         this.message = "데이터 조회 성공";
     }
 
-    private static List<MemberInterestedStackResponseDto> convertStack(List<String> memberInterestedStack) {
-        return memberInterestedStack.stream().map(stack -> new MemberInterestedStackResponseDto(stack)).toList();
+    private static List<TechStackListReadResponseDto> convertStack(List<TechStack> techStacks) {
+        return techStacks.stream().map(stack -> new TechStackListReadResponseDto(stack.getTechStack(),
+                stack.getIconUrl())).toList();
     }
 }
