@@ -106,7 +106,7 @@ public class AdminController {
         }
         System.out.println("admin = " + admin);
         SuccessResponseDto<DeleteResponseDto> successResponseDto = deleteFactory(deleteRequestDto.getCategory(),
-                deleteRequestDto.getId(), userInfo);
+                deleteRequestDto.getId(), admin);
         return successResponseDto;
     }
 
@@ -125,17 +125,12 @@ public class AdminController {
         return reportService.readReportList(size, page, sortType);
     }
 
-    private SuccessResponseDto<DeleteResponseDto> deleteFactory(String category, Long id, MemberJwtResponseDto dto) {
-        Member member = memberRepository.findById(dto.memberId()).orElseThrow();
-        boolean isAdmin = isAdmin(member);
-        if (!isAdmin) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
-        }
+    private SuccessResponseDto<DeleteResponseDto> deleteFactory(String category, Long id, Member admin) {
         SuccessResponseDto<DeleteResponseDto> successResponseDto = new SuccessResponseDto<>();
 
         if (category.equalsIgnoreCase("project")) {
             DeleteResponseDto data = projectService.deleteProject(
-                    member.getId(), id).getData();
+                    admin.getId(), id).getData();
             successResponseDto.setData(data);
             successResponseDto.setMessage("프로젝트 게시글 삭제가 완료되었습니다");
             successResponseDto.setSuccess(true);
@@ -143,7 +138,7 @@ public class AdminController {
         }
 
         if (category.equalsIgnoreCase("recruit")) {
-            DeleteResponseDto data = recruitService.deleteRecruit(member.getId(), id).getData();
+            DeleteResponseDto data = recruitService.deleteRecruit(admin.getId(), id).getData();
             successResponseDto.setData(data);
             successResponseDto.setMessage("모집 게시글 삭제가 완료되었습니다");
             successResponseDto.setSuccess(true);
@@ -152,7 +147,7 @@ public class AdminController {
         }
 
         if (category.equalsIgnoreCase("community")) {
-            DeleteResponseDto data = communityService.deleteCommunity(member.getId(), id).getData();
+            DeleteResponseDto data = communityService.deleteCommunity(admin.getId(), id).getData();
             successResponseDto.setData(data);
             successResponseDto.setMessage("커뮤니티 게시글 삭제가 완료되었습니다");
             successResponseDto.setSuccess(true);
