@@ -13,11 +13,11 @@ import java.util.List;
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     public List<Alarm> findByMemberId(String memberId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "update alarm a SET a.read_status = 'READ' where a.id = :alarmId and a.member_id = :memberId and a.read_status = 'UNREAD'",nativeQuery = true)
     int updateReadStatusToReadByIdAndMemberId(Long alarmId, String memberId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "update alarm a SET a.read_status = 'READ' WHERE a.member_id = :memberId AND a.read_status = 'UNREAD'", nativeQuery = true)
     int updateReadStatusToReadByMemberId(String memberId);
 
