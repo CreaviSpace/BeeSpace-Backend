@@ -2,7 +2,6 @@ package com.creavispace.project.domain.community.controller;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
-import com.creavispace.project.domain.common.dto.type.OrderBy;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
@@ -14,6 +13,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -79,18 +81,13 @@ public class CommunityController {
     @GetMapping(READ_COMMUNITY_LIST)
     @Operation(summary = "커뮤니티 게시글 리스트 조회 / 인기 태그 게시글 조회")
     public ResponseEntity<SuccessResponseDto<List<CommunityResponseDto>>> readCommunityList(
-        @RequestParam(value = "size", required = false, defaultValue = "6") Integer size,
-        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @ParameterObject @PageableDefault(size = 6) Pageable pageRequest,
         @RequestParam(value = "category", required = false) String category,
-        @RequestParam(value = "hashTag", required = false) String hashTag,
-        @RequestParam(value = "orderBy", required = false, defaultValue = "LATEST_ACTIVITY") String orderBy
-
+        @RequestParam(value = "hashTag", required = false) String hashTag
     ){
         log.info("/community/controller : 커뮤니티 게시글 리스트 조회 / 인기 태그 게시글 조회");
         CommunityCategory categoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
-        OrderBy orderByEnum = CustomValueOf.valueOf(OrderBy.class, orderBy, GlobalErrorCode.NOT_FOUND_ORDERBY);
-        return ResponseEntity.ok().body(communityService.readCommunityList(size, page, categoryEnum, hashTag, orderByEnum));
+        return ResponseEntity.ok().body(communityService.readCommunityList(categoryEnum, hashTag, pageRequest));
     }
-
 
 }

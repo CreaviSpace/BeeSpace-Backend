@@ -15,6 +15,7 @@ public enum GlobalErrorCode {
     NOT_FOUND_REPORT_CATEGORY(400, "신고 카테고리가 존재하지 않습니다."),
     NOT_FOUND_RECRUIT_CONTACTWAY(400, "모집 연락방법이 존재하지 않습니다."),
     NOT_FOUND_RECRUIT_PROCEEDWAY(400, "모집 진행방식이 존재하지 않습니다."),
+    NOT_FOUND_SORT_INVALID_DATA(400, "sort request 값이 유효하지 않습니다."),
 
     MEMBER_NOT_FOUND(400,"해당 회원이 존재하지 않습니다."),
     TECHSTACK_NOT_FOUND(400,"해당 기술스택이 존재하지 않습니다."),

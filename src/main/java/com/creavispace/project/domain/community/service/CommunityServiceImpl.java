@@ -2,7 +2,6 @@ package com.creavispace.project.domain.community.service;
 
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
-import com.creavispace.project.domain.common.dto.type.OrderBy;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
@@ -26,10 +25,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -266,15 +264,16 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public SuccessResponseDto<List<CommunityResponseDto>> readCommunityList(Integer size, Integer page,
-                                                                            CommunityCategory category, String hashTag,
-                                                                            OrderBy orderby) {
+    public SuccessResponseDto<List<CommunityResponseDto>> readCommunityList(CommunityCategory category, String hashTag, Pageable pageRequest) {
         List<CommunityResponseDto> data = null;
-        Pageable pageRequest = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, orderby.getColumnName()));
         Page<Community> pageable;
 
         String categoryStr = category == null ? null : category.name();
-        pageable = communityRepository.findByCategoryAndHashTagAndStatusTrue(categoryStr, hashTag, pageRequest);
+        try {
+            pageable = communityRepository.findByCategoryAndHashTagAndStatusTrue(categoryStr, hashTag, pageRequest);
+        }catch (InvalidDataAccessResourceUsageException e){
+            throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_SORT_INVALID_DATA);
+        }
 
         // 조건에 맞는 커뮤니티 게시글이 존재하는지
         if (!pageable.hasContent()) {
