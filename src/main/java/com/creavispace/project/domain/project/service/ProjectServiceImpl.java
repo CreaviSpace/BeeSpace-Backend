@@ -347,12 +347,19 @@ public class ProjectServiceImpl implements ProjectService {
     public SuccessResponseDto<ProjectDeleteResponseDto> deleteProject(String memberId, Long projectId) {
         ProjectDeleteResponseDto data = null;
         System.out.println("ProjectServiceImpl.deleteProject");
+
         // JWT에 저장된 회원이 존재하는지
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        Project project = projectRepository.findByIdAndMemberId(projectId,memberId)
-                .orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION));
+        // 삭제할 프로젝트 게시글이 존재하는지
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+
+        // 삭제할 권한이 있는지
+        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+        }
 
         // 비활성화 변경 및 저장
         project.disable();
