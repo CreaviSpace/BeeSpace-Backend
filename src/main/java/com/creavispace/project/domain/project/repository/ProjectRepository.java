@@ -1,5 +1,8 @@
 package com.creavispace.project.domain.project.repository;
 
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
@@ -59,4 +62,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     List<Project> findByIdIn(List<Long> projectIds);
 
     Optional<Project> findByIdAndMemberId(Long projectId, String memberId);
+
+    @Query("SELECT NEW com.creavispace.project.domain.admin.dto.MonthlySummary(YEAR(e.createdDate), MONTH(e.createdDate), COUNT(e)) FROM Project e WHERE YEAR(e.createdDate) = :year GROUP BY YEAR(e.createdDate), MONTH(e.createdDate)")
+    List<MonthlySummary> countMonthlySummary(@Param("year") int year);
+
+    @Query("SELECT NEW com.creavispace.project.domain.admin.dto.YearlySummary(YEAR(e.createdDate), COUNT(e)) FROM Project e GROUP BY YEAR(e.createdDate)")
+    List<YearlySummary> countYearlySummary();
+
+    @Query("SELECT NEW com.creavispace.project.domain.admin.dto.DailySummary(YEAR(e.createdDate), MONTH(e.createdDate), DAY(e.createdDate), COUNT(e)) FROM Project e WHERE YEAR(e.createdDate) = :year AND MONTH(e.createdDate) = :month GROUP BY YEAR(e.createdDate), MONTH(e.createdDate), DAY(e.createdDate)")
+    List<DailySummary> countDailySummary(@Param("year") int year, @Param("month") int month);
+
+
 }

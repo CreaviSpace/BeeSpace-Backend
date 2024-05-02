@@ -1,5 +1,8 @@
 package com.creavispace.project.domain.recruit.service;
 
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.dto.type.RecruitCategory;
@@ -499,6 +502,21 @@ public class RecruitServiceImpl implements RecruitService {
 
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "모집 게시글 리스트 조회가 완료되었습니다.", reads);
+    }
+
+    @Override
+    public SuccessResponseDto<List<MonthlySummary>> countMonthlySummary(int year) {
+        return new SuccessResponseDto(true,"월별 모집 게시물 통계 조회 완료", recruitRepository.countMonthlySummary(year));
+    }
+
+    @Override
+    public SuccessResponseDto<List<YearlySummary>> countYearlySummary() {
+        return new SuccessResponseDto(true,"연간 모집 게시물 통계 조회 완료", recruitRepository.countYearlySummary());
+    }
+
+    @Override
+    public SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month) {
+        return new SuccessResponseDto(true,"일간 모집 게시물 통계 조회 완료", recruitRepository.countDailySummary(year, month));
     }
 
     private List<RecruitListReadResponseDto> getRecruitListReadResponseDtos(List<Recruit> recruits) {

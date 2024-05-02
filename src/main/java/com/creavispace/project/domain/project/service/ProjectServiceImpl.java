@@ -1,5 +1,8 @@
 package com.creavispace.project.domain.project.service;
 
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
@@ -557,6 +560,21 @@ public class ProjectServiceImpl implements ProjectService {
         List<ProjectListReadResponseDto> projectListReadResponseDtos = getProjectListReadResponseDtos(pageable);
 
         return new SuccessResponseDto<>(true, "프로젝트 게시글 리스트 조회가 완료되었습니다.", projectListReadResponseDtos);
+    }
+
+    @Override
+    public SuccessResponseDto<List<MonthlySummary>> countMonthlySummary(int year) {
+        return new SuccessResponseDto(true,"월별 프로젝트 게시물 통계 조회 완료", projectRepository.countMonthlySummary(year));
+    }
+
+    @Override
+    public SuccessResponseDto<List<YearlySummary>> countYearlySummary() {
+        return new SuccessResponseDto(true,"연간 프로젝트 게시물 통계 조회 완료", projectRepository.countYearlySummary());
+    }
+
+    @Override
+    public SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month) {
+        return new SuccessResponseDto(true,"일간 프로젝트 게시물 통계 조회 완료", projectRepository.countDailySummary(year, month));
     }
 
     private Page<Project> findProject(String status, Pageable pageRequest) {

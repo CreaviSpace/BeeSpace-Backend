@@ -1,15 +1,21 @@
 package com.creavispace.project.domain.project.service;
 
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.domain.project.dto.response.*;
+import com.creavispace.project.global.common.Service;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface ProjectService {
+public interface ProjectService extends Service {
     public SuccessResponseDto<ProjectResponseDto> createProject(String memberId, ProjectRequestDto dto);
     public SuccessResponseDto<ProjectResponseDto> modifyProject(String memberId, Long projectId, ProjectRequestDto dto);
     public SuccessResponseDto<ProjectDeleteResponseDto> deleteProject(String memberId, Long projectId);
@@ -21,4 +27,11 @@ public interface ProjectService {
 
     SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectFeedBackList(String memberId, Integer size, Integer page, String sortType);
     SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectListForAdmin(Integer size, Integer page, String status, String sortType);
+
+    SuccessResponseDto<List<MonthlySummary>> countMonthlySummary(int year);
+
+    SuccessResponseDto<List<YearlySummary>> countYearlySummary();
+
+    SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month);
+
 }

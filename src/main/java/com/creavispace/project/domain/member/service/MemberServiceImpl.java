@@ -1,6 +1,10 @@
 package com.creavispace.project.domain.member.service;
 
 import com.creavispace.project.config.auth.utils.JwtUtil;
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
+import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
@@ -146,4 +150,20 @@ public class MemberServiceImpl implements MemberService {
     private List<String> convertTechStack(List<MyPageTechStackRequestDto> techStack) {
         return techStack.stream().map(stack -> stack.getTechStack()).toList();
     }
+
+    @Override
+    public SuccessResponseDto<List<MonthlySummary>> countMonthlySummary(int year) {
+        return new SuccessResponseDto(true,"월별 사용자 통계 조회 완료", memberRepository.countMonthlySummary(year));
+    }
+
+    @Override
+    public SuccessResponseDto<List<YearlySummary>> countYearlySummary() {
+        return new SuccessResponseDto(true,"연간 사용자 통계 조회 완료", memberRepository.countYearlySummary());
+    }
+
+    @Override
+    public SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month) {
+        return new SuccessResponseDto(true,"일간 사용자 통계 조회 완료", memberRepository.countDailySummary(year, month));
+    }
+
 }

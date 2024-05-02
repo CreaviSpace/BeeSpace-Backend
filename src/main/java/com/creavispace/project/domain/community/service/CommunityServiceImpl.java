@@ -1,5 +1,8 @@
 package com.creavispace.project.domain.community.service;
 
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.common.dto.type.PostType;
@@ -307,6 +310,21 @@ public class CommunityServiceImpl implements CommunityService {
 
         log.info("/community/service : readCommunityList success data = {}", data);
         return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
+    }
+
+    @Override
+    public SuccessResponseDto<List<MonthlySummary>> countMonthlySummary(int year) {
+        return new SuccessResponseDto(true,"월별 커뮤니티 게시물 통계 조회 완료", communityRepository.countMonthlySummary(year));
+    }
+
+    @Override
+    public SuccessResponseDto<List<YearlySummary>> countYearlySummary() {
+        return new SuccessResponseDto(true,"연간 커뮤니티 게시물 통계 조회 완료", communityRepository.countYearlySummary());
+    }
+
+    @Override
+    public SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month) {
+        return new SuccessResponseDto(true,"일간 커뮤니티 게시물 통계 조회 완료", communityRepository.countDailySummary(year, month));
     }
 
     @Override

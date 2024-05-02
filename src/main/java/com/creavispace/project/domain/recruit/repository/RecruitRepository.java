@@ -1,5 +1,8 @@
 package com.creavispace.project.domain.recruit.repository;
 
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
@@ -7,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -36,4 +40,15 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
     Page<Recruit> findByStatusFalse(Pageable pageRequest);
 
     List<Recruit> findByIdIn(List<Long> recruitIds);
+
+    @Query("SELECT NEW com.creavispace.project.domain.admin.dto.MonthlySummary(YEAR(e.createdDate), MONTH(e.createdDate), COUNT(e)) FROM Recruit e WHERE YEAR(e.createdDate) = :year GROUP BY YEAR(e.createdDate), MONTH(e.createdDate)")
+    List<MonthlySummary> countMonthlySummary(@Param("year") int year);
+
+    @Query("SELECT NEW com.creavispace.project.domain.admin.dto.YearlySummary(YEAR(e.createdDate), COUNT(e)) FROM Recruit e GROUP BY YEAR(e.createdDate)")
+    List<YearlySummary> countYearlySummary();
+
+    @Query("SELECT NEW com.creavispace.project.domain.admin.dto.DailySummary(YEAR(e.createdDate), MONTH(e.createdDate), DAY(e.createdDate), COUNT(e)) FROM Recruit e WHERE YEAR(e.createdDate) = :year AND MONTH(e.createdDate) = :month GROUP BY YEAR(e.createdDate), MONTH(e.createdDate), DAY(e.createdDate)")
+    List<DailySummary> countDailySummary(@Param("year") int year, @Param("month") int month);
+
+
 }
