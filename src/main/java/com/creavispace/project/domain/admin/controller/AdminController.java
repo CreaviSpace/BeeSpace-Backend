@@ -2,8 +2,11 @@ package com.creavispace.project.domain.admin.controller;
 
 
 import com.creavispace.project.config.auth.utils.JwtUtil;
+import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MemberListDto;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.admin.dto.request.DeleteRequestDto;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
@@ -18,10 +21,13 @@ import com.creavispace.project.domain.recruit.dto.response.RecruitListReadRespon
 import com.creavispace.project.domain.recruit.service.RecruitService;
 import com.creavispace.project.domain.report.entity.Report;
 import com.creavispace.project.domain.report.service.ReportService;
+import com.creavispace.project.global.common.Service;
 import com.creavispace.project.global.dto.DeleteResponseDto;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +40,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import static com.creavispace.project.global.util.UsableConst.*;
+
 @RequestMapping("/admin")
 @RestController
 @RequiredArgsConstructor
@@ -68,7 +76,8 @@ public class AdminController {
             @RequestParam(name = "status") String status,
             @RequestParam(name = SORT_TYPE) String sortType) {
         System.out.println("AdminController.projectContentsList");
-        SuccessResponseDto<List<ProjectListReadResponseDto>> projectList = projectService.readProjectListForAdmin(size, page, status, sortType);
+        SuccessResponseDto<List<ProjectListReadResponseDto>> projectList = projectService.readProjectListForAdmin(size,
+                page, status, sortType);
         return ResponseEntity.ok().body(projectList);
     }
 
@@ -79,7 +88,8 @@ public class AdminController {
             @RequestParam(name = "status") String status,
             @RequestParam(name = SORT_TYPE) String sortType) {
         System.out.println("AdminController.recruitContentsList");
-        SuccessResponseDto<List<RecruitListReadResponseDto>> recruitList = recruitService.readRecruitListForAdmin(size, page,
+        SuccessResponseDto<List<RecruitListReadResponseDto>> recruitList = recruitService.readRecruitListForAdmin(size,
+                page,
                 status, sortType);
         return ResponseEntity.ok().body(recruitList);
     }
@@ -90,19 +100,21 @@ public class AdminController {
             @RequestParam(name = "page") Integer page,
             @RequestParam(name = "status") String status,
             @RequestParam(name = SORT_TYPE) String sortType) {
-        SuccessResponseDto<List<CommunityResponseDto>> recruitList = communityService.readCommunityListForAdmin(size, page,
+        SuccessResponseDto<List<CommunityResponseDto>> recruitList = communityService.readCommunityListForAdmin(size,
+                page,
                 status, sortType);
         return ResponseEntity.ok().body(recruitList);
     }
 
     @PostMapping("/contents/delete")
-    public SuccessResponseDto<DeleteResponseDto> deleteContents(HttpServletRequest request, @RequestBody DeleteRequestDto deleteRequestDto) {
+    public SuccessResponseDto<DeleteResponseDto> deleteContents(HttpServletRequest request,
+                                                                @RequestBody DeleteRequestDto deleteRequestDto) {
         System.out.println("AdminController.deleteContents");
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
         Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
         if (!isAdmin(admin)) {
-             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
         System.out.println("admin = " + admin);
         SuccessResponseDto<DeleteResponseDto> successResponseDto = deleteFactory(deleteRequestDto.getCategory(),
@@ -111,10 +123,12 @@ public class AdminController {
     }
 
     @GetMapping("/member")
-    public List<MemberListDto> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam(SORT_TYPE) String sortType) {
+    public List<MemberListDto> memberList(@RequestParam Integer size, @RequestParam Integer page,
+                                          @RequestParam(SORT_TYPE) String sortType) {
 
         List<Member> members = memberService.findAllMembers(size, page, sortType);
-        List<MemberListDto> collect = members.stream().map(member -> new MemberListDto(member)).collect(Collectors.toList());
+        List<MemberListDto> collect = members.stream().map(member -> new MemberListDto(member))
+                .collect(Collectors.toList());
         return collect;
 
     }
@@ -156,8 +170,56 @@ public class AdminController {
         return null;
     }
 
+    @GetMapping("/statistics/monthly")
+    public SuccessResponseDto<List<MonthlySummary>> monthlyStatistics(@RequestParam int year, @RequestParam String category)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Service service = getService(category);
+        Method countMonthlySummary = service.getClass().getMethod("countMonthlySummary", int.class);
+        SuccessResponseDto<List<MonthlySummary>> monthlySummaryByYearIn = (SuccessResponseDto<List<MonthlySummary>>) countMonthlySummary.invoke(service, year);
+        return monthlySummaryByYearIn;
+    }
+
+    @GetMapping("/statistics/yearly")
+    public SuccessResponseDto<List<YearlySummary>> yearlyStatistics(@RequestParam String category)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Service service = getService(category);
+        Method countMonthlySummary = service.getClass().getMethod("countYearlySummary");
+        SuccessResponseDto<List<YearlySummary>> yearlySummary = (SuccessResponseDto<List<YearlySummary>>) countMonthlySummary.invoke(service);
+
+        return yearlySummary;
+    }
+
+    @GetMapping("/statistics/daily")
+    public SuccessResponseDto<List<DailySummary>> dailyStatistics(@RequestParam int year, @RequestParam int month, @RequestParam String category)
+            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        Service service = getService(category);
+        Method countMonthlySummary = service.getClass().getMethod("countDailySummary", int.class, int.class);
+        SuccessResponseDto<List<DailySummary>> dailySummaries = (SuccessResponseDto<List<DailySummary>>) countMonthlySummary.invoke(service, year, month);
+
+        return dailySummaries;
+    }
+
+
+    private Service getService(String service) {
+        if (service.equalsIgnoreCase("member")) {
+            return memberService;
+        }
+        if (service.equalsIgnoreCase("project")) {
+            return projectService;
+        }
+        if (service.equalsIgnoreCase("recruit")) {
+            return recruitService;
+        }
+        if (service.equalsIgnoreCase("community")) {
+            return communityService;
+        }
+        throw new IllegalArgumentException("서비스를 찾을 수 없습니다. :" + service);
+    }
+
+
     public boolean isAdmin(Member member) {
         return member.getRole().equals(Role.ADMIN);
     }
+
 
 }
