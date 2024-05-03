@@ -36,7 +36,7 @@ public class TechStackServiceImpl implements TechStackService{
         data = techStacks.stream()
             .map(techStack-> TechStackListReadResponseDto.builder()
                 .techStack(techStack.getTechStack())
-                .techStackIcon(techStack.getIconUrl())
+                .iconUrl(techStack.getIconUrl())
                 .build())
             .collect(Collectors.toList());
 

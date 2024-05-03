@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TechStackListReadResponseDto {
     private String techStack;
-    private String techStackIcon;
+    private String iconUrl;
 }
