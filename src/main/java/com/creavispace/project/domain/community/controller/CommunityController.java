@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -81,13 +80,15 @@ public class CommunityController {
     @GetMapping(READ_COMMUNITY_LIST)
     @Operation(summary = "커뮤니티 게시글 리스트 조회 / 인기 태그 게시글 조회")
     public ResponseEntity<SuccessResponseDto<List<CommunityResponseDto>>> readCommunityList(
-        @ParameterObject @PageableDefault(size = 6) Pageable pageRequest,
+        @ParameterObject Pageable pageRequest,
         @RequestParam(value = "category", required = false) String category,
         @RequestParam(value = "hashTag", required = false) String hashTag
+
     ){
         log.info("/community/controller : 커뮤니티 게시글 리스트 조회 / 인기 태그 게시글 조회");
         CommunityCategory categoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
         return ResponseEntity.ok().body(communityService.readCommunityList(categoryEnum, hashTag, pageRequest));
     }
+
 
 }
