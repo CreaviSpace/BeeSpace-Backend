@@ -18,7 +18,7 @@ public class AdminControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private AdminController controller = new AdminController(null,null,null,null,null, null);
+    private AdminController controller = new AdminController(null,null,null,null,null, null, null);
 
     @Test
     void isAdminTest() {

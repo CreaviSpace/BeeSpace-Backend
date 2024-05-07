@@ -20,7 +20,7 @@ class CommunityServiceImplTest {
             CommunityRequestDto communityRequestDto = CommunityRequestDto.builder().title("커뮤니티 테스트 타이틀" + 1)
                     .content("커뮤니티 테스트 내용" + i)
                     .category("QNA").hashTags(hashTag).build();
-            communityService.createCommunity("6861d93b", communityRequestDto);
+            communityService.createCommunity("c43d714d", communityRequestDto);
 
         }
     }
