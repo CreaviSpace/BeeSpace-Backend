@@ -1,6 +1,7 @@
 package com.creavispace.project.config.auth;
 
 import com.creavispace.project.config.JwtFilter;
+import com.creavispace.project.domain.admin.service.FiredMemberService;
 import com.creavispace.project.domain.jwt.service.JwtService;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.service.MemberService;
@@ -59,6 +60,7 @@ public class SecurityConfig {
     private String jwtSecret;
 
     private final MemberService memberService;
+    private final FiredMemberService firedMemberService;
     private final JwtService jwtService;
 
     @Bean

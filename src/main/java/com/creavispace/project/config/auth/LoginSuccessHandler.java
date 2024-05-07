@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import static com.creavispace.project.global.util.UsableConst.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String randomTokenName;
         System.out.println("authentication = " + authentication.getName());
         System.out.println("authentication = " + authentication.getAuthorities().stream().toList());
+
         if (memberOps.isPresent()) {
             randomTokenName = UUID.randomUUID().toString();
             log.info("JsonManager에 jwtDto 추가");
@@ -56,10 +58,15 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     private JwtDto loadJwt(Member member) {
-        String memberJwt = memberService.login(member.getMemberEmail(), member.getLoginType(), member.getId());
+        String memberJwt = memberService.login(member.getMemberEmail(), member.getLoginType(), member.getId(), member.isFired());
         String memberId = member.getId();
         boolean oldUser = isOldUser(member);
-        return new JwtDto(memberJwt, memberId, oldUser);
+        boolean fired = isFired(member);
+        return new JwtDto(memberJwt, memberId, AUTH_SUCCESS, oldUser, fired);
+    }
+
+    private boolean isFired(Member member) {
+        return member.isFired();
     }
 
     private void createRefreshToken(JwtDto jwtDto) {

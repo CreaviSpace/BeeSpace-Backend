@@ -13,12 +13,14 @@ import java.util.Date;
 @Slf4j
 public class JwtUtil {
 
-    public static String createJwt(String memberEmail, String loginType, String memberId, String secretKey,
+    public static String createJwt(String memberEmail, String loginType, String memberId,
+                                   Boolean fired, String secretKey,
                                    Long expiredTimeStampMs) {
         Claims claims = Jwts.claims();
         claims.put("memberEmail", memberEmail);
         claims.put("loginType", loginType);
         claims.put("memberId", memberId);
+        claims.put("fired", fired);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -33,11 +35,14 @@ public class JwtUtil {
         String memberId = userInfo.memberId();
         String loginType = userInfo.loginType();
         String memberEmail = userInfo.memberEmail();
+        boolean fired = userInfo.fired();
 
         Claims claims = Jwts.claims();
         claims.put("memberEmail", memberEmail);
         claims.put("loginType", loginType);
         claims.put("memberId", memberId);
+        claims.put("fired", fired);
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -52,11 +57,13 @@ public class JwtUtil {
         String memberId = userInfo.memberId();
         String loginType = userInfo.loginType();
         String memberEmail = userInfo.memberEmail();
+        boolean fired = userInfo.fired();
 
         Claims claims = Jwts.claims();
         claims.put("memberEmail", memberEmail);
         claims.put("loginType", loginType);
         claims.put("memberId", memberId);
+        claims.put("fired", fired);
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -71,7 +78,8 @@ public class JwtUtil {
         String memberEmail = body.get("memberEmail", String.class);
         String loginType = body.get("loginType", String.class);
         String memberId = body.get("memberId", String.class);
-        return new MemberJwtResponseDto(memberEmail, loginType, memberId);
+        Boolean fired = body.get("fired", Boolean.class);
+        return new MemberJwtResponseDto(memberEmail, loginType, memberId, fired);
     }
 
     public static boolean isExpired(String token, String secretKey) {

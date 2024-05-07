@@ -63,8 +63,13 @@ public class Member extends BaseTimeEntity {
     @JsonBackReference
     private String memberIntroduce;
 
+    //탈퇴
     @JsonBackReference
     private boolean expired;
+
+    //정지
+    @JsonBackReference
+    private boolean fired;
 
     @JsonBackReference
     private boolean enabled;
@@ -89,8 +94,9 @@ public class Member extends BaseTimeEntity {
         this.memberPosition = "";
         this.profileUrl = "";
         this.memberIntroduce= "";
-        expired = false;
-        enabled = false;
+        this.expired = false;
+        this.enabled = false;
+        this.fired = false;
     }
 
     public String getRoleKey() {
