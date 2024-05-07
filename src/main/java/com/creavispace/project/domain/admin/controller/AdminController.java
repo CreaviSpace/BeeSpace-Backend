@@ -7,6 +7,9 @@ import com.creavispace.project.domain.admin.dto.MemberListDto;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.admin.dto.request.DeleteRequestDto;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.request.MemberIdRequestDto;
+import com.creavispace.project.domain.admin.entity.FiredMember;
+import com.creavispace.project.domain.admin.repository.FiredMemberRepository;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
@@ -28,6 +31,7 @@ import com.creavispace.project.global.exception.GlobalErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +44,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import static com.creavispace.project.global.util.UsableConst.*;
 
 @RequestMapping("/admin")
@@ -56,17 +59,29 @@ public class AdminController {
     private final RecruitService recruitService;
     private final CommunityService communityService;
     private final ReportService reportService;
+    private final FiredMemberRepository firedMemberRepository;
 
     @PostMapping("/sanction")
-    public void sanctionMember(@RequestBody String memberId, HttpServletRequest request) {
+    public void sanctionMember(@RequestBody MemberIdRequestDto dto, HttpServletRequest request) {
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
         Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
         if (!isAdmin(admin)) {
             return;
         }
-        Member member = memberRepository.findById(memberId).orElseThrow();
-        member.setExpired(true);
+        Member member = memberRepository.findById(dto.getMemberId()).orElseThrow();
+
+        if (firedMemberRepository.existsById(dto.getMemberId())) {
+            firedMemberRepository.deleteById(dto.getMemberId());
+            member.setFired(false);
+            memberRepository.save(member);
+            return;
+        }
+        System.out.println("memberId = " + dto.getMemberId());
+        member.setFired(true);
+        memberRepository.save(member);
+
+        firedMemberRepository.save(new FiredMember(dto.getMemberId(), dto.getReason(), LocalDateTime.now().plusDays(8)));
     }
 
     @GetMapping("/contents/project")//
@@ -76,8 +91,7 @@ public class AdminController {
             @RequestParam(name = "status") String status,
             @RequestParam(name = SORT_TYPE) String sortType) {
         System.out.println("AdminController.projectContentsList");
-        SuccessResponseDto<List<ProjectListReadResponseDto>> projectList = projectService.readProjectListForAdmin(size,
-                page, status, sortType);
+        SuccessResponseDto<List<ProjectListReadResponseDto>> projectList = projectService.readProjectListForAdmin(size, page, status, sortType);
         return ResponseEntity.ok().body(projectList);
     }
 
@@ -88,8 +102,7 @@ public class AdminController {
             @RequestParam(name = "status") String status,
             @RequestParam(name = SORT_TYPE) String sortType) {
         System.out.println("AdminController.recruitContentsList");
-        SuccessResponseDto<List<RecruitListReadResponseDto>> recruitList = recruitService.readRecruitListForAdmin(size,
-                page,
+        SuccessResponseDto<List<RecruitListReadResponseDto>> recruitList = recruitService.readRecruitListForAdmin(size, page,
                 status, sortType);
         return ResponseEntity.ok().body(recruitList);
     }
@@ -100,21 +113,19 @@ public class AdminController {
             @RequestParam(name = "page") Integer page,
             @RequestParam(name = "status") String status,
             @RequestParam(name = SORT_TYPE) String sortType) {
-        SuccessResponseDto<List<CommunityResponseDto>> recruitList = communityService.readCommunityListForAdmin(size,
-                page,
+        SuccessResponseDto<List<CommunityResponseDto>> recruitList = communityService.readCommunityListForAdmin(size, page,
                 status, sortType);
         return ResponseEntity.ok().body(recruitList);
     }
 
     @PostMapping("/contents/delete")
-    public SuccessResponseDto<DeleteResponseDto> deleteContents(HttpServletRequest request,
-                                                                @RequestBody DeleteRequestDto deleteRequestDto) {
+    public SuccessResponseDto<DeleteResponseDto> deleteContents(HttpServletRequest request, @RequestBody DeleteRequestDto deleteRequestDto) {
         System.out.println("AdminController.deleteContents");
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
         Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
         if (!isAdmin(admin)) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
         System.out.println("admin = " + admin);
         SuccessResponseDto<DeleteResponseDto> successResponseDto = deleteFactory(deleteRequestDto.getCategory(),
@@ -123,12 +134,10 @@ public class AdminController {
     }
 
     @GetMapping("/member")
-    public List<MemberListDto> memberList(@RequestParam Integer size, @RequestParam Integer page,
-                                          @RequestParam(SORT_TYPE) String sortType) {
+    public List<MemberListDto> memberList(@RequestParam Integer size, @RequestParam Integer page, @RequestParam(SORT_TYPE) String sortType) {
 
         List<Member> members = memberService.findAllMembers(size, page, sortType);
-        List<MemberListDto> collect = members.stream().map(member -> new MemberListDto(member))
-                .collect(Collectors.toList());
+        List<MemberListDto> collect = members.stream().map(member -> new MemberListDto(member)).collect(Collectors.toList());
         return collect;
 
     }
@@ -220,6 +229,4 @@ public class AdminController {
     public boolean isAdmin(Member member) {
         return member.getRole().equals(Role.ADMIN);
     }
-
-
 }
