@@ -21,7 +21,7 @@ public abstract class BaseTimeEntity {
     @LastModifiedDate
     private LocalDateTime modifiedDate;
 
-    public boolean isNewMember() {
+    public boolean isNewItem() {
         return this.createdDate.toString().equals(this.modifiedDate.toString());
     }
 }
