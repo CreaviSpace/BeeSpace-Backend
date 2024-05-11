@@ -96,8 +96,9 @@ public class Recruit extends BaseTimeEntity {
         this.content = dto.getContent();
     }
 
-    public void disable(){
-        this.status = false;
+    public boolean disable(){
+        this.status = !status;
+        return status;
     }
 
     public void plusViewCount(){

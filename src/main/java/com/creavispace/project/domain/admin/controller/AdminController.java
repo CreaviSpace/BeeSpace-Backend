@@ -11,6 +11,7 @@ import com.creavispace.project.domain.admin.dto.request.MemberIdRequestDto;
 import com.creavispace.project.domain.admin.entity.FiredMember;
 import com.creavispace.project.domain.admin.repository.FiredMemberRepository;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
 import com.creavispace.project.domain.member.Role;
@@ -18,8 +19,10 @@ import com.creavispace.project.domain.member.dto.response.MemberJwtResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.member.service.MemberService;
+import com.creavispace.project.domain.project.dto.response.ProjectDeleteResponseDto;
 import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
 import com.creavispace.project.domain.project.service.ProjectService;
+import com.creavispace.project.domain.recruit.dto.response.RecruitDeleteResponseDto;
 import com.creavispace.project.domain.recruit.dto.response.RecruitListReadResponseDto;
 import com.creavispace.project.domain.recruit.service.RecruitService;
 import com.creavispace.project.domain.report.entity.Report;
@@ -81,7 +84,7 @@ public class AdminController {
         member.setFired(true);
         memberRepository.save(member);
 
-        firedMemberRepository.save(new FiredMember(dto.getMemberId(), dto.getReason(), LocalDateTime.now().plusDays(8)));
+        firedMemberRepository.save(new FiredMember(dto.getMemberId(), dto.getReason(), LocalDateTime.now().plusDays(dto.getPeriod())));
     }
 
     @GetMapping("/contents/project")//
@@ -121,6 +124,8 @@ public class AdminController {
     @PostMapping("/contents/delete")
     public SuccessResponseDto<DeleteResponseDto> deleteContents(HttpServletRequest request, @RequestBody DeleteRequestDto deleteRequestDto) {
         System.out.println("AdminController.deleteContents");
+        System.out.println("deleteRequestDto = " + deleteRequestDto.getCategory());
+        System.out.println("deleteRequestDto = " + deleteRequestDto.getId());
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
         MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
         Member admin = memberRepository.findById(userInfo.memberId()).orElseThrow();
@@ -152,31 +157,35 @@ public class AdminController {
         SuccessResponseDto<DeleteResponseDto> successResponseDto = new SuccessResponseDto<>();
 
         if (category.equalsIgnoreCase("project")) {
-            DeleteResponseDto data = projectService.deleteProject(
-                    admin.getId(), id).getData();
-            successResponseDto.setData(data);
-            successResponseDto.setMessage("프로젝트 게시글 삭제가 완료되었습니다");
-            successResponseDto.setSuccess(true);
-            return successResponseDto;
+            SuccessResponseDto<ProjectDeleteResponseDto> dto = projectService.deleteProject(
+                    admin.getId(), id);
+            ProjectDeleteResponseDto data = dto.getData();
+            return dtoSetting(dto, data);
         }
 
         if (category.equalsIgnoreCase("recruit")) {
-            DeleteResponseDto data = recruitService.deleteRecruit(admin.getId(), id).getData();
-            successResponseDto.setData(data);
-            successResponseDto.setMessage("모집 게시글 삭제가 완료되었습니다");
-            successResponseDto.setSuccess(true);
-            return successResponseDto;
+            SuccessResponseDto<RecruitDeleteResponseDto> dto = recruitService.deleteRecruit(
+                    admin.getId(), id);
+            RecruitDeleteResponseDto data = dto.getData();
+            return dtoSetting(dto, data);
 
         }
 
         if (category.equalsIgnoreCase("community")) {
-            DeleteResponseDto data = communityService.deleteCommunity(admin.getId(), id).getData();
-            successResponseDto.setData(data);
-            successResponseDto.setMessage("커뮤니티 게시글 삭제가 완료되었습니다");
-            successResponseDto.setSuccess(true);
-            return successResponseDto;
+            SuccessResponseDto<CommunityDeleteResponseDto> dto = communityService.deleteCommunity(admin.getId(), id);
+            CommunityDeleteResponseDto data = dto.getData();
+            return dtoSetting(dto, data);
         }
         return null;
+    }
+
+    private SuccessResponseDto<DeleteResponseDto> dtoSetting(SuccessResponseDto<?> dto,
+            DeleteResponseDto data) {
+        SuccessResponseDto<DeleteResponseDto> successResponseDto = new SuccessResponseDto<>();
+        successResponseDto.setData(data);
+        successResponseDto.setMessage(dto.getMessage());
+        successResponseDto.setSuccess(true);
+        return successResponseDto;
     }
 
     @GetMapping("/statistics/monthly")

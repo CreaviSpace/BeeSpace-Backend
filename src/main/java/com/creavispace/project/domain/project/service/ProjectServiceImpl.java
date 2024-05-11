@@ -365,7 +365,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         // 비활성화 변경 및 저장
-        project.disable();
+        boolean toggle = project.disable();
         projectRepository.save(project);
 
         // 프로젝트 삭제 결과 DTO
@@ -375,7 +375,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
         log.info("/project/service : deleteProject success data = {}", data);
+
         // 성공 응답 반환
+        if (toggle) {
+            return new SuccessResponseDto<>(true, "프로젝트 게시글 복구가 완료되었습니다.", data);
+        }
         return new SuccessResponseDto<>(true, "프로젝트 게시글 삭제가 완료되었습니다.", data);
     }
 

@@ -15,9 +15,13 @@ public class MemberIdRequestDto {
     @JsonProperty("reason")
     private String reason;
 
+    @JsonProperty
+    private Integer period;
+
     //제재 사유
-    public MemberIdRequestDto(String memberId, String reason) {
+    public MemberIdRequestDto(String memberId, String reason, Integer period) {
         this.memberId = memberId;
         this.reason = reason;
+        this.period = period;
     }
 }

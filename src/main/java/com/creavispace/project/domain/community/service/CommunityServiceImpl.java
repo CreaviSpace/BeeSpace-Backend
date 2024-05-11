@@ -195,7 +195,7 @@ public class CommunityServiceImpl implements CommunityService {
         }
 
         // 커뮤니티 비활성화 및 저장
-        community.disable();
+        boolean toggle = community.disable();
         communityRepository.save(community);
 
         // 커뮤니티 삭제 결과 DTO변환
@@ -205,7 +205,11 @@ public class CommunityServiceImpl implements CommunityService {
                 .build();
 
         log.info("/community/service : deleteCommunity success data = {}", data);
+
         // 성공 응답 반환
+        if (toggle) {
+            return new SuccessResponseDto<>(true, "커뮤니티 게시글 복구가 완료되었습니다.", data);
+        }
         return new SuccessResponseDto<>(true, "커뮤니티 게시글 삭제가 완료되었습니다.", data);
     }
 

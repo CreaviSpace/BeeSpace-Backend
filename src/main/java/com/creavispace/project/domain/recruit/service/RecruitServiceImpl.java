@@ -303,7 +303,7 @@ public class RecruitServiceImpl implements RecruitService {
         }
 
         // 모집 게시글 비활성화 및 저장
-        recruit.disable();
+        boolean toggle = recruit.disable();
         recruitRepository.save(recruit);
 
         // 모집 게시글 삭제 DTO
@@ -314,6 +314,10 @@ public class RecruitServiceImpl implements RecruitService {
 
         log.info("/recruit/service : deleteRecruit success data = {}", data);
         // 성공 응답 반환
+        if (toggle) {
+            return new SuccessResponseDto<>(true, "모집 게시글 복구가 완료되었습니다.", data);
+
+        }
         return new SuccessResponseDto<>(true, "모집 게시글 삭제가 완료되었습니다.", data);
     }
 

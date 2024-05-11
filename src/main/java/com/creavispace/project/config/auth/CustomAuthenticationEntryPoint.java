@@ -57,7 +57,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         log.info("리프레시 토큰 조회 jwt = {}", expiredToken);
         Optional<Jwt> refreshTokenOps = jwtService.findById(expiredToken);
         if (refreshTokenOps.isEmpty()) {
-            log.info("리프레시 토큰이 존재하지 않습니다");
+            log.info("리프레시 토큰이 존재하지 않습니다.");
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+        }
+        if (JwtUtil.isExpired(refreshTokenOps.get().getRefreshToken(), jwtSecret)) {
+            log.info("리프레시 토큰이 만료 되었습니다.");
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
         }
         log.info("리프레시 토큰이 존재합니다. 새로운 AccessToken 발급");

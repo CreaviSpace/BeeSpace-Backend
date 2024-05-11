@@ -87,8 +87,9 @@ public class Project extends BaseTimeEntity{
         this.bannerContent = dto.getBannerContent();
     }
 
-    public void disable(){
-        this.status = false;
+    public boolean disable(){
+        this.status = !status;
+        return status;
     }
 
     public void plusViewCount(){
