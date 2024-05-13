@@ -17,7 +17,7 @@ public interface CommunityHashTagRepository extends JpaRepository<CommunityHashT
 
     @Transactional
     @Modifying
-    @Query(value = "delete from community_hash_tag ch where ch.community_id = :communityId", nativeQuery = true)
+    @Query(value = "delete from community_hash_tag where community_id = :communityId", nativeQuery = true)
     public void deleteByCommunityId(Long communityId);
     
     @Query(value = "SELECT ch.hash_tag_id hashTag, COUNT(*) count " +
