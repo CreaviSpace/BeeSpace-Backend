@@ -23,7 +23,7 @@ public interface CommunityHashTagRepository extends JpaRepository<CommunityHashT
     @Query(value = "SELECT ch.hash_tag_id hashTag, COUNT(*) count " +
     "FROM community_hash_tag ch " +
     "JOIN hash_tag h " +
-    "ON ch.hash_tag_id = h.id " +
+    "ON ch.hash_tag_id = h.hash_tag " +
     "GROUP BY ch.hash_tag_id " +
     "ORDER BY count DESC " +
     "LIMIT 10", nativeQuery = true)
