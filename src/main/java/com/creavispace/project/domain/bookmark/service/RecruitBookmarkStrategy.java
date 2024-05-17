@@ -72,7 +72,9 @@ public class RecruitBookmarkStrategy implements BookmarkStrategy {
     public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
         System.out.println("RecruitBookmarkStrategy.readMyBookmark");
         List<RecruitBookmark> recruitBookmarks = recruitBookmarkRepository.findByMemberId(memberId, pageRequest);
-        List<Long> recruitIds = recruitBookmarks.stream().map(bookmarks -> bookmarks.getRecruit().getId()).toList();
+        List<Long> recruitIds = recruitBookmarks.stream()
+                .filter(bookmark -> bookmark.getRecruit().getStatus())
+                .map(bookmarks -> bookmarks.getRecruit().getId()).toList();
         List<RecruitTechStack> recruitTechStacks = recruitTechStackRepository.findByRecruitIdIn(recruitIds);
         List<Recruit> recruits = recruitRepository.findByIdIn(recruitIds);
 

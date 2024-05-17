@@ -71,7 +71,9 @@ public class ProjectBookmarkStrategy implements BookmarkStrategy {
     public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
         System.out.println("ProjectBookmarkStrategy.readMyBookmark");
         List<ProjectBookmark> projectBookmarks = projectBookmarkRepository.findByMemberId(memberId, pageRequest);
-        List<Long> projectIds = projectBookmarks.stream().map(projectBookmark -> projectBookmark.getProject().getId())
+        List<Long> projectIds = projectBookmarks.stream()
+                .filter(projectBookmark -> projectBookmark.getProject().isStatus())
+                .map(projectBookmark -> projectBookmark.getProject().getId())
                 .toList();
         projectBookmarkRepository.findByProjectIdIn(projectIds);
         projectRepository.findByIdIn(projectIds);

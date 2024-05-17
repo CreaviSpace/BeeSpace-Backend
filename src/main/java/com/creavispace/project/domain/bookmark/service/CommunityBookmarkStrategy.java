@@ -73,7 +73,9 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
         System.out.println("CommunityBookmarkStrategy.readMyBookmark");
         List<CommunityBookmark> communityBookmarks = communityBookmarkRepository.findByMemberId(memberId, pageRequest);
         List<BookmarkContentsResponseDto> bookmarks = new ArrayList<>();
-        List<Long> communityIds = communityBookmarks.stream().map(bookmark -> bookmark.getCommunity().getId()).toList();
+        List<Long> communityIds = communityBookmarks.stream()
+                .filter(bookmark -> bookmark.getCommunity().isStatus())
+                .map(bookmark -> bookmark.getCommunity().getId()).toList();
         List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityIdIn(communityIds);
         List<Community> communities = communityRepository.findByIdIn(communityIds);
 
