@@ -1,11 +1,11 @@
 package com.creavispace.project.domain.project.dto.request;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -21,4 +21,5 @@ public class ProjectRequestDto {
     private List<ProjectLinkRequestDto> linkDtos;
     private String thumbnail;
     private String bannerContent;
+    private List<String> images;
 }

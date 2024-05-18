@@ -31,5 +31,6 @@ public class ProjectReadResponseDto {
     private List<ProjectLinkResponseDto> links;
     private List<ProjectTechStackResponseDto> techStacks;
     private String projectViewLog;
+    private List<String> images;
 
 }

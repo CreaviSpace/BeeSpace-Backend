@@ -6,6 +6,10 @@ import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
+import com.creavispace.project.domain.file.entity.Image;
+import com.creavispace.project.domain.file.entity.ProjectImage;
+import com.creavispace.project.domain.file.repository.ProjectImageRepository;
+import com.creavispace.project.domain.file.service.FileService;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
@@ -32,6 +36,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +59,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectTechStackRepository projectTechStackRepository;
     private final ProjectLinkRepository projectLinkRepository;
+    private final ProjectImageRepository projectImageRepository;
+    private final FileService fileService;
 
     @Override
     @Transactional
@@ -59,6 +69,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<ProjectMemberRequestDto> memberDtos = dto.getMemberDtos();
         List<ProjectTechStackRequestDto> techStackDtos = dto.getTechStackDtos();
         List<ProjectLinkRequestDto> linkDtos = dto.getLinkDtos();
+        List<String> images = dto.getImages();
         ProjectCategory categoryEnum = CustomValueOf.valueOf(ProjectCategory.class, dto.getCategory(), GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
 
         // JWT에 저장된 회원이 존재하는지
@@ -81,6 +92,32 @@ public class ProjectServiceImpl implements ProjectService {
 
         // 프로젝트 저장
         projectRepository.save(project);
+
+        // 프로젝트 이미지가 있다면
+        if(images != null && !images.isEmpty()){
+            List<String> contentImages = new ArrayList<>();
+
+            Document doc = Jsoup.parse(dto.getContent());
+            Elements imageElements = doc.select("img");
+
+            for(Element imageElement : imageElements){
+                String imageUrl = imageElement.attr("src");
+                contentImages.add(imageUrl);
+            }
+
+            List<String> deletedImg = new ArrayList<>(images);
+            deletedImg.removeAll(contentImages);
+
+            fileService.deleteImages(deletedImg);
+
+            List<String> saveImg = new ArrayList<>(images);
+            saveImg.removeAll(deletedImg);
+
+            List<ProjectImage> saveProjectImages = saveImg.stream().map(img -> new ProjectImage(project,img)).toList();
+
+            projectImageRepository.saveAll(saveProjectImages);
+
+        }
 
         // 프로젝트 맴버가 있다면
         if(memberDtos != null && !memberDtos.isEmpty()){
@@ -135,6 +172,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<ProjectMember> projectMembers = projectMemberRepository.findByProjectIdOrderByPosition(projectId);
         List<ProjectLink> projectLinks = projectLinkRepository.findByProjectId(projectId);
         List<ProjectTechStack> projectTechStacks = projectTechStackRepository.findByProjectId(projectId);
+        List<ProjectImage> projectImages = projectImageRepository.findByProjectId(projectId);
 
         // position을 기준으로 그룹화
         Map<String, List<Member>> positionMap = new HashMap<>();
@@ -191,6 +229,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .positions(positions)
                 .links(links)
                 .techStacks(techStacks)
+                .images(projectImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/project/service : createProject success data = {}", data);
@@ -205,6 +244,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<ProjectMemberRequestDto> memberDtos = dto.getMemberDtos();
         List<ProjectTechStackRequestDto> techStackDtos = dto.getTechStackDtos();
         List<ProjectLinkRequestDto> linkDtos = dto.getLinkDtos();
+        List<String> images = dto.getImages();
 
         // JWT에 저장된 회원이 존재하는지
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -222,6 +262,33 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 수정 및 저장
         project.modify(dto);
         projectRepository.save(project);
+
+        // 프로젝트 이미지가 있다면
+        if(images != null && !images.isEmpty()){
+            List<String> contentImages = new ArrayList<>();
+
+            Document doc = Jsoup.parse(dto.getContent());
+            Elements imageElements = doc.select("img");
+
+            for(Element imageElement : imageElements){
+                String imageUrl = imageElement.attr("src");
+                contentImages.add(imageUrl);
+            }
+
+            List<String> deletedImg = new ArrayList<>(images);
+            deletedImg.removeAll(contentImages);
+
+            fileService.deleteImages(deletedImg);
+
+            List<String> saveImg = new ArrayList<>(images);
+            saveImg.removeAll(deletedImg);
+
+            List<ProjectImage> saveProjectImages = saveImg.stream().map(img -> new ProjectImage(project,img)).toList();
+
+            projectImageRepository.deleteByProjectId(projectId);
+            projectImageRepository.saveAll(saveProjectImages);
+
+        }
 
         // 기존 프로젝트 맴버 삭제
         projectMemberRepository.deleteByProjectId(projectId);
@@ -282,6 +349,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<ProjectMember> projectMembers = projectMemberRepository.findByProjectIdOrderByPosition(projectId);
         List<ProjectLink> projectLinks = projectLinkRepository.findByProjectId(projectId);
         List<ProjectTechStack> projectTechStacks = projectTechStackRepository.findByProjectId(projectId);
+        List<ProjectImage> projectImages = projectImageRepository.findByProjectId(projectId);
 
         // position을 기준으로 그룹화
         Map<String, List<Member>> positionMap = new HashMap<>();
@@ -338,6 +406,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .positions(positions)
                 .links(links)
                 .techStacks(techStacks)
+                .images(projectImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/project/service : modifyProject success data = {}", data);
@@ -494,6 +563,8 @@ public class ProjectServiceImpl implements ProjectService {
                         .build())
                 .collect(Collectors.toList());
 
+        List<ProjectImage> projectImages = projectImageRepository.findByProjectId(projectId);
+
         // 프로젝트 디테일 결과 DTO
         data = ProjectReadResponseDto.builder()
                 .id(project.getId())
@@ -514,6 +585,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .links(links)
                 .techStacks(techStacks)
                 .projectViewLog(projectViewLogHeader)
+                .images(projectImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/project/service : readProject success data = {}", data);

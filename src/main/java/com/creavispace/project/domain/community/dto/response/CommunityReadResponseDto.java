@@ -27,4 +27,5 @@ public class CommunityReadResponseDto {
     private String content;
     private List<CommunityHashTagDto> hashTags;
     private String communityViewLog;
+    private List<String> images;
 }

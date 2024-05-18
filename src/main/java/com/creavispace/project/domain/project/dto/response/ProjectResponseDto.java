@@ -1,12 +1,12 @@
 package com.creavispace.project.domain.project.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -31,4 +31,5 @@ public class ProjectResponseDto {
     private List<ProjectPositionResponseDto> positions;
     private List<ProjectLinkResponseDto> links;
     private List<ProjectTechStackResponseDto> techStacks;
+    private List<String> images;
 }

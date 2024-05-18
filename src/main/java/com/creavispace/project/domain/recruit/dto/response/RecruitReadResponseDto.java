@@ -37,4 +37,5 @@ public class RecruitReadResponseDto {
     private List<RecruitPositionResponseDto> positions;
     private List<RecruitTechStackResponseDto> techStacks;
     private String recruitViewLog;
+    private List<String> images;
 }

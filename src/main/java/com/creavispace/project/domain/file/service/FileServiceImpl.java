@@ -1,35 +1,24 @@
 package com.creavispace.project.domain.file.service;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.UUID;
-
-import javax.imageio.ImageIO;
-
-import org.marvinproject.image.transform.scale.Scale;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.file.dto.response.UploadFileResponseDto;
-import com.creavispace.project.domain.file.entity.CustomMultipartFile;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import marvin.image.MarvinImage;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -62,13 +51,15 @@ public class FileServiceImpl implements FileService {
         return new SuccessResponseDto<UploadFileResponseDto>(true, "이미지가 저장되었습니다.", new UploadFileResponseDto(url));
     }
 
-    // public SuccessResponseDto<String> deleteImage(String fileUrl) {
-    //     String splitStr = ".com/";
-    //     String fileName = fileUrl.substring(fileUrl.lastIndexOf(splitStr) + splitStr.length());
+     public void deleteImages(List<String> deletedImg) {
+        for(String fileUrl : deletedImg){
+         String splitStr = ".com/";
+         String fileName = fileUrl.substring(fileUrl.lastIndexOf(splitStr) + splitStr.length());
 
-    //     amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-    //     return new SuccessResponseDto<>(true, "이미지 삭제가 완료되었습니다.",fileUrl);
-    // }
+         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+
+        }
+     }
 
     private String createFileName(String fileName) {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));

@@ -26,4 +26,5 @@ public class CommunityResponseDto implements SearchListReadResponseDto{
     private String title;
     private String content;
     private List<CommunityHashTagDto> hashTags;
+    private List<String> images;
 }

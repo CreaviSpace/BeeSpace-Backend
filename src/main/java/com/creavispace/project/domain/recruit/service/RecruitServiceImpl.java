@@ -8,6 +8,10 @@ import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.common.dto.type.RecruitContactWay;
 import com.creavispace.project.domain.common.dto.type.RecruitProceedWay;
+import com.creavispace.project.domain.file.entity.Image;
+import com.creavispace.project.domain.file.entity.RecruitImage;
+import com.creavispace.project.domain.file.repository.RecruitImageRepository;
+import com.creavispace.project.domain.file.service.FileService;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
@@ -32,6 +36,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,6 +58,8 @@ public class RecruitServiceImpl implements RecruitService {
     private final RecruitPositionRepository recruitPositionRepository;
     private final TechStackRepository techStackRepository;
     private final RecruitTechStackRepository recruitTechStackRepository;
+    private final RecruitImageRepository recruitImageRepository;
+    private final FileService fileService;
 
     @Override
     @Transactional
@@ -84,6 +94,33 @@ public class RecruitServiceImpl implements RecruitService {
 
         // 모집 게시글 저장
         recruitRepository.save(recruit);
+
+        List<String> images = dto.getImages();
+
+        if(images != null && !images.isEmpty()){
+            List<String> contentImages = new ArrayList<>();
+
+            Document doc = Jsoup.parse(dto.getContent());
+            Elements imageElements = doc.select("img");
+
+            for(Element imageElement : imageElements){
+                String imageUrl = imageElement.attr("src");
+                contentImages.add(imageUrl);
+            }
+
+            List<String> deletedImg = new ArrayList<>(images);
+            deletedImg.removeAll(contentImages);
+
+            fileService.deleteImages(deletedImg);
+
+            List<String> saveImg = new ArrayList<>(images);
+            saveImg.removeAll(deletedImg);
+
+            List<RecruitImage> saveRecruitImages = saveImg.stream().map(img -> new RecruitImage(recruit,img)).toList();
+
+            recruitImageRepository.saveAll(saveRecruitImages);
+
+        }
 
         List<RecruitPositionRequestDto> positionDtos = dto.getPositions();
         // 모집 포지션이 있다면
@@ -123,6 +160,7 @@ public class RecruitServiceImpl implements RecruitService {
         Long recruitId = recruit.getId();
         List<RecruitPosition> recruitPositions = recruitPositionRepository.findByRecruitId(recruitId);
         List<RecruitTechStack> recruitTechStacks = recruitTechStackRepository.findByRecruitId(recruitId);
+        List<RecruitImage> recruitImages = recruitImageRepository.findByRecruitId(recruitId);
 
         // 가져온 포지션 정보 DTO 변환
         List<RecruitPositionResponseDto> positions = recruitPositions.stream()
@@ -163,6 +201,7 @@ public class RecruitServiceImpl implements RecruitService {
                 .modifiedDate(recruit.getModifiedDate())
                 .positions(positions)
                 .techStacks(techStacks)
+                .images(recruitImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/recruit/service : createRecruit success data = {}", data);
@@ -177,6 +216,7 @@ public class RecruitServiceImpl implements RecruitService {
         RecruitResponseDto data = null;
         List<RecruitPositionRequestDto> positionDtos = dto.getPositions();
         List<RecruitTechStackRequestDto> techStackDtos = dto.getTechStacks();
+        List<String> images = dto.getImages();
 
         // JWT에 저장된 회원이 존재하는지
         Member member = memberRepository.findById(memberId)
@@ -194,6 +234,31 @@ public class RecruitServiceImpl implements RecruitService {
         // 모집 게시글 수정 및 저장
         recruit.modify(dto);
         recruitRepository.save(recruit);
+
+        if(images != null && !images.isEmpty()){
+            List<String> contentImages = new ArrayList<>();
+
+            Document doc = Jsoup.parse(dto.getContent());
+            Elements imageElements = doc.select("img");
+
+            for(Element imageElement : imageElements){
+                String imageUrl = imageElement.attr("src");
+                contentImages.add(imageUrl);
+            }
+
+            List<String> deletedImg = new ArrayList<>(images);
+            deletedImg.removeAll(contentImages);
+
+            fileService.deleteImages(deletedImg);
+
+            List<String> saveImg = new ArrayList<>(images);
+            saveImg.removeAll(deletedImg);
+
+            List<RecruitImage> saveRecruitImages = saveImg.stream().map(img -> new RecruitImage(recruit,img)).toList();
+
+            recruitImageRepository.saveAll(saveRecruitImages);
+
+        }
 
         // 기존 포지션 정보 삭제
         recruitPositionRepository.deleteByRecruitId(recruitId);
@@ -236,6 +301,7 @@ public class RecruitServiceImpl implements RecruitService {
         // 저장된 포지션, 기술스택 정보 가져오기
         List<RecruitPosition> recruitPositions = recruitPositionRepository.findByRecruitId(recruitId);
         List<RecruitTechStack> recruitTechStacks = recruitTechStackRepository.findByRecruitId(recruitId);
+        List<RecruitImage> recruitImages = recruitImageRepository.findByRecruitId(recruitId);
 
         // 가져온 포지션 정보 DTO로 변환
         List<RecruitPositionResponseDto> positions = recruitPositions.stream()
@@ -276,6 +342,7 @@ public class RecruitServiceImpl implements RecruitService {
                 .modifiedDate(recruit.getModifiedDate())
                 .positions(positions)
                 .techStacks(techStacks)
+                .images(recruitImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/recruit/service : modifyRecruit success data = {}", data);
@@ -392,6 +459,8 @@ public class RecruitServiceImpl implements RecruitService {
             }
         }
 
+        List<RecruitImage> recruitImages = recruitImageRepository.findByRecruitId(recruitId);
+
         // 모집게시글 디테일 DTO
         data = RecruitReadResponseDto.builder()
                 .id(recruit.getId())
@@ -426,6 +495,7 @@ public class RecruitServiceImpl implements RecruitService {
                                 .build())
                         .collect(Collectors.toList()))
                 .recruitViewLog(recruitViewLogHeader)
+                .images(recruitImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/recruit/service : readRecruit success data = {}", data);

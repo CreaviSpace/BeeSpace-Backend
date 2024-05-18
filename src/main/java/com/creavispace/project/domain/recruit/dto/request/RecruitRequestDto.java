@@ -25,4 +25,5 @@ public class RecruitRequestDto {
     private String content;
     private List<RecruitPositionRequestDto> positions;
     private List<RecruitTechStackRequestDto> techStacks;
+    private List<String> images;
 }

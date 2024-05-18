@@ -33,5 +33,6 @@ public class RecruitResponseDto {
     private LocalDateTime modifiedDate;
     private List<RecruitPositionResponseDto> positions;
     private List<RecruitTechStackResponseDto> techStacks;
+    private List<String> images;
 }
 

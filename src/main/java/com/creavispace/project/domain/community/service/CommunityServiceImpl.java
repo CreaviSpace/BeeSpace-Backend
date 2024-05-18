@@ -13,6 +13,10 @@ import com.creavispace.project.domain.community.dto.response.CommunityReadRespon
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
+import com.creavispace.project.domain.file.entity.CommunityImage;
+import com.creavispace.project.domain.file.entity.Image;
+import com.creavispace.project.domain.file.repository.CommunityImageRepository;
+import com.creavispace.project.domain.file.service.FileService;
 import com.creavispace.project.domain.hashTag.entity.CommunityHashTag;
 import com.creavispace.project.domain.hashTag.entity.HashTag;
 import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
@@ -28,6 +32,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +56,8 @@ public class CommunityServiceImpl implements CommunityService {
     private final CommunityRepository communityRepository;
     private final HashTagRepository hashTagRepository;
     private final CommunityHashTagRepository communityHashTagRepository;
+    private final CommunityImageRepository communityImageRepository;
+    private final FileService fileService;
 
     @Override
     @Transactional
@@ -73,6 +83,32 @@ public class CommunityServiceImpl implements CommunityService {
         // 커뮤니티 게시글 저장
         communityRepository.save(community);
 
+        List<String> images = dto.getImages();
+
+        if(images != null && !images.isEmpty()){
+            List<String> contentImages = new ArrayList<>();
+
+            Document doc = Jsoup.parse(dto.getContent());
+            Elements imageElements = doc.select("img");
+
+            for(Element imageElement : imageElements){
+                String imageUrl = imageElement.attr("src");
+                contentImages.add(imageUrl);
+            }
+
+            List<String> deletedImg = new ArrayList<>(images);
+            deletedImg.removeAll(contentImages);
+
+            fileService.deleteImages(deletedImg);
+
+            List<String> saveImg = new ArrayList<>(images);
+            saveImg.removeAll(deletedImg);
+
+            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community,img)).toList();
+
+            communityImageRepository.saveAll(saveProjectImages);
+        }
+
         dto.getHashTags()
                 .forEach(hashTagDto -> {
                             HashTag hashTag = hashTagRepository.findByHashTag(hashTagDto).orElse(HashTag.builder().hashTag(hashTagDto).build());
@@ -93,6 +129,8 @@ public class CommunityServiceImpl implements CommunityService {
                         .build())
                 .collect(Collectors.toList());
 
+        List<CommunityImage> communityImages = communityImageRepository.findByCommunityId(community.getId());
+
         // 커뮤니티 게시글 생성 DTO
         data = CommunityResponseDto.builder()
                 .id(community.getId())
@@ -107,6 +145,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .title(community.getTitle())
                 .content(community.getContent())
                 .hashTags(communityHashTagDtos)
+                .images(communityImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/community/service : createCommunity success data = {}", data);
@@ -129,6 +168,34 @@ public class CommunityServiceImpl implements CommunityService {
         // 커뮤니티 게시글 수정 및 저장
         community.modify(dto);
         communityRepository.save(community);
+
+        List<String> images = dto.getImages();
+
+        if(images != null && !images.isEmpty()){
+            List<String> contentImages = new ArrayList<>();
+
+            Document doc = Jsoup.parse(dto.getContent());
+            Elements imageElements = doc.select("img");
+
+            for(Element imageElement : imageElements){
+                String imageUrl = imageElement.attr("src");
+                contentImages.add(imageUrl);
+            }
+
+            List<String> deletedImg = new ArrayList<>(images);
+            deletedImg.removeAll(contentImages);
+
+            fileService.deleteImages(deletedImg);
+
+            List<String> saveImg = new ArrayList<>(images);
+            saveImg.removeAll(deletedImg);
+
+            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community,img)).toList();
+
+            communityImageRepository.deleteByCommunityId(communityId);
+            communityImageRepository.saveAll(saveProjectImages);
+
+        }
 
         // 기존 커뮤니티 해시태그 삭제
         communityHashTagRepository.deleteByCommunityId(communityId);
@@ -154,6 +221,8 @@ public class CommunityServiceImpl implements CommunityService {
                         .build())
                 .collect(Collectors.toList());
 
+        List<CommunityImage> communityImages = communityImageRepository.findByCommunityId(communityId);
+
         // 커뮤니티 수정 DTO
         data = CommunityResponseDto.builder()
                 .id(community.getId())
@@ -168,6 +237,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .title(community.getTitle())
                 .content(community.getContent())
                 .hashTags(hashTags)
+                .images(communityImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/community/service : modifyCommunity success data = {}", data);
@@ -243,6 +313,7 @@ public class CommunityServiceImpl implements CommunityService {
         }
 
         List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityId(communityId);
+        List<CommunityImage> communityImages = communityImageRepository.findByCommunityId(communityId);
 
         // 커뮤니티 디테일 DTO변환
         data = CommunityReadResponseDto.builder()
@@ -263,6 +334,7 @@ public class CommunityServiceImpl implements CommunityService {
                                 .build())
                         .collect(Collectors.toList()))
                 .communityViewLog(communityViewLogHeader)
+                .images(communityImages.stream().map(Image::getUrl).toList())
                 .build();
 
         log.info("/community/service : readCommunity success data = {}", data);

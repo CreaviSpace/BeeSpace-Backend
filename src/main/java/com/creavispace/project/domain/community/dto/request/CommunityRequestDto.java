@@ -1,11 +1,11 @@
 package com.creavispace.project.domain.community.dto.request;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -16,4 +16,5 @@ public class CommunityRequestDto {
     private String title;
     private String content;
     private List<String> hashTags;
+    private List<String> images;
 }
