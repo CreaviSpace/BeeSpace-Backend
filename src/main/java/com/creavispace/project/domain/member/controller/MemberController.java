@@ -21,8 +21,11 @@ import com.creavispace.project.domain.techStack.repository.TechStackRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -136,7 +139,9 @@ public class MemberController {
 
     @PostMapping("/expire")
     @Operation(summary = "회원 탈퇴")
-    public void expireMember(@RequestBody(required = true) String jwt) {
+    public void expireMember(HttpServletRequest request) {
+        String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         memberService.expireMember(jwt);
     }
 }
