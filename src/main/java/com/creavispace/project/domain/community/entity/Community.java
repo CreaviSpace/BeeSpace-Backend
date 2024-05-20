@@ -2,6 +2,7 @@ package com.creavispace.project.domain.community.entity;
 
 import com.creavispace.project.domain.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.domain.common.entity.Post;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.global.exception.GlobalErrorCode;
@@ -17,7 +18,7 @@ import lombok.*;
 @AllArgsConstructor
 @JsonSerialize
 @ToString
-public class Community extends BaseTimeEntity {
+public class Community extends BaseTimeEntity implements Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -5,8 +5,12 @@ import com.creavispace.project.domain.alarm.entity.Alarm;
 import com.creavispace.project.domain.alarm.repository.AlarmRepository;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.domain.common.entity.Post;
+import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
+import com.creavispace.project.domain.project.repository.ProjectRepository;
+import com.creavispace.project.domain.recruit.repository.RecruitRepository;
 import com.creavispace.project.global.exception.CreaviCodeException;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import jakarta.transaction.Transactional;
@@ -20,17 +24,33 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AlarmServiceImpl implements AlarmService{
+public class AlarmServiceImpl implements AlarmService {
 
     private final AlarmRepository alarmRepository;
     private final MemberRepository memberRepository;
+    private final ProjectRepository projectRepository;
+    private final CommunityRepository communityRepository;
+    private final RecruitRepository recruitRepository;
 
     @Override
     public void createAlarm(String memberId, String alarmType, PostType postType, Long postId) {
         AlarmResponseDto data = null;
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
+        Post post;
+        switch(postType){
+            case PROJECT -> {
+                post = projectRepository.findById(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+            }
+            case COMMUNITY -> {
+                post = communityRepository.findById(postId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
+            }
+            case RECRUIT -> {
+                post = recruitRepository.findById(postId).orElseThrow(()->new CreaviCodeException(GlobalErrorCode.RECRUIT_NOT_FOUND));
+            }
+            default -> throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_POST_TYPE);
+        }
 
-        String message = postType.name()+" "+postId+"번 게시글에 새로운 "+alarmType+"이 등록되었습니다.";
+        String message = post.getTitle()+"게시글에 새로운 "+alarmType+"이 등록되었습니다.";
         Alarm alarm = Alarm.builder()
                 .alarmMessage(message)
                 .postType(postType)

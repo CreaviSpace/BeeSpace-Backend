@@ -7,6 +7,8 @@ import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.common.dto.type.PostType;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
+import com.creavispace.project.domain.project.entity.Project;
+import com.creavispace.project.domain.project.repository.ProjectRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +34,9 @@ class AlarmServiceImplTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private ProjectRepository projectRepository;
 
     @InjectMocks
     private AlarmServiceImpl alarmService;
@@ -47,9 +53,11 @@ class AlarmServiceImplTest {
 
         Member member = Member.builder().id(memberId).loginId("loginId").memberName("이름").loginType("네이버").build();
         Alarm alarm = Alarm.builder().alarmMessage(alarmMessage).postType(postType).postId(postId).member(member).readStatus(Alarm.readStatus.UNREAD).build();
+        Project project = Project.builder().id(1L).title("title").build();
 
         // when
         Mockito.when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        Mockito.when(projectRepository.findById(anyLong())).thenReturn(Optional.ofNullable(project));
         Mockito.when(alarmRepository.save(any())).thenReturn(alarm);
 
         alarmService.createAlarm(memberId, alarmType, PostType.PROJECT, postId);

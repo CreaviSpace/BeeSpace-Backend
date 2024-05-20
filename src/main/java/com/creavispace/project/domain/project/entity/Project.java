@@ -4,6 +4,7 @@ import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
 import com.creavispace.project.domain.comment.entity.ProjectComment;
 import com.creavispace.project.domain.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.domain.common.entity.Post;
 import com.creavispace.project.domain.like.entity.ProjectLike;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
@@ -23,7 +24,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Project extends BaseTimeEntity{
+public class Project extends BaseTimeEntity implements Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

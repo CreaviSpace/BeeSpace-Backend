@@ -1,25 +1,24 @@
 package com.creavispace.project.domain.recruit.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.util.List;
-
 import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
 import com.creavispace.project.domain.comment.entity.RecruitComment;
 import com.creavispace.project.domain.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.common.dto.type.RecruitContactWay;
 import com.creavispace.project.domain.common.dto.type.RecruitProceedWay;
 import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.domain.common.entity.Post;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
 import com.creavispace.project.global.exception.GlobalErrorCode;
 import com.creavispace.project.global.util.CustomValueOf;
 import com.creavispace.project.global.util.TimeUtil;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,7 +26,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @JsonSerialize
-public class Recruit extends BaseTimeEntity {
+public class Recruit extends BaseTimeEntity implements Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
