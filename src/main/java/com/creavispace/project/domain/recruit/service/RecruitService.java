@@ -3,11 +3,11 @@ package com.creavispace.project.domain.recruit.service;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.RecruitCategory;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
 import com.creavispace.project.domain.recruit.dto.response.*;
-import com.creavispace.project.global.common.Service;
+import com.creavispace.project.common.Service;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;

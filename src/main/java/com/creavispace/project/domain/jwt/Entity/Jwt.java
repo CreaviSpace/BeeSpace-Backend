@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.jwt.Entity;
 
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

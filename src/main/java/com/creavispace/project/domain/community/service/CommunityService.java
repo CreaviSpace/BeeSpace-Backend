@@ -3,13 +3,13 @@ package com.creavispace.project.domain.community.service;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.CommunityCategory;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
-import com.creavispace.project.global.common.Service;
+import com.creavispace.project.common.Service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 

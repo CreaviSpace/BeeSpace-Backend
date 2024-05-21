@@ -3,12 +3,12 @@ package com.creavispace.project.domain.member.service;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.mypage.dto.request.MyPageModifyRequestDto;
 
-import com.creavispace.project.global.common.Service;
+import com.creavispace.project.common.Service;
 import java.util.List;
 import java.util.Optional;
 

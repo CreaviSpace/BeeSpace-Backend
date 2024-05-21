@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.PostType;
-import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.CustomValueOf;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

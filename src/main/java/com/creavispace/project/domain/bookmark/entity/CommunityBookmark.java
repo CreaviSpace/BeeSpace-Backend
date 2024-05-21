@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.bookmark.entity;
 
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.member.entity.Member;
 

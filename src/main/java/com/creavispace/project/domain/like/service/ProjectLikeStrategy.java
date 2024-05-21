@@ -7,8 +7,8 @@ import com.creavispace.project.domain.like.repository.ProjectLikeRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.project.repository.ProjectRepository;
-import com.creavispace.project.global.exception.CreaviCodeException;
-import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

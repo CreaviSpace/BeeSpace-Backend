@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.report.service;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.report.dto.request.ReportRequestDto;
 import com.creavispace.project.domain.report.dto.response.ReportResponseDto;
 import com.creavispace.project.domain.report.entity.Report;

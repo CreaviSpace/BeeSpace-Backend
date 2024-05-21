@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.SearchType;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.SearchType;
 import com.creavispace.project.domain.search.constant.SwaggerExample;
 import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
 import com.creavispace.project.domain.search.service.SearchService;
-import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.CustomValueOf;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

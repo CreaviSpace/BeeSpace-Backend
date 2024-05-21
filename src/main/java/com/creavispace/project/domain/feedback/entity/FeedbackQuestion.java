@@ -5,8 +5,8 @@ import java.util.List;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.creavispace.project.domain.common.dto.type.QuestionType;
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.dto.type.QuestionType;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.project.entity.Project;
 
 import jakarta.persistence.Column;

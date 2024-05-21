@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.mypage.controller;
 
-import com.creavispace.project.config.auth.utils.JwtUtil;
+import com.creavispace.project.common.utils.JwtUtil;
 import com.creavispace.project.domain.member.dto.response.MemberJwtResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.service.MemberService;

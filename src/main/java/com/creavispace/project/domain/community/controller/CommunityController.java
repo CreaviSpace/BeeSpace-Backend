@@ -1,14 +1,14 @@
 package com.creavispace.project.domain.community.controller;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.CommunityCategory;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.CommunityCategory;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
-import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.CustomValueOf;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +86,7 @@ public class CommunityController {
 
     ){
         log.info("/community/controller : 커뮤니티 게시글 리스트 조회 / 인기 태그 게시글 조회");
+        log.info("================================="+pageRequest.getSort().toString());
         CommunityCategory categoryEnum = CustomValueOf.valueOf(CommunityCategory.class, category, GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
         return ResponseEntity.ok().body(communityService.readCommunityList(categoryEnum, hashTag, pageRequest));
     }

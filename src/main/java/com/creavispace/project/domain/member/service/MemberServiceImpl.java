@@ -1,17 +1,17 @@
 package com.creavispace.project.domain.member.service;
 
-import com.creavispace.project.config.auth.utils.JwtUtil;
+import com.creavispace.project.common.utils.JwtUtil;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.mypage.dto.request.MyPageModifyRequestDto;
 import com.creavispace.project.domain.mypage.dto.response.MyPageTechStackRequestDto;
-import com.creavispace.project.global.exception.CreaviCodeException;
-import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

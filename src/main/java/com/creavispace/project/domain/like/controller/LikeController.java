@@ -4,13 +4,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.PostType;
 import com.creavispace.project.domain.like.dto.response.LikeCountResponseDto;
 import com.creavispace.project.domain.like.dto.response.LikeResponseDto;
 import com.creavispace.project.domain.like.service.LikeService;
-import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.CustomValueOf;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

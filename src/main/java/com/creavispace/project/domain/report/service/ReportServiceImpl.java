@@ -6,18 +6,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.PostType;
-import com.creavispace.project.domain.common.dto.type.ReportCategory;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.common.dto.type.ReportCategory;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.report.dto.request.ReportRequestDto;
 import com.creavispace.project.domain.report.dto.response.ReportResponseDto;
 import com.creavispace.project.domain.report.entity.Report;
 import com.creavispace.project.domain.report.repository.ReportRepository;
-import com.creavispace.project.global.exception.CreaviCodeException;
-import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.CustomValueOf;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

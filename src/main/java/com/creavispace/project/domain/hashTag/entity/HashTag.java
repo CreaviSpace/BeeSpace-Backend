@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.hashTag.entity;
 
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;

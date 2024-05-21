@@ -1,8 +1,8 @@
 package com.creavispace.project.domain.search.service;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.PostType;
-import com.creavispace.project.domain.common.dto.type.SearchType;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.common.dto.type.SearchType;
 import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
@@ -19,8 +19,8 @@ import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.recruit.repository.RecruitRepository;
 import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
-import com.creavispace.project.global.exception.CreaviCodeException;
-import com.creavispace.project.global.exception.GlobalErrorCode;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

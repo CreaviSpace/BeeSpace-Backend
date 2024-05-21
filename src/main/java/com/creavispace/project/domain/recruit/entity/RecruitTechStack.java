@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.recruit.entity;
 
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.techStack.entity.TechStack;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;

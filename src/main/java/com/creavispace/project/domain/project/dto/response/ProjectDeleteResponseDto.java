@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.project.dto.response;
 
-import com.creavispace.project.global.dto.DeleteResponseDto;
+import com.creavispace.project.common.DeleteResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

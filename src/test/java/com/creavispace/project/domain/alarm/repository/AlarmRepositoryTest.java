@@ -1,7 +1,7 @@
 package com.creavispace.project.domain.alarm.repository;
 
 import com.creavispace.project.domain.alarm.entity.Alarm;
-import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.common.dto.type.PostType;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;

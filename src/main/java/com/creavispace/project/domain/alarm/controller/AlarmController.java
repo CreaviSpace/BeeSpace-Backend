@@ -2,7 +2,7 @@ package com.creavispace.project.domain.alarm.controller;
 
 import com.creavispace.project.domain.alarm.dto.response.AlarmResponseDto;
 import com.creavispace.project.domain.alarm.service.AlarmService;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.feedback.service;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackAnswerCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionModifyRequestDto;

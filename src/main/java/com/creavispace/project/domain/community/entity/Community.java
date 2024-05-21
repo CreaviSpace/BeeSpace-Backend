@@ -1,12 +1,12 @@
 package com.creavispace.project.domain.community.entity;
 
-import com.creavispace.project.domain.common.dto.type.CommunityCategory;
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
-import com.creavispace.project.domain.common.entity.Post;
+import com.creavispace.project.common.dto.type.CommunityCategory;
+import com.creavispace.project.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.Post;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.member.entity.Member;
-import com.creavispace.project.global.exception.GlobalErrorCode;
-import com.creavispace.project.global.util.CustomValueOf;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.CustomValueOf;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;

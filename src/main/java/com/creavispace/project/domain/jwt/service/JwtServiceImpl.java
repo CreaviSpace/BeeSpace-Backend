@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.jwt.service;
 
-import com.creavispace.project.config.auth.utils.JwtUtil;
+import com.creavispace.project.common.utils.JwtUtil;
 import com.creavispace.project.domain.jwt.Entity.Jwt;
 import com.creavispace.project.domain.jwt.repository.JwtRepository;
 import jakarta.transaction.Transactional;

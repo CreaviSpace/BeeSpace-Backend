@@ -1,7 +1,6 @@
 package com.creavispace.project.domain.techStack.entity;
 
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
-import jakarta.persistence.Column;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;

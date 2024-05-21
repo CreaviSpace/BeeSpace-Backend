@@ -4,7 +4,7 @@ import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResp
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
 import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
 import com.creavispace.project.domain.comment.service.CommentService;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
 import com.creavispace.project.domain.feedback.service.FeedbackService;
@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.creavispace.project.global.util.UsableConst.MEMBER_ID;
-import static com.creavispace.project.global.util.UsableConst.SORT_TYPE;
+import static com.creavispace.project.common.utils.UsableConst.MEMBER_ID;
+import static com.creavispace.project.common.utils.UsableConst.SORT_TYPE;
 
 @RestController
 @RequestMapping("/member")

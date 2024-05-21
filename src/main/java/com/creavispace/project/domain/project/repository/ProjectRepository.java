@@ -3,7 +3,7 @@ package com.creavispace.project.domain.project.repository;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
-import com.creavispace.project.domain.common.dto.type.ProjectCategory;
+import com.creavispace.project.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
 import org.springframework.data.domain.Page;

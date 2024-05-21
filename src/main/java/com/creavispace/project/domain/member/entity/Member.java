@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.member.entity;
 
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.dto.request.MemberSaveRequestDto;
 import com.creavispace.project.domain.member.service.MemberService;

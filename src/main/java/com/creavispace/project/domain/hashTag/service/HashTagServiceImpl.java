@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.hashTag.service;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.hashTag.dto.response.PopularHashTagReadResponseDto;
 import com.creavispace.project.domain.hashTag.entity.CommunityHashTagResult;
 import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;

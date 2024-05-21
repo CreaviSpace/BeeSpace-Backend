@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.report.dto.request.ReportRequestDto;
 import com.creavispace.project.domain.report.dto.response.ReportResponseDto;
 import com.creavispace.project.domain.report.service.ReportService;

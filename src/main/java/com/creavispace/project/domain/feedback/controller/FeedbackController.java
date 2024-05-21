@@ -1,8 +1,8 @@
 package com.creavispace.project.domain.feedback.controller;
 
 import com.creavispace.project.domain.alarm.service.AlarmService;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.common.dto.type.PostType;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.PostType;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackAnswerCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionModifyRequestDto;

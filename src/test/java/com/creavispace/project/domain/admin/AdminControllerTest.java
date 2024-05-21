@@ -1,16 +1,17 @@
 package com.creavispace.project.domain.admin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.creavispace.project.domain.admin.controller.AdminController;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 public class AdminControllerTest {
@@ -18,7 +19,7 @@ public class AdminControllerTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private AdminController controller = new AdminController(null,null,null,null,null, null, null);
+    private AdminController controller = new AdminController(null,null,null,null,null, null, null,null, null,null);
 
     @Test
     void isAdminTest() {

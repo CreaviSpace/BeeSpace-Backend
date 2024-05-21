@@ -1,12 +1,17 @@
 package com.creavispace.project.domain.admin.controller;
 
 
-import com.creavispace.project.config.auth.utils.JwtUtil;
+import com.creavispace.project.common.DeleteResponseDto;
+import com.creavispace.project.common.Service;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.JwtUtil;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MemberListDto;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.admin.dto.request.DeleteRequestDto;
-import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.request.MemberIdRequestDto;
 import com.creavispace.project.domain.admin.entity.FiredMember;
 import com.creavispace.project.domain.admin.repository.FiredMemberRepository;
@@ -16,8 +21,6 @@ import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
 import com.creavispace.project.domain.bookmark.repository.CommunityBookmarkRepository;
 import com.creavispace.project.domain.bookmark.repository.ProjectBookmarkRepository;
 import com.creavispace.project.domain.bookmark.repository.RecruitBookmarkRepository;
-import com.creavispace.project.domain.bookmark.service.BookmarkService;
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.service.CommunityService;
@@ -34,28 +37,20 @@ import com.creavispace.project.domain.recruit.dto.response.RecruitListReadRespon
 import com.creavispace.project.domain.recruit.service.RecruitService;
 import com.creavispace.project.domain.report.entity.Report;
 import com.creavispace.project.domain.report.service.ReportService;
-import com.creavispace.project.global.common.Service;
-import com.creavispace.project.global.dto.DeleteResponseDto;
-import com.creavispace.project.global.exception.CreaviCodeException;
-import com.creavispace.project.global.exception.GlobalErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import static com.creavispace.project.global.util.UsableConst.*;
+import org.springframework.web.bind.annotation.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.creavispace.project.common.utils.UsableConst.SORT_TYPE;
 
 @RequestMapping("/admin")
 @RestController
@@ -207,7 +202,7 @@ public class AdminController {
     }
 
     private SuccessResponseDto<DeleteResponseDto> dtoSetting(SuccessResponseDto<?> dto,
-            DeleteResponseDto data) {
+                                                             DeleteResponseDto data) {
         SuccessResponseDto<DeleteResponseDto> successResponseDto = new SuccessResponseDto<>();
         successResponseDto.setData(data);
         successResponseDto.setMessage(dto.getMessage());

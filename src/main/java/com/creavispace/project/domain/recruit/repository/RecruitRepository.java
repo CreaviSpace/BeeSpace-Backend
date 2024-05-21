@@ -3,7 +3,7 @@ package com.creavispace.project.domain.recruit.repository;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
-import com.creavispace.project.domain.common.dto.type.RecruitCategory;
+import com.creavispace.project.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.search.entity.SearchResultSet;
 import org.springframework.data.domain.Page;

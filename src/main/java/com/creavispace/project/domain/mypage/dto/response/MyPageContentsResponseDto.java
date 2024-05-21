@@ -1,6 +1,6 @@
 package com.creavispace.project.domain.mypage.dto.response;
 
-import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
 import java.util.List;
 import lombok.Getter;

@@ -1,8 +1,8 @@
 package com.creavispace.project.domain.report.entity;
 
-import com.creavispace.project.domain.common.dto.type.PostType;
-import com.creavispace.project.domain.common.dto.type.ReportCategory;
-import com.creavispace.project.domain.common.entity.BaseTimeEntity;
+import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.common.dto.type.ReportCategory;
+import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
