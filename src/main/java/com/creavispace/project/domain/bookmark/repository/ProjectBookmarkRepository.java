@@ -1,6 +1,8 @@
 package com.creavispace.project.domain.bookmark.repository;
 
 import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
+import com.creavispace.project.domain.project.entity.Project;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -23,4 +25,6 @@ public interface ProjectBookmarkRepository extends JpaRepository<ProjectBookmark
     List<ProjectBookmark> findByProjectIdIn(List<Long> projectIds);
 
     List<ProjectBookmark> findByMemberIdAndEnableTrue(String memberId, Pageable pageRequest);
+
+    Optional<ProjectBookmark> findByProjectId(Long id);
 }

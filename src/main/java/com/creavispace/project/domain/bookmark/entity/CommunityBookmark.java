@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Builder
@@ -37,6 +38,7 @@ public class CommunityBookmark extends BaseTimeEntity implements Bookmark {
     @JoinColumn(name = "community_id", nullable = false)
     private Community community;
 
+    @Setter
     private boolean enable;
 
     private LocalDateTime contentsCreatedDate;

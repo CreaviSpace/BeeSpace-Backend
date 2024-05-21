@@ -28,6 +28,7 @@ public class RecruitBookmark extends BaseTimeEntity implements Bookmark  {
     @JsonBackReference
     private Member member;
 
+    @Setter
     private boolean enable;
 
     private LocalDateTime contentsCreatedDate;

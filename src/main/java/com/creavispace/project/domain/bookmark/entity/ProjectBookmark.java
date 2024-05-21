@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -37,6 +38,7 @@ public class ProjectBookmark extends BaseTimeEntity implements Bookmark {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
+    @Setter
     private boolean enable;
 
     private LocalDateTime contentsCreatedDate;

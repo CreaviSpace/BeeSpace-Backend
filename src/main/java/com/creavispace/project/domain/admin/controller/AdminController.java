@@ -10,6 +10,13 @@ import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.request.MemberIdRequestDto;
 import com.creavispace.project.domain.admin.entity.FiredMember;
 import com.creavispace.project.domain.admin.repository.FiredMemberRepository;
+import com.creavispace.project.domain.bookmark.entity.CommunityBookmark;
+import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
+import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
+import com.creavispace.project.domain.bookmark.repository.CommunityBookmarkRepository;
+import com.creavispace.project.domain.bookmark.repository.ProjectBookmarkRepository;
+import com.creavispace.project.domain.bookmark.repository.RecruitBookmarkRepository;
+import com.creavispace.project.domain.bookmark.service.BookmarkService;
 import com.creavispace.project.domain.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
@@ -36,6 +43,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,6 +71,9 @@ public class AdminController {
     private final CommunityService communityService;
     private final ReportService reportService;
     private final FiredMemberRepository firedMemberRepository;
+    private final ProjectBookmarkRepository projectBookmarkRepository;
+    private final RecruitBookmarkRepository recruitBookmarkRepository;
+    private final CommunityBookmarkRepository communityBookmarkRepository;
 
     @PostMapping("/sanction")
     public void sanctionMember(@RequestBody MemberIdRequestDto dto, HttpServletRequest request) {
@@ -160,6 +171,12 @@ public class AdminController {
             SuccessResponseDto<ProjectDeleteResponseDto> dto = projectService.deleteProject(
                     admin.getId(), id);
             ProjectDeleteResponseDto data = dto.getData();
+
+            ProjectBookmark byProjectId = projectBookmarkRepository.findByProjectId(id)
+                    .orElseThrow(IllegalArgumentException::new);
+            byProjectId.setEnable(!byProjectId.isEnable());
+            projectBookmarkRepository.save(byProjectId);
+
             return dtoSetting(dto, data);
         }
 
@@ -167,6 +184,11 @@ public class AdminController {
             SuccessResponseDto<RecruitDeleteResponseDto> dto = recruitService.deleteRecruit(
                     admin.getId(), id);
             RecruitDeleteResponseDto data = dto.getData();
+
+            RecruitBookmark recruitBookmark = recruitBookmarkRepository.findByRecruitId(id)
+                    .orElseThrow(IllegalArgumentException::new);
+            recruitBookmark.setEnable(!recruitBookmark.isEnable());
+            recruitBookmarkRepository.save(recruitBookmark);
             return dtoSetting(dto, data);
 
         }
@@ -174,6 +196,11 @@ public class AdminController {
         if (category.equalsIgnoreCase("community")) {
             SuccessResponseDto<CommunityDeleteResponseDto> dto = communityService.deleteCommunity(admin.getId(), id);
             CommunityDeleteResponseDto data = dto.getData();
+
+            CommunityBookmark communityBookmark = communityBookmarkRepository.findByCommunityId(id)
+                    .orElseThrow(IllegalArgumentException::new);
+            communityBookmark.setEnable(!communityBookmark.isEnable());
+            communityBookmarkRepository.save(communityBookmark);
             return dtoSetting(dto, data);
         }
         return null;
