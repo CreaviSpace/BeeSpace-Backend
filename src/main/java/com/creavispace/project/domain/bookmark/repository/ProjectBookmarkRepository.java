@@ -21,4 +21,6 @@ public interface ProjectBookmarkRepository extends JpaRepository<ProjectBookmark
 
 
     List<ProjectBookmark> findByProjectIdIn(List<Long> projectIds);
+
+    List<ProjectBookmark> findByMemberIdAndEnableTrue(String memberId, Pageable pageRequest);
 }

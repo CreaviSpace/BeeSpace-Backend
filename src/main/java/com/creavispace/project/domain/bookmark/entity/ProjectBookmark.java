@@ -37,5 +37,7 @@ public class ProjectBookmark extends BaseTimeEntity implements Bookmark {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
+    private boolean enable;
+
     private LocalDateTime contentsCreatedDate;
 }

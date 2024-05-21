@@ -17,4 +17,5 @@ public interface CommunityBookmarkRepository extends JpaRepository<CommunityBook
 
     List<CommunityBookmark> findByMemberIdOrderByContentsCreatedDateDesc(String memberId, Pageable pageRequest);
 
+    List<CommunityBookmark> findByMemberIdAndEnableTrue(String memberId, Pageable pageRequest);
 }

@@ -16,4 +16,6 @@ public interface RecruitBookmarkRepository extends JpaRepository<RecruitBookmark
     List<RecruitBookmark> findByMemberIdOrderByContentsCreatedDateDesc(String memberId, Pageable pageRequest);
 
     List<RecruitBookmark> findByMemberIdOrderByContentsCreatedDateAsc(String memberId, Pageable pageRequest);
+
+    List<RecruitBookmark> findByMemberIdAndEnableTrue(String memberId, Pageable pageRequest);
 }

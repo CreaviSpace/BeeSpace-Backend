@@ -43,6 +43,7 @@ public class RecruitBookmarkStrategy implements BookmarkStrategy {
                 .member(member)
                 .recruit(recruit)
                     .contentsCreatedDate(recruit.getCreatedDate())
+                    .enable(true)
                 .build();
             recruitBookmarkRepository.save(saveBookmark);
             data = BookmarkResponseDto.builder().bookmarkStatus(true).build();
@@ -71,7 +72,7 @@ public class RecruitBookmarkStrategy implements BookmarkStrategy {
     @Override
     public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
         System.out.println("RecruitBookmarkStrategy.readMyBookmark");
-        List<RecruitBookmark> recruitBookmarks = recruitBookmarkRepository.findByMemberId(memberId, pageRequest);
+        List<RecruitBookmark> recruitBookmarks = recruitBookmarkRepository.findByMemberIdAndEnableTrue(memberId, pageRequest);
         List<Long> recruitIds = recruitBookmarks.stream()
                 .filter(bookmark -> bookmark.getRecruit().getStatus())
                 .map(bookmarks -> bookmarks.getRecruit().getId()).toList();

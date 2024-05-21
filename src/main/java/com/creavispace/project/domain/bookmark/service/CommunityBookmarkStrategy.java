@@ -44,6 +44,7 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
                 .member(member)
                 .community(community)
                 .contentsCreatedDate(community.getCreatedDate())
+                    .enable(true)
                 .build();
             communityBookmarkRepository.save(saveBookmark);
             data = BookmarkResponseDto.builder().bookmarkStatus(true).build();
@@ -71,7 +72,7 @@ public class CommunityBookmarkStrategy implements BookmarkStrategy {
     @Override
     public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
         System.out.println("CommunityBookmarkStrategy.readMyBookmark");
-        List<CommunityBookmark> communityBookmarks = communityBookmarkRepository.findByMemberId(memberId, pageRequest);
+        List<CommunityBookmark> communityBookmarks = communityBookmarkRepository.findByMemberIdAndEnableTrue(memberId, pageRequest);
         List<BookmarkContentsResponseDto> bookmarks = new ArrayList<>();
         List<Long> communityIds = communityBookmarks.stream()
                 .filter(bookmark -> bookmark.getCommunity().isStatus())

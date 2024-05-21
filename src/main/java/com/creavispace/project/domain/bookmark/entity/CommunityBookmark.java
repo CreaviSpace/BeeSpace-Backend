@@ -37,5 +37,7 @@ public class CommunityBookmark extends BaseTimeEntity implements Bookmark {
     @JoinColumn(name = "community_id", nullable = false)
     private Community community;
 
+    private boolean enable;
+
     private LocalDateTime contentsCreatedDate;
 }

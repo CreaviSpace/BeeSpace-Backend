@@ -42,6 +42,7 @@ public class ProjectBookmarkStrategy implements BookmarkStrategy {
                     .member(member)
                     .project(project)
                     .contentsCreatedDate(project.getCreatedDate())
+                    .enable(true)
                     .build();
             projectBookmarkRepository.save(saveBookmark);
             data = BookmarkResponseDto.builder().bookmarkStatus(true).build();
@@ -70,7 +71,7 @@ public class ProjectBookmarkStrategy implements BookmarkStrategy {
     @Override
     public List<BookmarkContentsResponseDto> readMyBookmark(String memberId, Pageable pageRequest) {
         System.out.println("ProjectBookmarkStrategy.readMyBookmark");
-        List<ProjectBookmark> projectBookmarks = projectBookmarkRepository.findByMemberId(memberId, pageRequest);
+        List<ProjectBookmark> projectBookmarks = projectBookmarkRepository.findByMemberIdAndEnableTrue(memberId, pageRequest);
         List<Long> projectIds = projectBookmarks.stream()
                 .filter(projectBookmark -> projectBookmark.getProject().isStatus())
                 .map(projectBookmark -> projectBookmark.getProject().getId())
