@@ -5,6 +5,7 @@ import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
@@ -88,7 +89,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public String login(String memberEmail, String loginType, String memberId, boolean fired) {
+    public String getJwt(String memberEmail, String loginType, String memberId, boolean fired) {
         String jwt = JwtUtil.createJwt(memberEmail, loginType, memberId, fired, jwtSecret, 1000 * 60 * 60L);
 
         return jwt;
@@ -114,8 +115,25 @@ public class MemberServiceImpl implements MemberService {
     public void expireMember(String jwt) {
         String memberId = JwtUtil.getUserInfo(jwt, jwtSecret).memberId();
         Member member = findMember(memberId);
-        member.setExpired(true);
-        member.setEnabled(false);
+        if (member.isExpired()) {
+            enableMember(jwt);
+            return;
+        }
+
+        if (member.isEnabled()) {
+            member.setExpired(true);
+            member.setEnabled(false);
+            member.setRole(Role.EX_MEMBER);
+            memberRepository.save(member);
+        }
+    }
+
+    private void enableMember(String jwt) {
+        String memberId = JwtUtil.getUserInfo(jwt, jwtSecret).memberId();
+        Member member = findMember(memberId);
+        member.setExpired(false);
+        member.setEnabled(true);
+        member.setRole(Role.MEMBER);
         memberRepository.save(member);
     }
 
