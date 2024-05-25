@@ -98,11 +98,4 @@ public class BookmarkServiceImpl implements BookmarkService {
 
         return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", data);
     }
-
-    private static PageRequest pageable(Integer page, Integer size, String sortType) {
-        if (sortType.equalsIgnoreCase("asc")) {
-            return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").ascending());
-        }
-        return PageRequest.of(page - 1, size, Sort.by("contentsCreatedDate").descending());
-    }
 }
