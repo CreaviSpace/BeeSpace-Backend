@@ -58,7 +58,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     private JwtDto loadJwt(Member member) {
-        String memberJwt = memberService.login(member.getMemberEmail(), member.getLoginType(), member.getId(), member.isFired());
+        String memberJwt = memberService.getJwt(member.getMemberEmail(), member.getLoginType(), member.getId(), member.isFired());
         String memberId = member.getId();
         boolean oldUser = isOldUser(member);
         boolean fired = isFired(member);
