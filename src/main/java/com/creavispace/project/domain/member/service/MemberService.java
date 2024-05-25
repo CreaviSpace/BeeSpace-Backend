@@ -27,7 +27,7 @@ public interface MemberService extends Service {
 
     List<Member> findAllMembers(Integer size, Integer page, String sortType);
 
-    String login(String memberEmail, String loginType, String memberId, boolean fired);
+    String getJwt(String memberEmail, String loginType, String memberId, boolean fired);
 
     Optional<Member> findByEmailAndLoginTypeAndMemberId(String memberEmail, String loginType, String memberId);
 
