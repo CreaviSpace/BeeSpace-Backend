@@ -80,7 +80,8 @@ public class SecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable).cors(httpSecurityCorsConfigurer -> corsFilter()).httpBasic(
                         AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
+                        auth -> auth.requestMatchers(HttpMethod.POST, "/member/expire").hasRole(Role.EX_MEMBER.name())
+                                .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers("/member/read/profile/**", "/member/read/contents/**", "/api/auth/**",
                                         "config/login", "/login/**", "member/login", "/join", "/swagger-ui/**",
                                         "/v3/api-docs/**")
