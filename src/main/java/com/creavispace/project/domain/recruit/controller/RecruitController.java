@@ -11,6 +11,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -66,8 +70,7 @@ public class RecruitController {
     @GetMapping(READ_RECRUIT_LIST)
     @Operation(summary = "모집 게시글 리스트")
     public ResponseEntity<SuccessResponseDto<List<RecruitListReadResponseDto>>> readRecruitList(
-        @RequestParam(value = "size", required = false, defaultValue = "6") Integer size,
-        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @ParameterObject @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
         @RequestParam(value = "category", required = false) String category
     ){
         log.info("/recruit/controller : 모집 게시글 리스트");
@@ -75,7 +78,7 @@ public class RecruitController {
         if(category != null){
             recruitCategory = CustomValueOf.valueOf(RecruitCategory.class, category, GlobalErrorCode.NOT_FOUND_RECRUIT_CATEGORY);
         }
-        return ResponseEntity.ok().body(recruitService.readRecruitList(size, page, recruitCategory));
+        return ResponseEntity.ok().body(recruitService.readRecruitList(pageRequest, recruitCategory));
     }
 
     @GetMapping(READ_RECRUIT)

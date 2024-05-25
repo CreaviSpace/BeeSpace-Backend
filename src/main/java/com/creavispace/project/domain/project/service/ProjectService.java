@@ -9,6 +9,7 @@ import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.domain.project.dto.response.*;
 import com.creavispace.project.common.Service;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface ProjectService extends Service {
     public SuccessResponseDto<ProjectResponseDto> modifyProject(String memberId, Long projectId, ProjectRequestDto dto);
     public SuccessResponseDto<ProjectDeleteResponseDto> deleteProject(String memberId, Long projectId);
     public SuccessResponseDto<List<PopularProjectReadResponseDto>> readPopularProjectList();
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Integer size, Integer page, ProjectCategory category);
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Pageable pageRequest, ProjectCategory category);
     public SuccessResponseDto<ProjectReadResponseDto> readProject(String memberId, Long projectId, HttpServletRequest request);
 
     SuccessResponseDto<List<ProjectListReadResponseDto>> readMyProjectList(String memberId, Integer size, Integer page, String category, String sortType);

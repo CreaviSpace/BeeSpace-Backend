@@ -11,6 +11,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -73,13 +77,12 @@ public class ProjectController {
     @GetMapping(READ_PROJECT_LIST)
     @Operation(summary = "프로젝트 게시글 리스트 조회")
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readProjectList(
-        @RequestParam(value = "size", required = false, defaultValue = "6") Integer size,
-        @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+        @ParameterObject @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
         @RequestParam(value = "category", required = false) String category
     ) {
         log.info("/project/controller : 프로젝트 게시글 리스트 조회");
         ProjectCategory projectCategory = CustomValueOf.valueOf(ProjectCategory.class, category, GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
-        return ResponseEntity.ok().body(projectService.readProjectList(size, page, projectCategory));
+        return ResponseEntity.ok().body(projectService.readProjectList(pageRequest, projectCategory));
     }
 
     @GetMapping(READ_PROJECT)

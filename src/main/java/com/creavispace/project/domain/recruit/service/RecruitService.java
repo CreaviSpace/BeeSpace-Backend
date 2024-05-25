@@ -9,6 +9,7 @@ import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
 import com.creavispace.project.domain.recruit.dto.response.*;
 import com.creavispace.project.common.Service;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface RecruitService extends Service {
     public SuccessResponseDto<RecruitResponseDto> createRecruit(String memberId, RecruitRequestDto dto);
     public SuccessResponseDto<RecruitResponseDto> modifyRecruit(String memberId, Long recruitId, RecruitRequestDto dto);
     public SuccessResponseDto<RecruitDeleteResponseDto> deleteRecruit(String memberId, Long recruitId);
-    public SuccessResponseDto<List<RecruitListReadResponseDto>> readRecruitList(Integer size, Integer page, RecruitCategory category);
+    public SuccessResponseDto<List<RecruitListReadResponseDto>> readRecruitList(Pageable pageRequest, RecruitCategory category);
     public SuccessResponseDto<RecruitReadResponseDto> readRecruit(String memberId, Long recruitId, HttpServletRequest request);
     public SuccessResponseDto<List<DeadLineRecruitListReadResponseDto>> readDeadlineRecruitList();
 

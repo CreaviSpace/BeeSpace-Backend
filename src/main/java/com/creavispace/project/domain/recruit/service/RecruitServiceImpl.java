@@ -1,13 +1,18 @@
 package com.creavispace.project.domain.recruit.service;
 
-import com.creavispace.project.domain.admin.dto.DailySummary;
-import com.creavispace.project.domain.admin.dto.MonthlySummary;
-import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.common.dto.type.PostType;
 import com.creavispace.project.common.dto.type.RecruitCategory;
 import com.creavispace.project.common.dto.type.RecruitContactWay;
 import com.creavispace.project.common.dto.type.RecruitProceedWay;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.utils.CustomValueOf;
+import com.creavispace.project.common.utils.TimeUtil;
+import com.creavispace.project.common.utils.UsableConst;
+import com.creavispace.project.domain.admin.dto.DailySummary;
+import com.creavispace.project.domain.admin.dto.MonthlySummary;
+import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.file.entity.Image;
 import com.creavispace.project.domain.file.entity.RecruitImage;
 import com.creavispace.project.domain.file.repository.RecruitImageRepository;
@@ -27,11 +32,6 @@ import com.creavispace.project.domain.recruit.repository.RecruitRepository;
 import com.creavispace.project.domain.recruit.repository.RecruitTechStackRepository;
 import com.creavispace.project.domain.techStack.entity.TechStack;
 import com.creavispace.project.domain.techStack.repository.TechStackRepository;
-import com.creavispace.project.common.exception.CreaviCodeException;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
-import com.creavispace.project.common.utils.TimeUtil;
-import com.creavispace.project.common.utils.UsableConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -389,10 +388,9 @@ public class RecruitServiceImpl implements RecruitService {
     }
 
     @Override
-    public SuccessResponseDto<List<RecruitListReadResponseDto>> readRecruitList(Integer size, Integer page,
+    public SuccessResponseDto<List<RecruitListReadResponseDto>> readRecruitList(Pageable pageRequest,
                                                                                 RecruitCategory category) {
         List<RecruitListReadResponseDto> data = null;
-        Pageable pageRequest = PageRequest.of(page - 1, size);
         Page<Recruit> pageable;
 
         // 카테고리가 존재한다면

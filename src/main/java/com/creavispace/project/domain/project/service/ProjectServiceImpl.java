@@ -476,9 +476,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Integer size, Integer page, ProjectCategory category) {
+    public SuccessResponseDto<List<ProjectListReadResponseDto>> readProjectList(Pageable pageRequest, ProjectCategory category) {
         List<ProjectListReadResponseDto> data = null;
-        Pageable pageRequest = PageRequest.of(page-1, size);
 
         String categoryStr = category == null ? null : category.name();
 
