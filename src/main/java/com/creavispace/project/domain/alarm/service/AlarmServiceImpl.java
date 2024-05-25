@@ -68,7 +68,7 @@ public class AlarmServiceImpl implements AlarmService {
     public SuccessResponseDto<List<AlarmResponseDto>> readAlarmList(String memberId) {
         List<AlarmResponseDto> data = null;
 
-        List<Alarm> alarms = alarmRepository.findByMemberId(memberId);
+        List<Alarm> alarms = alarmRepository.findByMemberIdOrderByIdDesc(memberId);
 
         data = alarms.stream()
                 .map(alarm -> AlarmResponseDto.builder()

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
-    public List<Alarm> findByMemberId(String memberId);
+    public List<Alarm> findByMemberIdOrderByIdDesc(String memberId);
 
     @Modifying(clearAutomatically = true)
     @Query(value = "update alarm a SET a.read_status = 'READ' where a.id = :alarmId and a.member_id = :memberId and a.read_status = 'UNREAD'",nativeQuery = true)
