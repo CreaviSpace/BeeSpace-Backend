@@ -87,8 +87,8 @@ public class SecurityConfig {
                                         "/v3/api-docs/**")
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "/community/**", "/hashtag/**", "/project/**",
-                                        "/comment/**", "/recruit/**", "/bookmark/**", "/like/**", "/search/**",
-                                        "/feedback/**", "/tackStack/**").permitAll()
+                                        "/comment/**", "/recruit/**", "/like/count", "/search/**",
+                                        "/tackStack/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member/**", "/review", "/file/**", "/like/**",
                                         "/project/**", "/comment/**", "/recruit/**", "/bookmark/**", "/report/**",
                                         "/community/**", "/feedback/**", "/tackStack/**")
