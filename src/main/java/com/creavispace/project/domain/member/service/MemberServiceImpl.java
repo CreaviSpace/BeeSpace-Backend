@@ -1,19 +1,18 @@
 package com.creavispace.project.domain.member.service;
 
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
 import com.creavispace.project.common.utils.JwtUtil;
 import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
-import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.mypage.dto.request.MyPageModifyRequestDto;
 import com.creavispace.project.domain.mypage.dto.response.MyPageTechStackRequestDto;
-import com.creavispace.project.common.exception.CreaviCodeException;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -123,7 +123,7 @@ public class MemberServiceImpl implements MemberService {
         if (member.isEnabled()) {
             member.setExpired(true);
             member.setEnabled(false);
-            member.setRole(Role.EX_MEMBER);
+            member.setRole(Role.GUEST);
             memberRepository.save(member);
         }
     }

@@ -80,7 +80,8 @@ public class SecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable).cors(httpSecurityCorsConfigurer -> corsFilter()).httpBasic(
                         AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers(HttpMethod.POST, "/member/expire").hasRole(Role.EX_MEMBER.name())
+                        auth -> auth
+                                .requestMatchers(HttpMethod.POST, "/member/expire").permitAll()
                                 .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers("/member/read/profile/**", "/member/read/contents/**", "/api/auth/**",
                                         "config/login", "/login/**", "member/login", "/join", "/swagger-ui/**",
@@ -92,7 +93,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/member/**", "/review", "/file/**", "/like/**",
                                         "/project/**", "/comment/**", "/recruit/**", "/bookmark/**", "/report/**",
                                         "/community/**", "/feedback/**", "/tackStack/**")
-                                .hasAnyRole(Role.MEMBER.name(), Role.ADMIN.name()).anyRequest()
+                                .hasAnyRole(Role.MEMBER.name(), Role.ADMIN.name())
+                                .anyRequest()
                                 .authenticated())
                 .logout(logout -> logout.logoutSuccessHandler(new LogoutHandler(jwtService)).logoutUrl("/logout"))
                 .oauth2Login(login -> login.userInfoEndpoint(endPoint -> endPoint.userService(customOauth2Service))
