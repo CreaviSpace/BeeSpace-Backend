@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "recruit_id"}))
 public class RecruitBookmark extends BaseTimeEntity implements Bookmark  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
