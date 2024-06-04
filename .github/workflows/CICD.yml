@@ -2,9 +2,9 @@ name: CICD
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "docker" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "docker" ]
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
+      - name: Build with Gradle
         run: |
           chmod +x ./gradlew
           ./gradlew clean build -x test
