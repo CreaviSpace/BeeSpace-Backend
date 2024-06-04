@@ -81,6 +81,7 @@ public class SecurityConfig {
                         AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
+                                .requestMatchers("/env").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member/expire").permitAll()
                                 .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
                                 .requestMatchers("/member/read/profile/**", "/member/read/contents/**", "/api/auth/**",
