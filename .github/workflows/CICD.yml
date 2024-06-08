@@ -2,9 +2,9 @@ name: CICD
 
 on:
   push:
-    branches: [ "docker" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "docker" ]
+    branches: [ "develop" ]
 
 permissions:
   contents: read
