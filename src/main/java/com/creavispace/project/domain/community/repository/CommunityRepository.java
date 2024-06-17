@@ -49,4 +49,5 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     List<DailySummary> countDailySummary(@Param("year") int year, @Param("month") int month);
 
 
+    List<Community> findByMemberId(String memberId);
 }

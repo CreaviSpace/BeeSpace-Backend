@@ -591,6 +591,45 @@ public class RecruitServiceImpl implements RecruitService {
         return new SuccessResponseDto(true,"일간 모집 게시물 통계 조회 완료", recruitRepository.countDailySummary(year, month));
     }
 
+    @Override
+    public SuccessResponseDto<RecruitDeleteResponseDto> deleteMemberRecruit(String memberId) {
+        RecruitDeleteResponseDto data = null;
+
+        // JWT에 저장된 회원이 존재하는지
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
+
+        // 삭제할 모집 게시글이 존재하는지
+        boolean toggle = member.isExpired();
+        List<Recruit> recruit = recruitRepository.findByMemberId(memberId);
+
+
+        // 삭제할 권한이 있는지
+        if (!memberId.equals(member.getId()) && !member.getRole().equals(Role.ADMIN)) {
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+        }
+
+        // 모집 게시글 비활성화 및 저장
+        recruit.stream().map(Recruit::disable);
+        recruitRepository.saveAll(recruit);
+
+        // 모집 게시글 삭제 DTO
+        data = RecruitDeleteResponseDto.builder()
+                .recruitId(9999L)
+                .postType(PostType.RECRUIT.name())
+                .build();
+
+        log.info("/recruit/service : deleteRecruit success data = {}", data);
+        // 성공 응답 반환
+        if (toggle) {
+            return new SuccessResponseDto<>(true, "모집 게시글 복구가 완료되었습니다.", data);
+
+        }
+        return new SuccessResponseDto<>(true, "모집 게시글 삭제가 완료되었습니다.", data);
+    }
+
+
+
     private List<RecruitListReadResponseDto> getRecruitListReadResponseDtos(List<Recruit> recruits) {
         System.out.println("RecruitServiceImpl.getRecruitListReadResponseDtos");
         List<Long> recruitIds = recruits.stream().map(Recruit::getId).toList();

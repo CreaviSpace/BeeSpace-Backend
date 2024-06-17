@@ -31,4 +31,5 @@ public interface RecruitService extends Service {
 
     SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month);
 
+    SuccessResponseDto<RecruitDeleteResponseDto> deleteMemberRecruit(String s);
 }

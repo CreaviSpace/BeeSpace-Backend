@@ -85,13 +85,13 @@ public class CommunityServiceImpl implements CommunityService {
 
         List<String> images = dto.getImages();
 
-        if(images != null && !images.isEmpty()){
+        if (images != null && !images.isEmpty()) {
             List<String> contentImages = new ArrayList<>();
 
             Document doc = Jsoup.parse(dto.getContent());
             Elements imageElements = doc.select("img");
 
-            for(Element imageElement : imageElements){
+            for (Element imageElement : imageElements) {
                 String imageUrl = imageElement.attr("src");
                 contentImages.add(imageUrl);
             }
@@ -104,20 +104,20 @@ public class CommunityServiceImpl implements CommunityService {
             List<String> saveImg = new ArrayList<>(images);
             saveImg.removeAll(deletedImg);
 
-            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community,img)).toList();
+            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community, img)).toList();
 
             communityImageRepository.saveAll(saveProjectImages);
         }
 
         dto.getHashTags()
                 .forEach(hashTagDto -> {
-                            HashTag hashTag = hashTagRepository.findByHashTag(hashTagDto).orElse(HashTag.builder().hashTag(hashTagDto).build());
-                            hashTag.plusUsageCount();
-                            hashTagRepository.save(hashTag);
+                    HashTag hashTag = hashTagRepository.findByHashTag(hashTagDto).orElse(HashTag.builder().hashTag(hashTagDto).build());
+                    hashTag.plusUsageCount();
+                    hashTagRepository.save(hashTag);
 
-                            CommunityHashTag communityHashTag = CommunityHashTag.builder().community(community).hashTag(hashTag).build();
-                            communityHashTagRepository.save(communityHashTag);
-                        });
+                    CommunityHashTag communityHashTag = CommunityHashTag.builder().community(community).hashTag(hashTag).build();
+                    communityHashTagRepository.save(communityHashTag);
+                });
 
         // 저장한 커뮤니티 해시태그 정보 가져오기
         List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityId(community.getId());
@@ -171,13 +171,13 @@ public class CommunityServiceImpl implements CommunityService {
 
         List<String> images = dto.getImages();
 
-        if(images != null && !images.isEmpty()){
+        if (images != null && !images.isEmpty()) {
             List<String> contentImages = new ArrayList<>();
 
             Document doc = Jsoup.parse(dto.getContent());
             Elements imageElements = doc.select("img");
 
-            for(Element imageElement : imageElements){
+            for (Element imageElement : imageElements) {
                 String imageUrl = imageElement.attr("src");
                 contentImages.add(imageUrl);
             }
@@ -190,7 +190,7 @@ public class CommunityServiceImpl implements CommunityService {
             List<String> saveImg = new ArrayList<>(images);
             saveImg.removeAll(deletedImg);
 
-            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community,img)).toList();
+            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community, img)).toList();
 
             communityImageRepository.deleteByCommunityId(communityId);
             communityImageRepository.saveAll(saveProjectImages);
@@ -289,8 +289,8 @@ public class CommunityServiceImpl implements CommunityService {
                                                                       HttpServletRequest request) {
         CommunityReadResponseDto data = null;
 
-        Community community = communityRepository.findById(communityId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
-        if(!community.isStatus() && !community.getMember().getId().equals(memberId)){
+        Community community = communityRepository.findById(communityId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
+        if (!community.isStatus() && !community.getMember().getId().equals(memberId)) {
             throw new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND);
         }
 
@@ -350,7 +350,7 @@ public class CommunityServiceImpl implements CommunityService {
         String categoryStr = category == null ? null : category.name();
         try {
             pageable = communityRepository.findByCategoryAndHashTagAndStatusTrue(categoryStr, hashTag, pageRequest);
-        }catch (InvalidDataAccessResourceUsageException e){
+        } catch (InvalidDataAccessResourceUsageException e) {
             throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_SORT_INVALID_DATA);
         }
 
@@ -390,17 +390,54 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public SuccessResponseDto<List<MonthlySummary>> countMonthlySummary(int year) {
-        return new SuccessResponseDto(true,"월별 커뮤니티 게시물 통계 조회 완료", communityRepository.countMonthlySummary(year));
+        return new SuccessResponseDto(true, "월별 커뮤니티 게시물 통계 조회 완료", communityRepository.countMonthlySummary(year));
     }
 
     @Override
     public SuccessResponseDto<List<YearlySummary>> countYearlySummary() {
-        return new SuccessResponseDto(true,"연간 커뮤니티 게시물 통계 조회 완료", communityRepository.countYearlySummary());
+        return new SuccessResponseDto(true, "연간 커뮤니티 게시물 통계 조회 완료", communityRepository.countYearlySummary());
     }
 
     @Override
     public SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month) {
-        return new SuccessResponseDto(true,"일간 커뮤니티 게시물 통계 조회 완료", communityRepository.countDailySummary(year, month));
+        return new SuccessResponseDto(true, "일간 커뮤니티 게시물 통계 조회 완료", communityRepository.countDailySummary(year, month));
+    }
+
+    @Override
+    public SuccessResponseDto<CommunityDeleteResponseDto> deleteMemberCommunity(String memberId) {
+        CommunityDeleteResponseDto data = null;
+
+        // JWT에 저장된 회원이 존재하는지
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
+
+        // 삭제할 커뮤니티 게시글이 존재하는지
+        List<Community> community = communityRepository.findByMemberId(memberId);
+        boolean toggle = member.isExpired();
+        // 삭제할 권한이 있는지
+        if (!memberId.equals(member.getId()) && !member.getRole().equals(Role.ADMIN)) {
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+        }
+
+        community.stream().map(Community::disable);
+
+        // 커뮤니티 비활성화 및 저장
+        communityRepository.saveAll(community);
+
+        // 커뮤니티 삭제 결과 DTO변환
+        data = CommunityDeleteResponseDto.builder()
+                .communityId(9999L)
+                .postType(PostType.COMMUNITY.name())
+                .build();
+
+        log.info("/community/service : deleteCommunity success data = {}", data);
+
+        // 성공 응답 반환
+        if (toggle) {
+            return new SuccessResponseDto<>(true, "커뮤니티 게시글 복구가 완료되었습니다.", data);
+        }
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 삭제가 완료되었습니다.", data);
+
     }
 
     @Override

@@ -32,4 +32,5 @@ public interface CommunityService extends Service {
 
     SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month);
 
+    SuccessResponseDto<CommunityDeleteResponseDto> deleteMemberCommunity(String s);
 }

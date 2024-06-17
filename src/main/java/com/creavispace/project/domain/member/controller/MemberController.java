@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.member.controller;
 
+import com.creavispace.project.common.utils.JwtUtil;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.service.BookmarkService;
 import com.creavispace.project.domain.comment.dto.response.MyPageCommentResponseDto;
@@ -9,6 +10,7 @@ import com.creavispace.project.domain.community.dto.response.CommunityResponseDt
 import com.creavispace.project.domain.community.service.CommunityService;
 import com.creavispace.project.domain.feedback.service.FeedbackService;
 import com.creavispace.project.domain.member.dto.response.DataResponseDto;
+import com.creavispace.project.domain.member.dto.response.MemberJwtResponseDto;
 import com.creavispace.project.domain.member.dto.response.MemberResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.service.MemberService;
@@ -141,7 +143,10 @@ public class MemberController {
     @Operation(summary = "회원 탈퇴")
     public void expireMember(HttpServletRequest request) {
         String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+        MemberJwtResponseDto userInfo = JwtUtil.getUserInfo(jwt, jwtSecret);
         memberService.expireMember(jwt);
+        projectService.deleteMemberProject(userInfo.memberId());
+        recruitService.deleteMemberRecruit(userInfo.memberId());
+        communityService.deleteMemberCommunity(userInfo.memberId());
     }
 }

@@ -41,7 +41,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -440,6 +439,49 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 삭제 결과 DTO
         data = ProjectDeleteResponseDto.builder()
                 .projectId(project.getId())
+                .postType(PostType.PROJECT.name())
+                .build();
+
+        log.info("/project/service : deleteProject success data = {}", data);
+
+        // 성공 응답 반환
+        if (toggle) {
+            return new SuccessResponseDto<>(true, "프로젝트 게시글 복구가 완료되었습니다.", data);
+        }
+        return new SuccessResponseDto<>(true, "프로젝트 게시글 삭제가 완료되었습니다.", data);
+    }
+    @Override
+    @Transactional
+    public SuccessResponseDto<ProjectDeleteResponseDto> deleteMemberProject(String memberId) {
+        ProjectDeleteResponseDto data = null;
+        System.out.println("ProjectServiceImpl.deleteProject");
+
+        // JWT에 저장된 회원이 존재하는지
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        Member member = optionalMember.orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
+        boolean toggle = member.isExpired();
+
+        // 삭제할 프로젝트 게시글이 존재하는지
+        List<Project> project = projectRepository.findAllByMemberId(memberId);
+
+        if (project.size() == 0) {
+            return null;
+        }
+        long count = project.stream().filter(p -> !memberId.equals(p.getMember().getId()) && p.getMember().getRole().equals(Role.ADMIN)).count();
+        // 삭제할 권한이 있는지
+        if(count != 0 && !member.getRole().equals(Role.ADMIN)){
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+        }
+
+        // 비활성화 변경 및 저장
+
+        project.stream().map(Project::disable);
+
+        projectRepository.saveAll(project);
+
+        // 프로젝트 삭제 결과 DTO
+        data = ProjectDeleteResponseDto.builder()
+                .projectId(9999L)
                 .postType(PostType.PROJECT.name())
                 .build();
 
