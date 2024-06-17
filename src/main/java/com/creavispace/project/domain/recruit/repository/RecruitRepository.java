@@ -25,7 +25,7 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
     public List<Recruit> findTop3ByStatusTrueOrderByEndAsc();
 
     @Query(value = "SELECT 'RECRUIT' AS postType, r.id AS postId, r.created_date AS createdDate FROM recruit r WHERE (r.content LIKE %:text% OR r.title LIKE %:text%) AND r.status = true ORDER BY created_date DESC", nativeQuery = true)
-    public Page<SearchResultSet> findRecruitSearchData(String text, Pageable pageable);
+    public Page<SearchResultSet> findRecruitSearchData(@Param("text") String text, Pageable pageable);
 
 
     //ky
@@ -35,7 +35,7 @@ public interface RecruitRepository extends JpaRepository<Recruit, Long> {
 //    Optional<Recruit> findById(String memberId);
 
     @Query(value = "SELECT 'RECRUIT' AS postType, r.id AS postId, r.created_date AS createdDate FROM recruit r WHERE (r.content LIKE %:text% OR r.title LIKE %:text%) AND r.status = true AND r.category = :searchType ORDER BY created_date DESC", nativeQuery = true)
-    public Page<SearchResultSet> findRecruitCategorySearchData(String text, String searchType, Pageable pageable);
+    public Page<SearchResultSet> findRecruitCategorySearchData(@Param("text") String text,@Param("searchType") String searchType, Pageable pageable);
 
     Page<Recruit> findByStatusFalse(Pageable pageRequest);
 

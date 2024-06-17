@@ -4,14 +4,13 @@ import com.creavispace.project.domain.admin.dto.DailySummary;
 import com.creavispace.project.domain.admin.dto.MonthlySummary;
 import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.domain.member.entity.Member;
-import java.time.LocalDateTime;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
     boolean existsByMemberEmail(String email);
@@ -23,7 +22,7 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     Optional<Member> findByMemberEmailAndLoginTypeAndId(String memberEmail, String loginType, String memberId);
 
     @Query("SELECT m FROM Member m WHERE m.memberNickname LIKE %:keyword% OR m.id LIKE %:keyword%")
-    List<Member> findByMemberNicknameOrIdTagContaining(String keyword);
+    List<Member> findByMemberNicknameOrIdTagContaining(@Param("keyword") String keyword);
 
     Optional<Member> findByLoginId(String loginId);
 

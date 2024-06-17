@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface CommunityHashTagRepository extends JpaRepository<CommunityHashT
     @Transactional
     @Modifying
     @Query(value = "delete from community_hash_tag where community_id = :communityId", nativeQuery = true)
-    public void deleteByCommunityId(Long communityId);
+    public void deleteByCommunityId(@Param("communityId") Long communityId);
     
     @Query(value = "SELECT ch.hash_tag_id hashTag, COUNT(*) count " +
     "FROM community_hash_tag ch " +

@@ -37,7 +37,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     Optional<Community> findByIdAndMemberId(Long communityId, String memberId);
 
     @Query(value = "select * from community c where (:category is null or c.category = :category) and c.status = true and exists ( select 1 from community_hash_tag ch where ch.community_id = c.id and (:hashTag is null or ch.hash_tag_id = :hashTag) )", nativeQuery = true)
-    Page<Community> findByCategoryAndHashTagAndStatusTrue(String category, String hashTag, Pageable pageable);
+    Page<Community> findByCategoryAndHashTagAndStatusTrue(@Param("category") String category, @Param("hashTag") String hashTag, Pageable pageable);
 
     @Query("SELECT NEW com.creavispace.project.domain.admin.dto.MonthlySummary(YEAR(e.createdDate), MONTH(e.createdDate), COUNT(e)) FROM Community e WHERE YEAR(e.createdDate) = :year GROUP BY YEAR(e.createdDate), MONTH(e.createdDate)")
     List<MonthlySummary> countMonthlySummary(@Param("year") int year);

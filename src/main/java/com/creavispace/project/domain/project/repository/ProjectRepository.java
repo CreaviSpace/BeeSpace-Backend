@@ -23,7 +23,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     public Page<Project> findAllByStatusTrue(Pageable pageable);
 
     @Query(value = "select * from project where status = true and (:category is null or category = :category)", nativeQuery = true)
-    public Page<Project> findAllByStatusTrueAndCategory(String category, Pageable pageable);
+    public Page<Project> findAllByStatusTrueAndCategory(@Param("category") String category, Pageable pageable);
 
     public Optional<Project> findByIdAndStatusTrue(Long projectId);
 
