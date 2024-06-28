@@ -42,10 +42,6 @@ public class Member extends BaseTimeEntity {
     @JsonBackReference
     private String memberEmail;
 
-    @Column(nullable = false)
-    @JsonBackReference
-    private String memberName;
-
     private String memberNickname;
 
     @JsonBackReference
@@ -84,7 +80,6 @@ public class Member extends BaseTimeEntity {
     public Member(MemberSaveRequestDto dto, MemberService memberService) {
         this.id = memberService.createId();
         this.memberEmail = dto.getMemberEmail();
-        this.memberName = dto.getMemberName();
         this.loginId = dto.getLoginId();
         this.loginType = dto.getLoginType();
         this.role = dto.getRole();

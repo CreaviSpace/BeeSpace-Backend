@@ -21,8 +21,6 @@ public interface MemberService extends Service {
 
     Member findById(String memberId);
 
-    Optional<Member> findByEmailAndNameAndLoginId(String email, String name, String loginId);
-
     boolean emailExsists(String memberEmail);
 
     List<Member> findAllMembers(Integer size, Integer page, String sortType);
