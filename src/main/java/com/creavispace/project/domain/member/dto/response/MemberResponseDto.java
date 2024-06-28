@@ -19,6 +19,7 @@ import java.util.List;
 @ToString
 public class MemberResponseDto {
     private final String memberId;
+    private final String memberEmail;
     private final String profileUrl;
     private final String memberNickname;
     private final Integer memberCareer;
@@ -30,6 +31,7 @@ public class MemberResponseDto {
 
     public MemberResponseDto(Member member) {
         this.memberId = member.getId();
+        this.memberEmail = member.getMemberEmail();
         this.profileUrl = member.getProfileUrl();
         this.memberNickname = member.getMemberNickname();
         this.memberCareer = member.getMemberCareer();
@@ -41,6 +43,7 @@ public class MemberResponseDto {
     }
     public MemberResponseDto(Member member, List<TechStack> techStacks) {
         this.memberId = member.getId();
+        this.memberEmail = member.getMemberEmail();
         this.profileUrl = member.getProfileUrl();
         this.memberNickname = member.getMemberNickname();
         this.memberCareer = member.getMemberCareer();
