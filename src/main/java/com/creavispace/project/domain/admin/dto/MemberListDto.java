@@ -9,7 +9,6 @@ public class MemberListDto {
     private final String id;
     private final String loginId;
     private final String memberEmail;
-    private final String memberName;
     private final String memberNickname;
     private final String loginType;
     private final Role role;
@@ -20,7 +19,6 @@ public class MemberListDto {
         this.id = member.getId();
         this.loginId = member.getLoginId();
         this.memberEmail = member.getMemberEmail();
-        this.memberName = member.getMemberName();
         this.memberNickname = member.getMemberNickname();
         this.loginType = member.getLoginType();
         this.role = member.getRole();

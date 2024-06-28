@@ -72,11 +72,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Optional<Member> findByEmailAndNameAndLoginId(String email, String name, String loginId) {
-        return memberRepository.findByMemberEmailAndMemberNameAndLoginId(email, name, loginId);
-    }
-
-    @Override
     public boolean emailExsists(String memberEmail) {
         return memberRepository.existsByMemberEmail(memberEmail);
     }
