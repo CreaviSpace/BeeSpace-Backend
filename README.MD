@@ -31,17 +31,16 @@
 ---
 
 ## 기술스택
-JAVA 17, Gradle, SpringBoot 3.2.1 , Spring Data JPA, Spring Secruity 6.2.1, Junit 5, MySQL, AWS S3, JWT
+`JAVA 17`, `Gradle`, `SpringBoot 3.2.1` , `Spring Data JPA`, `Spring Secruity 6.2.1`, `MySQL`, `AWS`, `S3`, `JWT`, `QueryDsl`
 
 ## ERD
-![ERD](https://github.com/CreaviSpace/CreaviSpace-Backend/assets/82141580/06b95d94-c415-44c3-ae03-8df7ca4416ed)
+ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
+![image](https://github.com/user-attachments/assets/a331ef6b-276a-4b9c-984e-cc735a6ed0aa)
 
 ## 프로젝트 아키텍쳐
+![image](https://github.com/user-attachments/assets/6ea5d407-7ace-4d5c-b4d1-1fdfbba029e3)
 
-## 백엔드 배포 과정
-
-## API Swagger
-https://port-0-creavispace-backend-am952nlsse11uk.sel5.cloudtype.app/swagger-ui/index.html#/
+## API 문서
 
 ### 커밋 컨벤션
 
