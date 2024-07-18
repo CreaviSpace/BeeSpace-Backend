@@ -12,7 +12,7 @@ public interface BookmarkService {
     public SuccessResponseDto<BookmarkResponseDto> readBookmark(String memberId, Long postId, String postType);
 
 
-    //ky
-    public SuccessResponseDto<List<BookmarkContentsResponseDto>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType)
-            throws JsonProcessingException;
+//    //ky
+//    public SuccessResponseDto<List<BookmarkContentsResponseDto>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType)
+//            throws JsonProcessingException;
 }

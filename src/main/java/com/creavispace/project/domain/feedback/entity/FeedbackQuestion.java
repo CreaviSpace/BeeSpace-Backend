@@ -1,29 +1,15 @@
 package com.creavispace.project.domain.feedback.entity;
 
-import java.util.List;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.creavispace.project.common.dto.type.QuestionType;
 import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.project.entity.Project;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -33,20 +19,38 @@ import lombok.NoArgsConstructor;
 public class FeedbackQuestion extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "feedback_question_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     @Column(nullable = false)
-    private String question;
+    private String questionText;
     
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
-    @OneToMany(mappedBy = "feedbackQuestion", fetch = FetchType.LAZY)
-    private List<ChoiceItem> choiceItems;
+    @OneToMany(mappedBy = "feedbackQuestion", cascade = CascadeType.ALL)
+    private List<QuestionOption> options;
+
+    @OneToMany(mappedBy = "feedbackQuestion", cascade = CascadeType.ALL)
+    private List<FeedbackAnswer> answers;
+
+    public void setProject(Project project){
+        this.project = project;
+    }
+
+    public void addOption(QuestionOption option){
+        options.add(option);
+        option.setFeedbackQuestion(this);
+    }
+
+    public void addAnswer(FeedbackAnswer answer){
+        answers.add(answer);
+        answer.setFeedbackQuestion(this);
+    }
+
 }

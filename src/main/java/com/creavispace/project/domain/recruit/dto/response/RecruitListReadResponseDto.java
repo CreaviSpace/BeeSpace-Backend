@@ -1,20 +1,18 @@
 package com.creavispace.project.domain.recruit.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecruitListReadResponseDto implements SearchListReadResponseDto {
+public class RecruitListReadResponseDto{
     private Long id;
     private String postType;
     // enum으로 관리 변경

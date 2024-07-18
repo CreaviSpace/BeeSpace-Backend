@@ -11,7 +11,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CreaviCodeException.class)
     public ResponseEntity<FailResponseDto> handleNotFoundException(CreaviCodeException ex) {
-        GlobalErrorCode globalErrorCode = ex.getErrorCode();
-        return ResponseEntity.status(globalErrorCode.getCode()).body(new FailResponseDto(false, globalErrorCode.getMessage(), globalErrorCode.getCode()));
+        return ResponseEntity.status(ex.getStatus()).body(new FailResponseDto(false, ex.getMessage(), ex.getStatus()));
     }
 }

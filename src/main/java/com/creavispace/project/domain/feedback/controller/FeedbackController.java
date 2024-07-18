@@ -1,13 +1,11 @@
 package com.creavispace.project.domain.feedback.controller;
 
-import com.creavispace.project.domain.alarm.service.AlarmService;
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.domain.alarm.service.AlarmService;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackAnswerCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionCreateRequestDto;
-import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionModifyRequestDto;
 import com.creavispace.project.domain.feedback.dto.response.FeedbackAnalysisResponseDto;
-import com.creavispace.project.domain.feedback.dto.response.FeedbackAnswerCreateResponseDto;
 import com.creavispace.project.domain.feedback.dto.response.FeedbackQuestionResponseDto;
 import com.creavispace.project.domain.feedback.service.FeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,31 +27,31 @@ public class FeedbackController {
     private final AlarmService alarmService;
 
     private final static String CREATE_FEEDBACK_QUESTION = "/question";
-    private final static String MODIFY_FEEDBACK_QUESTION = "/question";
+    private final static String DELETE_FEEDBACK_QUESTION = "/question/{questionId}";
     private final static String READ_FEEDBACK_QUESTION = "/question";
     private final static String CREATE_FEEDBACK_ANSWER = "/answer";
     private final static String ANALYSIS_FEEDBACK = "/analysis";
 
     @PostMapping(CREATE_FEEDBACK_QUESTION)
     @Operation(summary = "피드백 질문 생성")
-    public ResponseEntity<SuccessResponseDto<List<FeedbackQuestionResponseDto>>> createFeedbackQuestion(
+    public ResponseEntity<SuccessResponseDto<Long>> createFeedbackQuestion(
         @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId, 
-        @RequestBody List<FeedbackQuestionCreateRequestDto> requestBody
+        @RequestBody FeedbackQuestionCreateRequestDto requestBody
     ){
         log.info("/feedback/controller : 피드백 질문 생성");
         return ResponseEntity.ok().body(feedbackService.createFeedbackQuestion(memberId, projectId, requestBody));
     }
 
-    @PutMapping(MODIFY_FEEDBACK_QUESTION)
-    @Operation(summary = "피드백 질문 수정 - 기존 질문을 수정할순 없고, 질문의 추가 생성/삭제가 가능한 기능")
-    public ResponseEntity<SuccessResponseDto<List<FeedbackQuestionResponseDto>>> modifyFeedbackQuestion(
+    @DeleteMapping(DELETE_FEEDBACK_QUESTION)
+    @Operation(summary = "피드백 질문 삭제")
+    public ResponseEntity<SuccessResponseDto<Long>> modifyFeedbackQuestion(
         @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId,
-        @RequestBody List<FeedbackQuestionModifyRequestDto> requestBody
+        @PathVariable("questionId") Long questionId
     ){
         log.info("/feedback/controller : 피드백 질문 수정");
-        return ResponseEntity.ok().body(feedbackService.modifyFeedbackQuestion(memberId, projectId, requestBody));
+        return ResponseEntity.ok().body(feedbackService.deleteFeedbackQuestion(memberId, projectId, questionId));
     }
 
     @GetMapping(READ_FEEDBACK_QUESTION)
@@ -67,13 +65,13 @@ public class FeedbackController {
 
     @PostMapping(CREATE_FEEDBACK_ANSWER)
     @Operation(summary = "피드백 답변 생성")
-    public ResponseEntity<SuccessResponseDto<FeedbackAnswerCreateResponseDto>> createFeedbackAnswer(
+    public ResponseEntity<SuccessResponseDto<Long>> createFeedbackAnswer(
         @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId,
         @RequestBody List<FeedbackAnswerCreateRequestDto> requestBody
     ){
         log.info("/feedback/controller : 피드백 답변 생성");
-        SuccessResponseDto<FeedbackAnswerCreateResponseDto> response = feedbackService.createFeedbackAnswer(memberId, projectId, requestBody);
+        SuccessResponseDto<Long> response = feedbackService.createFeedbackAnswer(memberId, projectId, requestBody);
         alarmService.createAlarm(memberId,"피드백" ,PostType.PROJECT, projectId);
         return ResponseEntity.ok().body(response);
     }

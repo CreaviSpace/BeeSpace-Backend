@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.recruit.dto.request;
 
+import com.creavispace.project.domain.recruit.entity.Recruit;
 import lombok.*;
 
 import java.util.List;
@@ -9,16 +10,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RecruitRequestDto {
-
-    // enum 관리로 변경
-    private String category;
+    private Recruit.Category category;
     private int amount;
     private int workDay;
     private String contact;
-    // enum 관리로 변경
-    private String contactWay;
-    // enum 관리로 변경
-    private String proceedWay;
+    private Recruit.ContactWay contactWay;
+    private Recruit.ProceedWay proceedWay;
     private String end;
     private String endFormat;
     private String title;

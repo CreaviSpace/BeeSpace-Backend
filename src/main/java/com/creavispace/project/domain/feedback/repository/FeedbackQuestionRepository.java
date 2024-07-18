@@ -12,12 +12,4 @@ import com.creavispace.project.domain.feedback.entity.FeedbackQuestion;
 
 @Repository
 public interface FeedbackQuestionRepository extends JpaRepository<FeedbackQuestion, Long> {
-
-    public void deleteByProjectId(Long projectId);
-
-    @Modifying
-    @Query(value = "DELETE FROM feedback_question WHERE id NOT IN (:ids)", nativeQuery = true)
-    public void deleteByQuestionIds(@Param("ids") List<Long> modifyFeedbackQuestionIds);
-
-    public List<FeedbackQuestion> findByProjectId(Long projectId);
 }

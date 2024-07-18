@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum GlobalErrorCode {
+    NOT_PUBLIC_CONTENT(403, "공개된 게시글이 아닙니다."),
     NOT_FOUND_POST_TYPE(400, "게시글 타입이 존재하지 않습니다."),
     NOT_FOUND_COMMUNITY_CATEGORY(400, "커뮤니티 카테고리가 존재하지 않습니다."),
     NOT_FOUND_ORDERBY(400, "커뮤니티 정렬타입이 존재하지 않습니다."),
@@ -41,6 +42,6 @@ public enum GlobalErrorCode {
     NOT_FEEDBACK_ANSWER_CONTENT(400, "피드백 답변이 존재하지 않습니다."),
     NOT_FOUND_ALARM(400,"해당 알림이 존재하지 않습니다." );
 
-    private final Integer code;
+    private final Integer status;
     private final String message;
 }

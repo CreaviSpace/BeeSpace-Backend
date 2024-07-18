@@ -1,30 +1,25 @@
 package com.creavispace.project.domain.project.dto.response;
 
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ProjectListReadResponseDto implements SearchListReadResponseDto{
+public class ProjectListReadResponseDto{
     private Long id;
     private String postType;
     private String category;
     private String title;
+    private String content;
     private List<ProjectLinkResponseDto> links;
     private String thumbnail;
     private String bannerContent;
-    private boolean status;
+    private String status;
     private LocalDateTime createdDate;
     private String memberNickname;
     private String memberProfile;

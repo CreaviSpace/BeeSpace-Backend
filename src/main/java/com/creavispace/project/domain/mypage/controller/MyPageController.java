@@ -1,52 +1,87 @@
 package com.creavispace.project.domain.mypage.controller;
 
-import com.creavispace.project.common.utils.JwtUtil;
-import com.creavispace.project.domain.member.dto.response.MemberJwtResponseDto;
-import com.creavispace.project.domain.member.entity.Member;
-import com.creavispace.project.domain.member.service.MemberService;
-import com.creavispace.project.domain.mypage.dto.request.MyPageModifyRequestDto;
-import com.creavispace.project.domain.mypage.dto.response.MyPageProfileResponseDto;
+import com.creavispace.project.common.dto.response.SuccessResponseDto;
+import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.domain.comment.service.CommentService;
+import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
+import com.creavispace.project.domain.community.entity.CommunityCategory;
+import com.creavispace.project.domain.community.service.CommunityService;
+import com.creavispace.project.domain.mypage.dto.response.MyPageCommentResponseDto;
+import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
+import com.creavispace.project.domain.project.entity.Project;
+import com.creavispace.project.domain.project.service.ProjectService;
+import com.creavispace.project.domain.recruit.dto.response.RecruitListReadResponseDto;
+import com.creavispace.project.domain.recruit.entity.Recruit;
+import com.creavispace.project.domain.recruit.service.RecruitService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/mypage")
 @RequiredArgsConstructor
 public class MyPageController {
 
-    private final MemberService memberService;
+    private final ProjectService projectService;
+    private final RecruitService recruitService;
+    private final CommunityService communityService;
+    private final CommentService commentService;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-
-    @PostMapping("mypage/edit")
-    @Operation(summary = "마이페이지 수정")
-    public ResponseEntity<MyPageProfileResponseDto> modifyProfile(HttpServletRequest request,
-                                                                  @RequestBody MyPageModifyRequestDto requestDto) {
-        Member member = getMember(request);
-
-
-        Member update = memberService.update(member, requestDto);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new MyPageProfileResponseDto(update));
+    @GetMapping("/post/project")
+    @Operation(summary = "마이페이지 프로젝트 리스트 조회")
+    public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> mypagePostProjectList(
+            @AuthenticationPrincipal String memberId,
+            @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
+            @RequestParam("memberId") String memberId_param,
+            @RequestParam("category") Project.Category category
+    ) {
+        return ResponseEntity.ok().body(projectService.readProjectListByMemberId(pageRequest, category, memberId, memberId_param));
     }
 
-    private Member getMember(HttpServletRequest request) {
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        MemberJwtResponseDto memberInfo = JwtUtil.getUserInfo(authorization, secretKey);
-        Member member = memberService.findById(memberInfo.memberId());
-        return member;
+    @GetMapping("/post/recruit")
+    @Operation(summary = "마이페이지 모집 리스트 조회")
+    public ResponseEntity<SuccessResponseDto<List<RecruitListReadResponseDto>>> mypagePostRecruitList(
+            @AuthenticationPrincipal String memberId,
+            @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
+            @RequestParam("memberId") String memberId_param,
+            @RequestParam("category") Recruit.Category category
+    ) {
+        return ResponseEntity.ok().body(recruitService.readRecruitListByMemberId(pageRequest, category, memberId, memberId_param));
     }
+
+    @GetMapping("/post/community")
+    @Operation(summary = "마이페이지 커뮤니티 리스트 조회")
+    public ResponseEntity<SuccessResponseDto<List<CommunityResponseDto>>> mypagePostCommunityList(
+            @AuthenticationPrincipal String memberId,
+            @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
+            @RequestParam("memberId") String memberId_param,
+            @RequestParam("category") CommunityCategory category
+    ) {
+        return ResponseEntity.ok().body(communityService.mypageCommunityList(pageRequest, category, memberId, memberId_param));
+    }
+
+    @GetMapping("/comment")
+    @Operation(summary = "마이페이지 내가 작성한 댓글 프로젝트 리스트 조회")
+    public ResponseEntity<SuccessResponseDto<List<MyPageCommentResponseDto>>> mypageCommentProjectList(
+            @AuthenticationPrincipal String memberId,
+            @RequestParam("postType") PostType postType,
+            @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+            ){
+        return ResponseEntity.ok().body(commentService.mypageCommentPost(memberId, postType, pageable));
+    }
+
+
+
 }

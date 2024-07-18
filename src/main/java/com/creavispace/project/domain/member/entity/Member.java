@@ -1,12 +1,17 @@
 package com.creavispace.project.domain.member.entity;
 
 import com.creavispace.project.common.entity.BaseTimeEntity;
-import com.creavispace.project.domain.member.Role;
-import com.creavispace.project.domain.member.dto.request.MemberSaveRequestDto;
-import com.creavispace.project.domain.member.service.MemberService;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.creavispace.project.common.post.entity.Post;
+import com.creavispace.project.domain.alarm.entity.Alarm;
+import com.creavispace.project.domain.auth.jwt.entity.RefreshToken;
+import com.creavispace.project.domain.bookmark.entity.CommunityBookmark;
+import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
+import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
+import com.creavispace.project.domain.like.entity.CommunityLike;
+import com.creavispace.project.domain.like.entity.ProjectLike;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,74 +37,63 @@ import java.util.List;
 public class Member extends BaseTimeEntity {
     @Id
     @Column(name = "member_id")
-    //회원 관련 정보와 로그인 정보는 분리
     private String id;
 
-    @Column(nullable = false)
-    @JsonBackReference
-    private String loginId;
+    private String provider;
 
-    @JsonBackReference
     private String memberEmail;
-
-    @Column(nullable = false)
-    @JsonBackReference
-    private String memberName;
 
     private String memberNickname;
 
-    @JsonBackReference
     private String profileUrl;
-
-    @Column(nullable = false)
-    @JsonBackReference
-    private String loginType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @JsonBackReference
     private Role role;
 
-    @JsonBackReference
     private String memberIntroduce;
 
-    //탈퇴
-    @JsonBackReference
-    private boolean expired;
-
-    //정지
-    @JsonBackReference
-    private boolean fired;
-
-    @JsonBackReference
-    private boolean enabled;
-
-    @JsonBackReference
     private String memberPosition;
-    @JsonBackReference
+
     private Integer memberCareer;
-    @JsonBackReference
-    private List<String> interestedStack;
 
-    public Member(MemberSaveRequestDto dto, MemberService memberService) {
-        this.id = memberService.createId();
-        this.memberEmail = dto.getMemberEmail();
-        this.memberName = dto.getMemberName();
-        this.loginId = dto.getLoginId();
-        this.loginType = dto.getLoginType();
-        this.role = dto.getRole();
-        this.memberNickname = dto.getMemberNickname();
-        this.interestedStack = new ArrayList<>();
-        this.memberCareer = 0;
-        this.memberPosition = "";
-        this.profileUrl = "";
-        this.memberIntroduce= "";
-        this.expired = false;
-        this.enabled = false;
-        this.fired = false;
+    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private RefreshToken refreshToken;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InterestTechStack> interestedStack = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Post> posts = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<CommunityBookmark> communityBookmarks = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<ProjectBookmark> projectBookmarks = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<RecruitBookmark> recruitBookmarks = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<CommunityLike> communityLikes = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<ProjectLike> projectLikes = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Alarm> alarms = new ArrayList<>();
+
+    public void changeRole(Role role){
+        this.role = role;
     }
 
-    public String getRoleKey() {
-        return this.role.getKey();
-    }
 }

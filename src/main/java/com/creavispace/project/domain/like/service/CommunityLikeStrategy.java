@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.like.service;
 
+import com.creavispace.project.common.post.entity.Post;
 import com.creavispace.project.domain.community.entity.Community;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.like.dto.response.LikeCountResponseDto;
@@ -12,6 +13,8 @@ import com.creavispace.project.common.exception.GlobalErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.NoSuchElementException;
+
 @Component
 @RequiredArgsConstructor
 public class CommunityLikeStrategy implements LikeStrategy {
@@ -22,7 +25,9 @@ public class CommunityLikeStrategy implements LikeStrategy {
     @Override
     public LikeResponseDto likeToggle(Member member, Long postId) {
         LikeResponseDto data = null;
-        Community community = communityRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
+        Community community = communityRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("커뮤니티 id("+postId+")가 존재하지 않습니다."));
+
+        if(!community.getStatus().equals(Post.Status.PUBLIC)) throw new CreaviCodeException(GlobalErrorCode.NOT_PUBLIC_CONTENT);
 
         CommunityLike communityLike = communityLikeRepository.findByCommunityIdAndMemberId(postId, member.getId());
 
@@ -32,21 +37,21 @@ public class CommunityLikeStrategy implements LikeStrategy {
                     .community(community)
                     .build();
             communityLikeRepository.save(saveLike);
-            community.plusLikeCount();
             data = new LikeResponseDto(true);
         }else{
             communityLikeRepository.deleteById(communityLike.getId());
-            community.minusLikeCount();
             data = new LikeResponseDto(false);
         }
-        communityRepository.save(community);
+
         return data;
     }
 
     @Override
     public LikeResponseDto readLike(String memberId, Long postId) {
-        communityRepository.findByIdAndStatusTrue(postId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
+        communityRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("커뮤니티 id("+postId+")가 존재하지 않습니다."));
+
         boolean isCommunityLike = communityLikeRepository.existsByCommunityIdAndMemberId(postId, memberId);
+
         return new LikeResponseDto(isCommunityLike);
     }
 

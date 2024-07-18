@@ -16,5 +16,4 @@ public class CommentResponseDto {
     private String memberProfileUrl;
     private LocalDateTime modifiedDate;
     private String content;
-    private String contentsTitle;
 }
