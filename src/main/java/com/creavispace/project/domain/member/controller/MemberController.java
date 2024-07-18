@@ -19,13 +19,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/")
+    @GetMapping("/{memberId}")
     @Operation(summary = "사용자 아이디로 사용자 프로필 조회")
-    public ResponseEntity<SuccessResponseDto<MemberResponseDto>> readMember(@RequestParam("member-id") String memberId) {
+    public ResponseEntity<SuccessResponseDto<MemberResponseDto>> readMember(@PathVariable("memberId") String memberId) {
         return ResponseEntity.ok().body(memberService.readMember(memberId));
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("")
     @Operation(summary = "회원 탈퇴")
     public void withdrawn(@AuthenticationPrincipal String memberId) {
         memberService.withdrawn(memberId);
@@ -36,28 +36,7 @@ public class MemberController {
     public ResponseEntity<SuccessResponseDto<List<SearchMemberResponseDto>>> searchMember(@RequestParam("text") String text) {
         return ResponseEntity.ok().body(memberService.searchMember(text));
     }
-//
-//    @GetMapping("/read/bookmark")
-//    @Operation(summary = " 사용자 아이디로 사용자가 북마크한 게시물 검색, sortType = asc or desc 대 소문자 구분 안함")
-//    public ResponseEntity<SuccessResponseDto<List<BookmarkContentsResponseDto>>> readMemberBookmarkContents(
-//            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
-//            @RequestParam String category, @RequestParam(SORT_TYPE) String sortType) throws JsonProcessingException {
-//        SuccessResponseDto<List<BookmarkContentsResponseDto>> listSuccessResponseDto = bookmarkService.readMyBookmark(memberId, page, size,
-//                category, sortType);
-//
-//        return ResponseEntity.ok().body(listSuccessResponseDto);
-//    }
-//
-//    @GetMapping("/read/feedback")
-//    @Operation(summary = "사용자 아이디로 사용자 피드백 조회")
-//    public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readMemberFeedbackContents(
-//            @RequestParam(MEMBER_ID) String memberId, @RequestParam Integer page, @RequestParam Integer size,
-//            @RequestParam(SORT_TYPE) String sortType) {
-//        SuccessResponseDto<List<ProjectListReadResponseDto>> memberProjectContents = projectService.readMyProjectFeedBackList(
-//                memberId, size, page, sortType);
-//        return ResponseEntity.ok().body(memberProjectContents);
 
-//    }
 
 
 }

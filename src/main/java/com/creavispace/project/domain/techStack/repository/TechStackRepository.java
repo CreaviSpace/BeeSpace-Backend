@@ -8,9 +8,6 @@ import java.util.List;
 
 @Repository
 public interface TechStackRepository extends JpaRepository<TechStack, String>{
-    public List<TechStack> findByTechStackContains(String techStack);
     public List<TechStack> findByTechStackStartingWith(String techStack);
-    public List<TechStack> findByTechStack(String techStack);
-
     List<TechStack> findByTechStackIn(List<String> techStacks);
 }

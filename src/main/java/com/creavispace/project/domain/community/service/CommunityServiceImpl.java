@@ -15,7 +15,7 @@ import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.file.entity.CommunityImage;
 import com.creavispace.project.domain.file.entity.Image;
 import com.creavispace.project.domain.file.service.ImageManager;
-import com.creavispace.project.domain.hashTag.entity.CommunityHashTag;
+import com.creavispace.project.domain.hashTag.entity.HashTag;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.entity.Role;
 import com.creavispace.project.domain.member.repository.MemberRepository;
@@ -43,18 +43,14 @@ public class CommunityServiceImpl implements CommunityService {
     public SuccessResponseDto<Long> createCommunity(String memberId, CommunityRequestDto dto) {
         // 맴버 엔티티 조회
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("로그인 회원 아이디가 존재하지 않습니다."));
-        // 커뮤니티 이미지 필터(게시글에 사용되지 않는 이미지 삭제)
-        List<String> filteredImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
         // 커뮤니티 이미지 생성
-        List<CommunityImage> communityImages = filteredImages.stream()
-                .map(CommunityImage::new)
-                .toList();
+        List<CommunityImage> communityImages = CommunityImage.getUsedImageFilter(dto.getImages(), dto.getContent());
         // 커뮤니티 해시태그 생성
-        List<CommunityHashTag> communityHashTags = dto.getHashTags().stream()
-                .map(hashTag -> CommunityHashTag.builder().hashTag(hashTag).build())
+        List<HashTag> hashTags = dto.getHashTags().stream()
+                .map(hashTag -> HashTag.builder().hashTag(hashTag).build())
                 .toList();
         // 커뮤니티 생성
-        Community community = Community.createCommunity(dto, member, communityImages, communityHashTags);
+        Community community = Community.createCommunity(dto, member, communityImages, hashTags);
         // 커뮤니티 게시글 저장
         communityRepository.save(community);
         // 성공 응답 반환
@@ -78,25 +74,20 @@ public class CommunityServiceImpl implements CommunityService {
         // 커뮤니티 해시태그 업데이트
         updateCommunityHashTag(community, dto.getHashTags());
 
-        // 커뮤니티 이미지 필터(게시글에 사용되지 않는 이미지 삭제)
-        List<String> filteredNewImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
-
         // 커뮤니티 이미지 업데이트
-        updateCommunityImages(community, filteredNewImages);
+        updateCommunityImages(community, dto);
 
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "커뮤니티 게시글 수정이 완료되었습니다.", communityId);
 
     }
 
-    private void updateCommunityImages(Community community, List<String> newImages) {
+    private void updateCommunityImages(Community community, CommunityRequestDto dto) {
         // 기존 커뮤니티 이미지 삭제
         community.getCommunityImages().clear();
 
         // new 커뮤니티 이미지 생성
-        List<CommunityImage> communityImages = newImages.stream()
-                .map(CommunityImage::new)
-                .toList();
+        List<CommunityImage> communityImages = CommunityImage.getUsedImageFilter(dto.getImages(), dto.getContent());
 
         // new 커뮤니티 이미지 저장
         for (CommunityImage communityImage : communityImages) {
@@ -106,15 +97,15 @@ public class CommunityServiceImpl implements CommunityService {
 
     private void updateCommunityHashTag(Community community, List<String> hashTags) {
         // 기존 커뮤니티 해시태그 삭제
-        community.getCommunityHashTags().clear();
+        community.getHashTags().clear();
 
         // new 커뮤니티 해시태그 생성
-        List<CommunityHashTag> newCommunityHashTags = hashTags.stream()
-                .map(newHashTag -> CommunityHashTag.builder().hashTag(newHashTag).build())
+        List<HashTag> newHashTags = hashTags.stream()
+                .map(newHashTag -> HashTag.builder().hashTag(newHashTag).build())
                 .toList();
 
         // new 커뮤니티 해시태그 저장
-        for(CommunityHashTag newHashTag : newCommunityHashTags){
+        for(HashTag newHashTag : newHashTags){
             community.addCommunityHashTag(newHashTag);
         }
     }
@@ -173,7 +164,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .modifiedDate(community.getModifiedDate())
                 .title(community.getTitle())
                 .content(community.getContent())
-                .hashTags(community.getCommunityHashTags().stream()
+                .hashTags(community.getHashTags().stream()
                         .map(hashTag -> CommunityHashTagDto.builder()
                                 .hashTag(hashTag.getHashTag())
                                 .build())
@@ -206,7 +197,7 @@ public class CommunityServiceImpl implements CommunityService {
                         .modifiedDate(community.getModifiedDate())
                         .title(community.getTitle())
                         .content(community.getContent())
-                        .hashTags(community.getCommunityHashTags().stream()
+                        .hashTags(community.getHashTags().stream()
                                 .map(communityHashTag -> CommunityHashTagDto.builder().hashTag(communityHashTag.getHashTag()).build())
                                 .toList())
                         .images(community.getCommunityImages().stream()
@@ -257,7 +248,7 @@ public class CommunityServiceImpl implements CommunityService {
                         .modifiedDate(community.getModifiedDate())
                         .title(community.getTitle())
                         .content(community.getContent())
-                        .hashTags(community.getCommunityHashTags().stream()
+                        .hashTags(community.getHashTags().stream()
                                 .map(communityHashTag -> CommunityHashTagDto.builder().hashTag(communityHashTag.getHashTag()).build())
                                 .toList())
                         .images(community.getCommunityImages().stream()

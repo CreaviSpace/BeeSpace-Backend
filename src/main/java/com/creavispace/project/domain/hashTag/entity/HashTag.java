@@ -13,9 +13,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommunityHashTag extends BaseTimeEntity {
+public class HashTag extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "hash_tag_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

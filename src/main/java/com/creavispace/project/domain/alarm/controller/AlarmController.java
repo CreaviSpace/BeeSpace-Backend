@@ -48,7 +48,7 @@ public class AlarmController {
 
     @PutMapping(MODIFY_ALL_ALARM)
     @Operation(summary = "알림 전체 읽음")
-    public ResponseEntity<SuccessResponseDto<Integer>> modifyAllAlarm(
+    public ResponseEntity<SuccessResponseDto<Void>> modifyAllAlarm(
             @AuthenticationPrincipal String memberId
     ){
         log.info("/alarm/controller : 알림 전체 읽음");

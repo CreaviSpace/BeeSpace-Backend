@@ -1,6 +1,5 @@
 package com.creavispace.project.domain.file.service;
 
-import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,25 +11,28 @@ import java.util.List;
 import static org.jsoup.Jsoup.parse;
 
 @Component
-@RequiredArgsConstructor
 public class ImageManager {
 
-    private final FileService fileService;
-    public List<String> deleteUnusedImagesAndFilterUsedImages(List<String> images, String content){
-        // Content 삭제된 이미지
+    public List<String> usedImageFilter(List<String> images, String content){
+        // 삭제할 이미지 객체 생성
         List<String> deletedImages = deleteImagesByContent(images, content);
-        // S3저장소에서 삭제
-        fileService.deleteImages(deletedImages);
-        // 저장할 이미지 생성
+        // 게시글 작성중에 업로드한 모든 이미지
         List<String> saveImg = new ArrayList<>(images);
+        // 게시글 작성중에 업로드한 모든 이미지 - 삭제된 이미지
         saveImg.removeAll(deletedImages);
         return saveImg;
     }
 
-    private List<String> deleteImagesByContent(List<String> images, String content){
+    public List<String> deleteImagesByContent(List<String> images, String content){
+        // 실제 저장된 Content 이미지
         List<String> contentImages = imagesByContent(content);
+
+        // 삭제할 이미지가 저장된 객체 생성
         List<String> deletedImg = new ArrayList<>(images);
+
+        // 게시글 작성중에 업로드한 모든 이미지 - 실제 저장된 Content 이미지
         deletedImg.removeAll(contentImages);
+
         return deletedImg;
     }
 

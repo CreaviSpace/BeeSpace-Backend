@@ -10,6 +10,7 @@ import lombok.Getter;
 public class InterestTechStack {
 
     @Id
+    @Column(name = "interest_tech_stack_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

@@ -1,9 +1,12 @@
 package com.creavispace.project.domain.file.entity;
 
+import com.creavispace.project.domain.file.service.ImageManager;
 import com.creavispace.project.domain.recruit.entity.Recruit;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -26,5 +29,12 @@ public class RecruitImage extends Image {
         this.recruit = recruit;
     }
 
+
+    public static List<RecruitImage> getUsedImageFilter(List<String> images, String content){
+        ImageManager imageManager = new ImageManager();
+        List<String> filteredImages = imageManager.usedImageFilter(images, content);
+
+        return filteredImages.stream().map(RecruitImage::new).toList();
+    }
 
 }

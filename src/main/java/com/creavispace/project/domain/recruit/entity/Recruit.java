@@ -42,6 +42,7 @@ public class Recruit extends Post {
     @Column(nullable = false)
     private String contact;
 
+    @Enumerated(EnumType.STRING)
     private RecruitmentStatus recruitmentStatus;
 
     @Builder.Default
@@ -54,7 +55,7 @@ public class Recruit extends Post {
 
     @Builder.Default
     @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RecruitPosition> recruitPositions = new ArrayList<>();
+    private List<Position> positions = new ArrayList<>();
 
     public enum Category {PROJECT_RECRUIT, STUDY;}
     public enum ProceedWay {ONLINE, OFFLINE, ON_OFFLINE;}
@@ -71,12 +72,12 @@ public class Recruit extends Post {
         recruitTechStack.setRecruit(this);
     }
 
-    public void addRecruitPosition(RecruitPosition recruitPosition){
-        recruitPositions.add(recruitPosition);
-        recruitPosition.setRecruit(this);
+    public void addRecruitPosition(Position position){
+        positions.add(position);
+        position.setRecruit(this);
     }
 
-    public static Recruit createRecruit(RecruitRequestDto dto, Member member, List<RecruitImage> recruitImages, List<RecruitTechStack> recruitTechStacks, List<RecruitPosition> recruitPositions) {
+    public static Recruit createRecruit(RecruitRequestDto dto, Member member, List<RecruitImage> recruitImages, List<RecruitTechStack> recruitTechStacks, List<Position> positions) {
         // 모집 생성
         Recruit recruit = Recruit.builder()
                 .category(dto.getCategory())
@@ -94,8 +95,8 @@ public class Recruit extends Post {
             recruit.addRecruitImage(recruitImage);
         }
         // 모집 포지션 추가
-        for(RecruitPosition recruitPosition : recruitPositions){
-            recruit.addRecruitPosition(recruitPosition);
+        for(Position position : positions){
+            recruit.addRecruitPosition(position);
         }
         // 모집 기술스택 추가
         for(RecruitTechStack recruitTechStack : recruitTechStacks){

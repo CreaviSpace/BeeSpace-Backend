@@ -14,8 +14,8 @@ import com.creavispace.project.domain.recruit.dto.request.RecruitPositionRequest
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
 import com.creavispace.project.domain.recruit.dto.request.RecruitTechStackRequestDto;
 import com.creavispace.project.domain.recruit.dto.response.*;
+import com.creavispace.project.domain.recruit.entity.Position;
 import com.creavispace.project.domain.recruit.entity.Recruit;
-import com.creavispace.project.domain.recruit.entity.RecruitPosition;
 import com.creavispace.project.domain.recruit.entity.RecruitTechStack;
 import com.creavispace.project.domain.recruit.repository.RecruitRepository;
 import com.creavispace.project.domain.techStack.entity.TechStack;
@@ -46,13 +46,8 @@ public class RecruitServiceImpl implements RecruitService {
     public SuccessResponseDto<Long> createRecruit(String memberId, RecruitRequestDto dto) {
         // 맴버 엔티티 조회
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("로그인 회원 아이디가 존재하지 않습니다."));
-        // todo : 시간이 지나면 이미지 필터를 사용해야하는걸 모를것같은데 좀더 괜찮은 방법이 있는지 확인
-        // 모집 이미지 필터(게시글에 사용되지 않는 이미지 삭제)
-        List<String> filteredImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
         // 모집 이미지 생성
-        List<RecruitImage> recruitImages = filteredImages.stream()
-                .map(RecruitImage::new)
-                .toList();
+        List<RecruitImage> recruitImages = RecruitImage.getUsedImageFilter(dto.getImages(), dto.getContent());
         // 모집 기술스택 조회
         List<TechStack> techStacks = techStackRepository.findByTechStackIn(dto.getTechStacks().stream().map(RecruitTechStackRequestDto::getTechStack).toList());
         // 모집 기술스택 생성
@@ -60,16 +55,16 @@ public class RecruitServiceImpl implements RecruitService {
                 .map(techStack -> RecruitTechStack.builder().techStack(techStack).build())
                 .toList();
         // 모집 포지션 생성
-        List<RecruitPosition> recruitPositions = dto.getPositions().stream()
-                .map(positionDto -> RecruitPosition.builder()
+        List<Position> positions = dto.getPositions().stream()
+                .map(positionDto -> Position.builder()
                         .position(positionDto.getPosition())
                         .amount(positionDto.getAmount())
                         .now(positionDto.getNow())
-                        .status(RecruitPosition.Status.RECRUITING)
+                        .status(Position.Status.RECRUITING)
                         .build())
                 .toList();
         // 모집 생성
-        Recruit recruit = Recruit.createRecruit(dto, member, recruitImages, recruitTechStacks, recruitPositions);
+        Recruit recruit = Recruit.createRecruit(dto, member, recruitImages, recruitTechStacks, positions);
 
         // 모집 저장
         recruitRepository.save(recruit);
@@ -92,10 +87,8 @@ public class RecruitServiceImpl implements RecruitService {
         // 모집 업데이트
         recruit.update(dto);
 
-        // 모집 이미지 필터(게시글에 사용되지 않는 이미지 삭제)
-        List<String> filteredNewImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
         // 모집 이미지 업데이트
-        updateRecruitImages(recruit, filteredNewImages);
+        updateRecruitImages(recruit, dto);
 
         // 모집 포지션 업데이트
         updateRecruitPositions(recruit, dto.getPositions());
@@ -132,11 +125,11 @@ public class RecruitServiceImpl implements RecruitService {
 
     private void updateRecruitPositions(Recruit recruit, List<RecruitPositionRequestDto> newPositions) {
         // 기존 모집 포지션 삭제
-        recruit.getRecruitPositions().clear();
+        recruit.getPositions().clear();
 
         // new 모집 포지션 생성
-        List<RecruitPosition> newRecruitPositions = newPositions.stream()
-                .map(newPosition -> RecruitPosition.builder()
+        List<Position> newRecruitPositions = newPositions.stream()
+                .map(newPosition -> Position.builder()
                         .position(newPosition.getPosition())
                         .amount(newPosition.getAmount())
                         .now(newPosition.getNow())
@@ -144,22 +137,20 @@ public class RecruitServiceImpl implements RecruitService {
                 .toList();
 
         // new 모집 포지션 저장
-        for (RecruitPosition newRecruitPosition : newRecruitPositions) {
-            recruit.addRecruitPosition(newRecruitPosition);
+        for (Position newPosition : newRecruitPositions) {
+            recruit.addRecruitPosition(newPosition);
         }
     }
 
-    private void updateRecruitImages(Recruit recruit, List<String> newImages) {
+    private void updateRecruitImages(Recruit recruit, RecruitRequestDto dto) {
         // 기존 모집 이미지 삭제
         recruit.getRecruitImages().clear();
 
         // new 모집 이미지 생성
-        List<RecruitImage> newRecruitImages = newImages.stream()
-                .map(RecruitImage::new)
-                .toList();
+        List<RecruitImage> recruitImages = RecruitImage.getUsedImageFilter(dto.getImages(), dto.getContent());
 
         // new 모집 이미지 저장
-        for (RecruitImage newRecruitImage : newRecruitImages) {
+        for (RecruitImage newRecruitImage : recruitImages) {
             recruit.addRecruitImage(newRecruitImage);
         }
     }
@@ -203,7 +194,7 @@ public class RecruitServiceImpl implements RecruitService {
                                 .title(recruit.getTitle())
                                 .content(recruit.getContent())
                                 .amount(recruit.getAmount())
-                                .now(recruit.getRecruitPositions().stream().mapToInt(RecruitPosition::getNow).sum())
+                                .now(recruit.getPositions().stream().mapToInt(Position::getNow).sum())
                                 .createdDate(recruit.getCreatedDate())
                                 .memberNickname(recruit.getMember().getMemberNickname())
                                 .memberProfile(recruit.getMember().getProfileUrl())
@@ -257,7 +248,7 @@ public class RecruitServiceImpl implements RecruitService {
                 .createdDate(recruit.getCreatedDate())
                 .modifiedDate(recruit.getModifiedDate())
                 .images(recruit.getRecruitImages().stream().map(RecruitImage::getUrl).toList())
-                .positions(recruit.getRecruitPositions().stream()
+                .positions(recruit.getPositions().stream()
                         .map(recruitPosition -> RecruitPositionResponseDto.builder()
                                 .id(recruitPosition.getId())
                                 .position(recruitPosition.getPosition())
@@ -340,7 +331,7 @@ public class RecruitServiceImpl implements RecruitService {
                         .title(recruit.getTitle())
                         .content(recruit.getContent())
                         .amount(recruit.getAmount())
-                        .now(recruit.getRecruitPositions().stream().mapToInt(RecruitPosition::getNow).sum())
+                        .now(recruit.getPositions().stream().mapToInt(Position::getNow).sum())
                         .createdDate(recruit.getCreatedDate())
                         .memberNickname(recruit.getMember().getMemberNickname())
                         .memberProfile(recruit.getMember().getProfileUrl())

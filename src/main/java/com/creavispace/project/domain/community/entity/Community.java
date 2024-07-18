@@ -4,7 +4,7 @@ import com.creavispace.project.common.dto.type.PostType;
 import com.creavispace.project.common.post.entity.Post;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
 import com.creavispace.project.domain.file.entity.CommunityImage;
-import com.creavispace.project.domain.hashTag.entity.CommunityHashTag;
+import com.creavispace.project.domain.hashTag.entity.HashTag;
 import com.creavispace.project.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,7 +30,7 @@ public class Community extends Post {
 
     @Builder.Default
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommunityHashTag> communityHashTags = new ArrayList<>();
+    private List<HashTag> hashTags = new ArrayList<>();
 
     public void update(CommunityRequestDto dto) {
         super.changeTitleAndContentAndThumbnailAndBannerContent(dto.getTitle(), dto.getContent(),null,null);
@@ -43,13 +43,13 @@ public class Community extends Post {
         communityImage.setCommunity(this);
     }
 
-    public void addCommunityHashTag(CommunityHashTag communityHashTag){
-        communityHashTags.add(communityHashTag);
-        communityHashTag.setCommunity(this);
+    public void addCommunityHashTag(HashTag hashTag){
+        hashTags.add(hashTag);
+        hashTag.setCommunity(this);
     }
 
     //== 생성 메서드 ==//
-    public static Community createCommunity(CommunityRequestDto dto, Member member, List<CommunityImage> communityImages, List<CommunityHashTag> communityHashTags) {
+    public static Community createCommunity(CommunityRequestDto dto, Member member, List<CommunityImage> communityImages, List<HashTag> hashTags) {
         Community community = Community.builder()
                 .category(dto.getCategory())
                 .build();
@@ -57,8 +57,8 @@ public class Community extends Post {
         for(CommunityImage communityImage : communityImages){
             community.addCommunityImages(communityImage);
         }
-        for(CommunityHashTag communityHashTag : communityHashTags){
-            community.addCommunityHashTag(communityHashTag);
+        for(HashTag hashTag : hashTags){
+            community.addCommunityHashTag(hashTag);
         }
         return community;
     }

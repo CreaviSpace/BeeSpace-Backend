@@ -35,7 +35,7 @@ public class ReportServiceImpl implements ReportService{
             .postType(dto.getPostType())
             .postId(dto.getPostId())
             .content(dto.getContent())
-            .status(Boolean.TRUE)
+            .status(Report.Status.PENDING)
             .build();
 
         // 신고 저장

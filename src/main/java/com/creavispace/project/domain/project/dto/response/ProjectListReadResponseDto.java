@@ -15,6 +15,7 @@ public class ProjectListReadResponseDto{
     private String postType;
     private String category;
     private String title;
+    private String content;
     private List<ProjectLinkResponseDto> links;
     private String thumbnail;
     private String bannerContent;

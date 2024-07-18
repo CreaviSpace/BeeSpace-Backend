@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@ToString(exclude = {"projectLinks", "projectMembers", "projectTechStacks", "projectImages", "feedbackQuestions"})
+@ToString(exclude = {"links", "projectMembers", "projectTechStacks", "projectImages", "feedbackQuestions"})
 public class Project extends Post {
 
     private String field;
@@ -30,7 +30,7 @@ public class Project extends Post {
 
     @Builder.Default
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectLink> projectLinks = new ArrayList<>();
+    private List<Link> links = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -52,9 +52,9 @@ public class Project extends Post {
 
     //== 연관관계 메서드 ==//
 
-    public void addProjectLink(ProjectLink projectLink){
-        projectLinks.add(projectLink);
-        projectLink.setProject(this);
+    public void addProjectLink(Link link){
+        links.add(link);
+        link.setProject(this);
     }
     public void addProjectMember(ProjectMember projectMember){
         projectMembers.add(projectMember);
@@ -77,7 +77,7 @@ public class Project extends Post {
 
     //== 생성 메서드 ==//
 
-    public static Project createProject(ProjectRequestDto dto, Member member, List<ProjectMember> projectMembers, List<ProjectLink> projectLinks, List<ProjectTechStack> projectTechStacks, List<ProjectImage> projectImages){
+    public static Project createProject(ProjectRequestDto dto, Member member, List<ProjectMember> projectMembers, List<Link> links, List<ProjectTechStack> projectTechStacks, List<ProjectImage> projectImages){
         // 프로젝트 생성
         Project project = Project.builder()
                 .field(dto.getField())
@@ -91,8 +91,8 @@ public class Project extends Post {
             project.addProjectMember(projectMember);
         }
         // 프로젝트 링크 추가
-        for(ProjectLink projectLink : projectLinks){
-            project.addProjectLink(projectLink);
+        for(Link link : links){
+            project.addProjectLink(link);
         }
         // 프로젝트 기술스택 추가
         for(ProjectTechStack projectTechStack : projectTechStacks){

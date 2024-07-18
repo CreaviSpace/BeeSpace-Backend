@@ -27,7 +27,7 @@ public class FeedbackController {
     private final AlarmService alarmService;
 
     private final static String CREATE_FEEDBACK_QUESTION = "/question";
-    private final static String DELETE_FEEDBACK_QUESTION = "/question";
+    private final static String DELETE_FEEDBACK_QUESTION = "/question/{questionId}";
     private final static String READ_FEEDBACK_QUESTION = "/question";
     private final static String CREATE_FEEDBACK_ANSWER = "/answer";
     private final static String ANALYSIS_FEEDBACK = "/analysis";
@@ -43,12 +43,12 @@ public class FeedbackController {
         return ResponseEntity.ok().body(feedbackService.createFeedbackQuestion(memberId, projectId, requestBody));
     }
 
-    @PutMapping(DELETE_FEEDBACK_QUESTION)
+    @DeleteMapping(DELETE_FEEDBACK_QUESTION)
     @Operation(summary = "피드백 질문 삭제")
     public ResponseEntity<SuccessResponseDto<Long>> modifyFeedbackQuestion(
         @AuthenticationPrincipal String memberId,
         @RequestParam("projectId") Long projectId,
-        @RequestParam("questionId") Long questionId
+        @PathVariable("questionId") Long questionId
     ){
         log.info("/feedback/controller : 피드백 질문 수정");
         return ResponseEntity.ok().body(feedbackService.deleteFeedbackQuestion(memberId, projectId, questionId));

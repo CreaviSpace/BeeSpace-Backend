@@ -33,7 +33,6 @@ public class ProjectController {
     private static final String READ_POPULAR_PROJECT = "/project/popular";
     private static final String READ_PROJECT_LIST = "/project";
     private static final String READ_PROJECT = "/project/{projectId}";
-    private static final String MYPAGE_READ_PROJECT_LIST = "/mypage/project/{projectId}";
 
     @PostMapping(CREATE_PROJECT)
     @Operation(summary = "프로젝트 게시글 생성")

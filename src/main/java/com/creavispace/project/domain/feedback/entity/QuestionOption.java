@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class QuestionOption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "question_option_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -16,8 +16,8 @@ import com.creavispace.project.domain.project.dto.request.ProjectMemberRequestDt
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
 import com.creavispace.project.domain.project.dto.request.ProjectTechStackRequestDto;
 import com.creavispace.project.domain.project.dto.response.*;
+import com.creavispace.project.domain.project.entity.Link;
 import com.creavispace.project.domain.project.entity.Project;
-import com.creavispace.project.domain.project.entity.ProjectLink;
 import com.creavispace.project.domain.project.entity.ProjectMember;
 import com.creavispace.project.domain.project.entity.ProjectTechStack;
 import com.creavispace.project.domain.project.repository.ProjectRepository;
@@ -60,8 +60,8 @@ public class ProjectServiceImpl implements ProjectService {
                 .toList();
 
         // 프로젝트 링크 생성
-        List<ProjectLink> projectLinks = dto.getLinkDtos().stream()
-                .map(projectLinkDto -> ProjectLink.builder()
+        List<Link> links = dto.getLinkDtos().stream()
+                .map(projectLinkDto -> Link.builder()
                         .linkType(projectLinkDto.getLinkType())
                         .url(projectLinkDto.getUrl())
                         .build())
@@ -76,16 +76,11 @@ public class ProjectServiceImpl implements ProjectService {
                         .build())
                 .toList();
 
-        // todo : 시간이 지나면 이미지 필터를 사용해야하는걸 모를것같은데 좀더 괜찮은 방법이 있는지 확인
-        // 프로젝트 이미지 필터(게시글에 사용되지 않는 이미지 필터)
-        List<String> filteredImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
         // 프로젝트 이미지 생성
-        List<ProjectImage> projectImages = filteredImages.stream()
-                .map(ProjectImage::new)
-                .toList();
+        List<ProjectImage> projectImages = ProjectImage.getUsedImageFilter(dto.getImages(), dto.getContent());
 
         // 프로젝트 생성
-        Project project = Project.createProject(dto, member, projectMembers, projectLinks, projectTechStacks, projectImages);
+        Project project = Project.createProject(dto, member, projectMembers, links, projectTechStacks, projectImages);
 
         // 프로젝트 저장
         projectRepository.save(project);
@@ -116,23 +111,19 @@ public class ProjectServiceImpl implements ProjectService {
         // 프로젝트 기술스택 업데이트
         updateProjectTechStacks(project, dto.getTechStackDtos());
 
-        // 프로젝트 이미지 필터(게시글에 사용되지 않는 이미지 삭제)
-        List<String> filteredNewImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
         // 프로젝트 이미지 업데이트
-        updateProjectImages(project, filteredNewImages);
+        updateProjectImages(project, dto);
 
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "프로젝트 게시글의 수정이 완료되었습니다.", projectId);
     }
 
-    private void updateProjectImages(Project project, List<String> newImages) {
+    private void updateProjectImages(Project project, ProjectRequestDto dto) {
         // 기존 프로젝트 이미지 삭제
         project.getProjectImages().clear();
 
         // new 프로젝트 이미지 생성
-        List<ProjectImage> projectImages = newImages.stream()
-                .map(ProjectImage::new)
-                .toList();
+        List<ProjectImage> projectImages = ProjectImage.getUsedImageFilter(dto.getImages(), dto.getContent());
 
         // new 프로젝트 이미지 저장
         for(ProjectImage projectImage : projectImages){
@@ -165,18 +156,18 @@ public class ProjectServiceImpl implements ProjectService {
 
     private void updateProjectLinks(Project project, List<ProjectLinkRequestDto> linkDtos) {
         // 기존 프로젝트 링크 삭제
-        project.getProjectLinks().clear();
+        project.getLinks().clear();
 
         // new 프로젝트 링크 생성
-        List<ProjectLink> newProjectLinks = linkDtos.stream()
-                .map(newLink -> ProjectLink.builder()
+        List<Link> newLinks = linkDtos.stream()
+                .map(newLink -> Link.builder()
                         .linkType(newLink.getLinkType())
                         .url(newLink.getUrl())
                         .build())
                 .toList();
 
         // new 프로젝트 링크 저장
-        for(ProjectLink newLink : newProjectLinks){
+        for(Link newLink : newLinks){
             project.addProjectLink(newLink);
         }
     }
@@ -188,9 +179,10 @@ public class ProjectServiceImpl implements ProjectService {
         // new 프로젝트 맴버 조회
         List<String> memberIds = newMembers.stream()
                 .map(ProjectMemberRequestDto::getMemberId)
+                .filter(Objects::nonNull)
+                .distinct()
                 .toList();
 
-        // todo : 일치하는 데이터가 없거나 중복된 id가 존재하는 경우 이 로직은 잘못된 로직으로 수정이 필요.
         List<Member> members = memberRepository.findAllById(memberIds);
 
         for (int i = 0; i < newMembers.size(); i++) {
@@ -266,7 +258,7 @@ public class ProjectServiceImpl implements ProjectService {
                                 .postType(PostType.PROJECT.name())
                                 .category(project.getCategory().name())
                                 .title(project.getTitle())
-                                .links(project.getProjectLinks().stream().map(pl -> ProjectLinkResponseDto.builder().linkType(pl.getLinkType()).url(pl.getUrl()).build()).toList())
+                                .links(project.getLinks().stream().map(pl -> ProjectLinkResponseDto.builder().linkType(pl.getLinkType()).url(pl.getUrl()).build()).toList())
                                 .thumbnail(project.getThumbnail())
                                 .bannerContent(project.getBannerContent())
                                 .status(project.getStatus().name())
@@ -332,7 +324,8 @@ public class ProjectServiceImpl implements ProjectService {
                         .postType(PostType.PROJECT.name())
                         .category(project.getCategory().name())
                         .title(project.getTitle())
-                        .links(project.getProjectLinks().stream().map(pl -> ProjectLinkResponseDto.builder().linkType(pl.getLinkType()).url(pl.getUrl()).build()).toList())
+                        .content(project.getContent())
+                        .links(project.getLinks().stream().map(pl -> ProjectLinkResponseDto.builder().linkType(pl.getLinkType()).url(pl.getUrl()).build()).toList())
                         .thumbnail(project.getThumbnail())
                         .bannerContent(project.getBannerContent())
                         .status(project.getStatus().name())
@@ -370,7 +363,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
 
         // 프로젝트 링크 toDto
-        List<ProjectLinkResponseDto> links = project.getProjectLinks().stream()
+        List<ProjectLinkResponseDto> links = project.getLinks().stream()
                 .map(projectLink -> ProjectLinkResponseDto.builder()
                         .linkType(projectLink.getLinkType())
                         .url(projectLink.getUrl())

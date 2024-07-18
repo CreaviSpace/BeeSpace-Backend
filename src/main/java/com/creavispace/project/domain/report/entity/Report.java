@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 public class Report extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "report_id")
     private Long id;
 
     @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
@@ -48,5 +49,7 @@ public class Report extends BaseTimeEntity{
     @Column(nullable = false)
     private String content;
 
-    private Boolean status;
+    private Status status;
+
+    public enum Status{PENDING, APPROVED, DENIED}
 }

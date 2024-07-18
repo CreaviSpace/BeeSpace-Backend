@@ -14,6 +14,7 @@ public abstract class Post extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
+    @Column(name = "post_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -36,6 +37,7 @@ public abstract class Post extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String bannerContent;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     public enum Status {PUBLIC, PRIVATE, REPORT, DELETE}

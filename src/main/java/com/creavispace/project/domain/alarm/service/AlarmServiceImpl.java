@@ -97,14 +97,14 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Transactional
     @Override
-    public SuccessResponseDto<Integer> modifyAllAlarm(String memberId) {
+    public SuccessResponseDto<Void> modifyAllAlarm(String memberId) {
 
         List<Alarm> alarms = alarmRepository.findByMemberId(memberId);
         for (Alarm alarm : alarms) {
             alarm.changeStatus(Alarm.readStatus.READ);
         }
 
-        return new SuccessResponseDto<>(true, "알림 전체 읽음 처리가 완료되었습니다.", alarms.size());
+        return new SuccessResponseDto<>(true, "알림 전체 읽음 처리가 완료되었습니다.", null);
     }
 
     @Override

@@ -13,7 +13,7 @@ public interface AlarmService {
 
     public SuccessResponseDto<Long> modifyAlarm(String memberId, Long alarmId);
 
-    SuccessResponseDto<Integer> modifyAllAlarm(String memberId);
+    SuccessResponseDto<Void> modifyAllAlarm(String memberId);
 
     SuccessResponseDto<Void> deleteAlarm(String memberId, Long alarmId);
 
