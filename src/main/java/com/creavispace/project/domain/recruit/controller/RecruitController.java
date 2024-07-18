@@ -1,12 +1,12 @@
 package com.creavispace.project.domain.recruit.controller;
 
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.common.dto.type.RecruitCategory;
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
-import com.creavispace.project.domain.recruit.dto.response.*;
+import com.creavispace.project.domain.recruit.dto.response.DeadLineRecruitListReadResponseDto;
+import com.creavispace.project.domain.recruit.dto.response.RecruitListReadResponseDto;
+import com.creavispace.project.domain.recruit.dto.response.RecruitReadResponseDto;
+import com.creavispace.project.domain.recruit.entity.Recruit;
 import com.creavispace.project.domain.recruit.service.RecruitService;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class RecruitController {
 
     @PostMapping(CREATE_RECRUIT)
     @Operation(summary = "모집 게시글 생성")
-    public ResponseEntity<SuccessResponseDto<RecruitResponseDto>> createRecruit(
+    public ResponseEntity<SuccessResponseDto<Long>> createRecruit(
         @AuthenticationPrincipal String memberId,
         @RequestBody RecruitRequestDto requestBody
     ){
@@ -48,7 +48,7 @@ public class RecruitController {
 
     @PutMapping(MODIFY_RECRUIT)
     @Operation(summary = "모집 게시글 수정")
-    public ResponseEntity<SuccessResponseDto<RecruitResponseDto>> modifyRecruit(
+    public ResponseEntity<SuccessResponseDto<Long>> modifyRecruit(
         @AuthenticationPrincipal String memberId,
         @PathVariable("recruitId") Long recruitId, 
         @RequestBody RecruitRequestDto requestBody
@@ -59,7 +59,7 @@ public class RecruitController {
 
     @DeleteMapping(DELETE_RECRUIT)
     @Operation(summary = "모집 게시글 삭제")
-    public ResponseEntity<SuccessResponseDto<RecruitDeleteResponseDto>> deleteRecruit(
+    public ResponseEntity<SuccessResponseDto<Long>> deleteRecruit(
         @AuthenticationPrincipal String memberId,
         @PathVariable("recruitId") Long recruitId
     ){
@@ -70,15 +70,11 @@ public class RecruitController {
     @GetMapping(READ_RECRUIT_LIST)
     @Operation(summary = "모집 게시글 리스트")
     public ResponseEntity<SuccessResponseDto<List<RecruitListReadResponseDto>>> readRecruitList(
-        @ParameterObject @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
-        @RequestParam(value = "category", required = false) String category
+            @ParameterObject @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
+            @RequestParam(value = "category", required = false) Recruit.Category category
     ){
         log.info("/recruit/controller : 모집 게시글 리스트");
-        RecruitCategory recruitCategory = null;
-        if(category != null){
-            recruitCategory = CustomValueOf.valueOf(RecruitCategory.class, category, GlobalErrorCode.NOT_FOUND_RECRUIT_CATEGORY);
-        }
-        return ResponseEntity.ok().body(recruitService.readRecruitList(pageRequest, recruitCategory));
+        return ResponseEntity.ok().body(recruitService.readRecruitList(pageRequest, category));
     }
 
     @GetMapping(READ_RECRUIT)
@@ -89,7 +85,7 @@ public class RecruitController {
         HttpServletRequest request
     ){
         log.info("/recruit/controller : 모집 게시글 디테일");
-        return ResponseEntity.ok().body(recruitService.readRecruit(memberId, recruitId, request));
+        return ResponseEntity.ok().body(recruitService.readRecruit(memberId, recruitId));
     }
 
     @GetMapping(READ_DEADLINE_RECRUIT_LIST)

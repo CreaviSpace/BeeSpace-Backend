@@ -18,8 +18,13 @@ public class RecruitImage extends Image {
     @JoinColumn(name = "recruit_id")
     private Recruit recruit;
 
-    public RecruitImage(Recruit recruit, String url){
-        this.recruit = recruit;
+    public RecruitImage(String url){
         this.url = url;
     }
+    
+    public void setRecruit(Recruit recruit){
+        this.recruit = recruit;
+    }
+
+
 }

@@ -18,8 +18,9 @@ public class CommunityImage extends Image {
     @JoinColumn(name = "community_id")
     private Community community;
 
-    public CommunityImage(Community community, String url){
-        this.community = community;
+    public CommunityImage(String url){
         this.url = url;
     }
+
+    public void setCommunity(Community community){ this.community = community; }
 }

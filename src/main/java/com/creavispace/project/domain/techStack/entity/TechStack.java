@@ -18,4 +18,5 @@ public class TechStack extends BaseTimeEntity {
     private String techStack;
 
     private String iconUrl;
+
 }

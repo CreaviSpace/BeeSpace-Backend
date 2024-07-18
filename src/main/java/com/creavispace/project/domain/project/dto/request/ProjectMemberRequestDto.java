@@ -13,4 +13,5 @@ public class ProjectMemberRequestDto {
     private String memberId;
     // enum으로 관리 변경
     private String position;
+
 }

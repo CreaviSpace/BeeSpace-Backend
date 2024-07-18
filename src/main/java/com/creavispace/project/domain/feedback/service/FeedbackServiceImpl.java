@@ -1,43 +1,33 @@
 package com.creavispace.project.domain.feedback.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.creavispace.project.domain.member.Role;
-import org.springframework.stereotype.Service;
-
+import com.creavispace.project.common.post.entity.Post;
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.common.dto.type.QuestionType;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackAnswerCreateRequestDto;
 import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionCreateRequestDto;
-import com.creavispace.project.domain.feedback.dto.request.FeedbackQuestionModifyRequestDto;
 import com.creavispace.project.domain.feedback.dto.response.ChoiceItemResponseDto;
-import com.creavispace.project.domain.feedback.dto.response.ChoiceItemsAnalysisResponseDto;
 import com.creavispace.project.domain.feedback.dto.response.FeedbackAnalysisResponseDto;
-import com.creavispace.project.domain.feedback.dto.response.FeedbackAnswerCreateResponseDto;
 import com.creavispace.project.domain.feedback.dto.response.FeedbackQuestionResponseDto;
-import com.creavispace.project.domain.feedback.dto.response.ObjectiveFeedbackAnalysisResponseDto;
-import com.creavispace.project.domain.feedback.dto.response.SubjectiveFeedbackAnalysisResponseDto;
-import com.creavispace.project.domain.feedback.entity.ChoiceItem;
+import com.creavispace.project.domain.feedback.dto.response.OptionAnalysisDto;
 import com.creavispace.project.domain.feedback.entity.FeedbackAnswer;
 import com.creavispace.project.domain.feedback.entity.FeedbackQuestion;
-import com.creavispace.project.domain.feedback.entity.SelectedItem;
-import com.creavispace.project.domain.feedback.repository.ChoiceItemRepository;
+import com.creavispace.project.domain.feedback.entity.QuestionOption;
 import com.creavispace.project.domain.feedback.repository.FeedbackAnswerRepository;
 import com.creavispace.project.domain.feedback.repository.FeedbackQuestionRepository;
-import com.creavispace.project.domain.feedback.repository.SelectedItemRepository;
+import com.creavispace.project.domain.feedback.repository.QuestionOptionRepository;
+import com.creavispace.project.domain.member.entity.Role;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
 import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.project.repository.ProjectRepository;
-import com.creavispace.project.common.exception.CreaviCodeException;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -47,315 +37,156 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
     private final FeedbackQuestionRepository feedbackQuestionRepository;
-    private final ChoiceItemRepository choiceItemRepository;
     private final FeedbackAnswerRepository feedbackAnswerRepository;
-    private final SelectedItemRepository selectedItemRepository;
+    private final QuestionOptionRepository questionOptionRepository;
 
     @Override
     @Transactional
-    public SuccessResponseDto<List<FeedbackQuestionResponseDto>> createFeedbackQuestion(String memberId, Long projectId,
-            List<FeedbackQuestionCreateRequestDto> dtos) {
-        List<FeedbackQuestionResponseDto> data = null;
-        // JWT에 저장된 회원이 존재하는지
-        if(!memberRepository.existsById(memberId)) throw new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND);
+    public SuccessResponseDto<Long> createFeedbackQuestion(String memberId, Long projectId,
+                                                           FeedbackQuestionCreateRequestDto dto) {
+        // 프로젝트 엔티티 조회
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new NoSuchElementException("프로젝트 id(" + projectId + ")가 존재하지 않습니다."));
 
-        // 프로젝트가 존재하는지
-        Project project = projectRepository.findById(projectId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
-        
-        // 피드백 질문 생성 및 저장
-        List<FeedbackQuestion> feedbackQuestions = dtos.stream()
-            .map(dto -> {
-                // 질문 타입이 존재하는지
-                QuestionType questionType = CustomValueOf.valueOf(QuestionType.class, dto.getQuestionType(), GlobalErrorCode.NOT_FOUND_QUESTION_TYPE);
-                // 질문 생성
-                FeedbackQuestion feedbackQuestion = FeedbackQuestion.builder()
-                .project(project)
-                .question(dto.getQuestion())
-                .questionType(questionType)
-                .build();
-                // 질문 저장
-                feedbackQuestionRepository.save(feedbackQuestion);
+        // 피드백 질문 생성 권한 조회
+        if(!project.getMember().getId().equals(memberId)) throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
 
-                // 객관식 or 체크박스 타입인지
-                if(dto.getQuestionType().equals("OBJECTIVE") || dto.getQuestionType().equals("CHECKBOX")){
-                    // 선택지 생성
-                    List<ChoiceItem> choiceItems = dto.getChoiceItems().stream()
-                        .map(choiceItem -> ChoiceItem.builder()
-                            .feedbackQuestion(feedbackQuestion)
-                            .item(choiceItem)
-                            .build())
-                        .collect(Collectors.toList());
-                    // 선택지 저장
-                    choiceItemRepository.saveAll(choiceItems);
-                }
+        // 피드백 질문 생성
+        FeedbackQuestion feedbackQuestion = FeedbackQuestion.builder().questionText(dto.getQuestion()).questionType(dto.getQuestionType()).build();
+        for(String option : dto.getChoiceItems()){
+            // 피드백 질문 옵션 생성 및 저장
+            feedbackQuestion.addOption(QuestionOption.builder().optionText(option).build());
+        }
+        // 피드백 질문 저장
+        project.addFeedbackQuestion(feedbackQuestion);
 
-                return feedbackQuestion;
-            })
-            .collect(Collectors.toList());
-
-        project.feedbackTrue();
-        projectRepository.save(project);
-
-        // 피드백 질문 DTO
-        data = feedbackQuestions.stream()
-            .map(feedbackQuestion -> {
-                List<ChoiceItem> choiceItems = choiceItemRepository.findByFeedbackQuestionId(feedbackQuestion.getId());
-                
-                return FeedbackQuestionResponseDto.builder()
-                    .questionId(feedbackQuestion.getId())
-                    .question(feedbackQuestion.getQuestion())
-                    .questionType(feedbackQuestion.getQuestionType().name())
-                    .choiceItems(choiceItems.stream()
-                        .map(choiceItem -> ChoiceItemResponseDto.builder()
-                            .id(choiceItem.getId())
-                            .item(choiceItem.getItem())
-                            .build())
-                        .collect(Collectors.toList()))
-                    .build();
-                })
-            .collect(Collectors.toList());
-
-        log.info("/feedback/service : createFeedbackQuestion success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "피드백 질문 저장이 완료되었습니다.", data);
-
+        return new SuccessResponseDto<>(true, "해당 피드백 질문 저장이 완료되었습니다.", feedbackQuestion.getId());
     }
 
     @Override
     @Transactional
-    public SuccessResponseDto<List<FeedbackQuestionResponseDto>> modifyFeedbackQuestion(String memberId, Long projectId,
-            List<FeedbackQuestionModifyRequestDto> dtos) {
-        List<FeedbackQuestionResponseDto> data = null;
-        // JWT에 저장된 회원이 존재하는지
-        Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
+    public SuccessResponseDto<Long> deleteFeedbackQuestion(String memberId, Long projectId,
+            Long feedbackQuestionId) {
+        // 프로젝트 엔티티 조회
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new NoSuchElementException("프로젝트 id(" + projectId + ")가 존재하지 않습니다."));
 
-        // 프로젝트가 존재하는지
-        Project project = projectRepository.findById(projectId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+        // 삭제 권한 조회
+        if(!project.getMember().getId().equals(memberId)) throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
 
-        // 수정 권한이 있는지
-        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
-        }
+        // 피드백 질문 삭제
+        feedbackQuestionRepository.deleteById(feedbackQuestionId);
 
-        // 피드백 질문을 모두 삭제했다면
-        if(dtos == null || dtos.isEmpty()) {
-            feedbackQuestionRepository.deleteByProjectId(projectId);
-            project.feedbackFalse();
-            projectRepository.save(project);
-            return new SuccessResponseDto<>(true, "피드백 질문 추가/삭제 저장이 완료되었습니다.", new ArrayList<FeedbackQuestionResponseDto>());
-        }
-
-        // 수정할 피드백 질문 ID 그룹화
-        List<Long> modifyFeedbackQuestionIds = dtos.stream()
-            .filter(dto -> dto.getQuestionId() != null)
-            .map(dto -> dto.getQuestionId())
-            .collect(Collectors.toList());
-
-        // 일부 삭제된 피드백 질문 삭제
-        if(modifyFeedbackQuestionIds != null && !modifyFeedbackQuestionIds.isEmpty())
-            feedbackQuestionRepository.deleteByQuestionIds(modifyFeedbackQuestionIds);
-
-        // modify 피드백
-        List<FeedbackQuestion> feedbackQuestions = dtos.stream()
-            .map(dto-> {
-                // 기존에 있던 피드백인 경우 그대로 리턴
-                if(dto.getQuestionId() != null){
-                    return feedbackQuestionRepository.findById(dto.getQuestionId()).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.FEEDBACK_QUESTION_NOT_FOUND));
-                }
-                // 신규 피드백은 저장 후 리턴
-                else{
-                    // 피드백 질문 타입이 존재하는지
-                    QuestionType questionType = CustomValueOf.valueOf(QuestionType.class, dto.getQuestionType(), GlobalErrorCode.NOT_FOUND_QUESTION_TYPE);
-                    // 신규 피드백 저장
-                    FeedbackQuestion feedbackQuestion = FeedbackQuestion.builder()
-                    .project(project)
-                    .question(dto.getQuestion())
-                    .questionType(questionType)
-                    .build();
-                    // 신규 피드백 저장
-                    feedbackQuestionRepository.save(feedbackQuestion);
-    
-                    // 객관식 or 체크박스일 경우 선택지 저장
-                    if(dto.getQuestionType().equals("OBJECTIVE") || dto.getQuestionType().equals("CHECKBOX")){
-                        // 선택지 생성
-                        List<ChoiceItem> choiceItems = dto.getChoiceItems().stream()
-                            .map(choiceTiem -> ChoiceItem.builder()
-                                .feedbackQuestion(feedbackQuestion)
-                                .item(choiceTiem)
-                                .build())
-                            .collect(Collectors.toList());
-                        // 선택지 저장
-                        choiceItemRepository.saveAll(choiceItems);
-                    }
-                    return feedbackQuestion;
-                }
-            })
-            .collect(Collectors.toList());
-
-        project.feedbackTrue();
-        projectRepository.save(project);
-
-        // 피드백 질문 DTO
-        data = feedbackQuestions.stream()
-            .map(feedbackQuestion -> {
-                List<ChoiceItem> choiceItems = choiceItemRepository.findByFeedbackQuestionId(feedbackQuestion.getId());
-
-                return FeedbackQuestionResponseDto.builder()
-                    .questionId(feedbackQuestion.getId())
-                    .question(feedbackQuestion.getQuestion())
-                    .questionType(feedbackQuestion.getQuestionType().name())
-                    .choiceItems(choiceItems.stream()
-                        .map(choiceItem -> ChoiceItemResponseDto.builder()
-                            .id(choiceItem.getId())
-                            .item(choiceItem.getItem())
-                            .build())
-                        .collect(Collectors.toList()))
-                    .build();
-                })
-            .collect(Collectors.toList());
-
-        log.info("/feedback/service : modifyFeedbackQuestion success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "피드백 질문 추가/삭제 저장이 완료되었습니다.", data);
+        return new SuccessResponseDto<>(true, "해당 피드백 질문 삭제가 완료되었습니다.", feedbackQuestionId);
     }
 
     @Override
     public SuccessResponseDto<List<FeedbackQuestionResponseDto>> readFeedbackQuestion(Long projectId) {
         List<FeedbackQuestionResponseDto> data = null;
 
-        // 피드백 질문 리스트 가져오기
-        List<FeedbackQuestion> feedbackQuestions = feedbackQuestionRepository.findByProjectId(projectId);
+        // 프로젝트 엔티티 조회
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new NoSuchElementException("프로젝트 id(" + projectId + ")가 존재하지 않습니다."));
 
-        // 피드백 질문 리스트 DTO
+        // 공개된 프로젝트인지
+        if(!project.getStatus().equals(Post.Status.PUBLIC)) throw new CreaviCodeException(GlobalErrorCode.NOT_PUBLIC_CONTENT);
+
+        // 피드백 질문 조회
+        List<FeedbackQuestion> feedbackQuestions = project.getFeedbackQuestions();
+
+        // 조회 결과 toDto
         data = feedbackQuestions.stream()
-            .map(feedbackQuestion -> {
-                List<ChoiceItem> choiceItems = choiceItemRepository.findByFeedbackQuestionId(feedbackQuestion.getId());
-                return FeedbackQuestionResponseDto.builder()
-                .questionId(feedbackQuestion.getId())
-                .question(feedbackQuestion.getQuestion())
-                .questionType(feedbackQuestion.getQuestionType().name())
-                .choiceItems(choiceItems.stream()
-                    .map(choiceItem -> ChoiceItemResponseDto.builder()
-                        .id(choiceItem.getId())
-                        .item(choiceItem.getItem())
+                .map(feedbackQuestion -> FeedbackQuestionResponseDto.builder()
+                        .questionId(feedbackQuestion.getId())
+                        .question(feedbackQuestion.getQuestionText())
+                        .questionType(feedbackQuestion.getQuestionType().name())
+                        .choiceItems(feedbackQuestion.getOptions().stream()
+                                .map(option -> ChoiceItemResponseDto.builder()
+                                        .id(option.getId())
+                                        .item(option.getOptionText())
+                                        .build())
+                                .toList())
                         .build())
-                    .collect(Collectors.toList()))
-                .build();
-            })
-            .collect(Collectors.toList());
+                .toList();
 
-        log.info("/feedback/service : readFeedbackQuestion success data = {}", data);
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "피드백 질문 리스트 조회가 완료되었습니다.", data);
     }
 
     @Override
     @Transactional
-    public SuccessResponseDto<FeedbackAnswerCreateResponseDto> createFeedbackAnswer(
+    public SuccessResponseDto<Long> createFeedbackAnswer(
             String memberId, Long projectId, List<FeedbackAnswerCreateRequestDto> dtos) {
-        FeedbackAnswerCreateResponseDto data = null;
+        // 맴버 엔티티 조회
+        Member member = memberRepository.findById(memberId).orElseThrow(()-> new NoSuchElementException("로그인 회원 아이디가 존재하지 않습니다."));
 
-        // JWT에 저장된 회원이 존재하는지
-        Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
+        // 프로젝트 엔티티 조회
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new NoSuchElementException("프로젝트 id(" + projectId + ")가 존재하지 않습니다."));
 
-        // 피드백 답변이 있는지
-        if(dtos == null || dtos.isEmpty()) throw new CreaviCodeException(GlobalErrorCode.NOT_FEEDBACK_ANSWER_CONTENT);
-        
-        // 피드백 답변 저장
-        List<FeedbackAnswer> feedbackAnswers = dtos.stream()
-                .map(dto -> {
-                    // 존재하는 질문인지
-                    FeedbackQuestion feedbackQuestion = feedbackQuestionRepository.findById(dto.getQuestionId()).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.FEEDBACK_QUESTION_NOT_FOUND));
-                    // 답변 생성
-                    FeedbackAnswer feedbackAnswer = FeedbackAnswer.builder()
-                        .feedbackQuestion(feedbackQuestion)
-                        .member(member)
-                        .answer(dto.getAnswer())
-                        .build();
-                    // 답변 저장
-                    feedbackAnswerRepository.save(feedbackAnswer);
+        // 공개된 프로젝트인지
+        if(!project.getStatus().equals(Post.Status.PUBLIC)) throw new CreaviCodeException(GlobalErrorCode.NOT_PUBLIC_CONTENT);
 
-                    // 객관식이나 체크박스일 경우 선택지 답변 저장
-                    if(feedbackQuestion.getQuestionType().name().equals("OBJECTIVE") || feedbackQuestion.getQuestionType().name().equals("CHECKBOX")){
+        // 피드백 답변 생성, 저장
+        for (FeedbackAnswerCreateRequestDto dto : dtos) {
+            Long questionId = dto.getQuestionId();
+            // 피드백 질문 조회
+            FeedbackQuestion feedbackQuestion = feedbackQuestionRepository.findById(questionId).orElseThrow(() -> new NoSuchElementException("질문 id(" + questionId + ")가 존재하지 않습니다."));
 
-                        List<SelectedItem> selectedItems = dto.getSelectedItems().stream()
-                            .map(selectedItemDto -> {
-                                ChoiceItem choiceItem = choiceItemRepository.findByIdAndFeedbackQuestionId(selectedItemDto.getId(), dto.getQuestionId()).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.CHOICE_ITEM_NOT_FOUND));
+            // 피드백 답변 생성
+            List<FeedbackAnswer> feedbackAnswers = dto.getSelectedItems().stream()
+                    .map(choiceItemRequestDto -> {
+                        Long selectedOptionId = choiceItemRequestDto.getId();
+                        // 피드백 질문 옵션 조회
+                        QuestionOption questionOption = selectedOptionId == null ? null : questionOptionRepository.findById(selectedOptionId).orElseThrow(() -> new NoSuchElementException("질문 옵션 id(" + selectedOptionId + ")가 존재하지 않습니다."));
+                        return FeedbackAnswer.builder()
+                                .answerText(dto.getAnswer())
+                                .member(member)
+                                .selectedOption(questionOption)
+                                .build();
+                    })
+                    .toList();
+            // 피드백 답변 저장
+            for (FeedbackAnswer feedbackAnswer : feedbackAnswers) {
+                feedbackQuestion.addAnswer(feedbackAnswer);
+            }
+        }
 
-                                return SelectedItem.builder()
-                                    .feedbackAnswer(feedbackAnswer)
-                                    .choiceItem(choiceItem)
-                                    .build();
-                                })
-                            .collect(Collectors.toList());
-    
-                        selectedItemRepository.saveAll(selectedItems);
-                    }
-                        
-                    return feedbackAnswer;
-                })
-                .collect(Collectors.toList());
-
-        data = FeedbackAnswerCreateResponseDto.builder().projectId(projectId).build();
-
-        log.info("/feedback/service : createFeedbackAnswer success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "해당 프로젝트의 피드백 답변을 완료했습니다.", data);
+        return new SuccessResponseDto<>(true, "해당 프로젝트의 피드백 답변을 완료했습니다.", projectId);
     }
 
     @Override
     public SuccessResponseDto<List<FeedbackAnalysisResponseDto>> analysisFeedback(String memberId, Long projectId) {
         List<FeedbackAnalysisResponseDto> data = null;
-        // JWT에 저장된 회원이 존재하는지
-        Member member = memberRepository.findById(memberId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
 
-        // 프로젝트가 존재하는지
-        Project project = projectRepository.findById(projectId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+        // 맴버 엔티티 조회
+        Member member = memberRepository.findById(memberId).orElseThrow(()-> new NoSuchElementException("로그인 회원 아이디가 존재하지 않습니다."));
 
-        // 피드백 분석 조회 권한이 있는지
-        if(!memberId.equals(project.getMember().getId()) && !member.getRole().equals(Role.ADMIN)){
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
-        }
+        // 프로젝트 엔티티 조회
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new NoSuchElementException("프로젝트 id(" + projectId + ")가 존재하지 않습니다."));
 
-        // 피드백 질문 가져오기
-        List<FeedbackQuestion> feedbackQuestions = feedbackQuestionRepository.findByProjectId(projectId);
+        // 권한 조회
+        if(!project.getMember().getId().equals(memberId) && !member.getRole().equals(Role.ADMIN)) throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
 
-        // 피드백 질문이 없다면
-        if(feedbackQuestions == null || feedbackQuestions.isEmpty()) throw new CreaviCodeException(GlobalErrorCode.NOT_QUESTION_ANALYSIS_CONTENT);
-
-        // 피드백 분석 DTO
-        data = feedbackQuestions.stream()
-            .map(feedbackQuestion -> {
-                switch (feedbackQuestion.getQuestionType().name()) {
-                    case "OBJECTIVE", "CHECKBOX":
-                        return ObjectiveFeedbackAnalysisResponseDto.builder()
-                        .question(feedbackQuestion.getQuestion())
+        // 피드백 분석 결과
+        data = project.getFeedbackQuestions().stream().map(feedbackQuestion -> FeedbackAnalysisResponseDto.builder()
+                        .questionId(feedbackQuestion.getId())
+                        .questionText(feedbackQuestion.getQuestionText())
                         .questionType(feedbackQuestion.getQuestionType().name())
-                        .choiceItemsAnalysis(feedbackQuestion.getChoiceItems().stream()
-                            .map(choiceItem -> {
-                                return ChoiceItemsAnalysisResponseDto.builder()
-                                .choiceItem(choiceItem.getItem())
-                                .selectedCount(selectedItemRepository.countByChoiceItemId(choiceItem.getId()))
-                                .build();
-                            })
-                            .collect(Collectors.toList()))
-                        .build();
-                    case "SUBJECTIVE":
-                        List<FeedbackAnswer> feedbackAnswers = feedbackAnswerRepository.findByFeedbackQuestionId(feedbackQuestion.getId());
-                        return SubjectiveFeedbackAnalysisResponseDto.builder()
-                            .question(feedbackQuestion.getQuestion())
-                            .questionType(feedbackQuestion.getQuestionType().name())
-                            .answers(feedbackAnswers.stream()
-                                .map(feedbackAnswer -> feedbackAnswer.getAnswer())
-                                .collect(Collectors.toList()))
-                            .build();
-                    default:
-                        throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_QUESTION_TYPE);
-                }
-            })
-            .collect(Collectors.toList());
+                        .selectedOptions(feedbackQuestion.getOptions().stream()
+                                .map(questionOption -> {
+                                    // 해당 옵션의 선택된 수 조회
+                                    int count = feedbackAnswerRepository.countBySelectedOptionId(questionOption.getId());
+                                    return OptionAnalysisDto.builder()
+                                            .optionId(questionOption.getId())
+                                            .optionText(questionOption.getOptionText())
+                                            .selectedCount(count)
+                                            .build();
+                                })
+                                .toList())
+                        .answers(feedbackQuestion.getAnswers().stream().map(FeedbackAnswer::getAnswerText).toList())
+                        .build())
+                .toList();
 
-        log.info("/feedback/service : analysisFeedback success data = {}", data);
         // 성공 응답 반환
         return new SuccessResponseDto<>(true, "피드백 분석 조회가 완료되었습니다.", data);
 

@@ -1,23 +1,17 @@
 package com.creavispace.project.domain.recruit.entity;
 
-import com.creavispace.project.domain.bookmark.entity.RecruitBookmark;
-import com.creavispace.project.domain.comment.entity.RecruitComment;
-import com.creavispace.project.common.dto.type.RecruitCategory;
-import com.creavispace.project.common.dto.type.RecruitContactWay;
-import com.creavispace.project.common.dto.type.RecruitProceedWay;
-import com.creavispace.project.common.entity.BaseTimeEntity;
-import com.creavispace.project.common.Post;
+import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.common.post.entity.Post;
+import com.creavispace.project.common.utils.TimeUtil;
+import com.creavispace.project.domain.file.entity.RecruitImage;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.recruit.dto.request.RecruitRequestDto;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
-import com.creavispace.project.common.utils.TimeUtil;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,24 +20,16 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @JsonSerialize
-public class Recruit extends BaseTimeEntity implements Post {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+public class Recruit extends Post {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private RecruitCategory category;
+    private Category category;
 
     private int amount;
 
     @Enumerated(EnumType.STRING)
-    private RecruitProceedWay proceedWay;
+    private ProceedWay proceedWay;
 
     private int workDay;
 
@@ -51,56 +37,82 @@ public class Recruit extends BaseTimeEntity implements Post {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private RecruitContactWay contactWay;
+    private ContactWay contactWay;
 
     @Column(nullable = false)
     private String contact;
 
-    @Column(nullable = false)
-    private String title;
+    private RecruitmentStatus recruitmentStatus;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
+    @Builder.Default
+    @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecruitImage> recruitImages = new ArrayList<>();
 
-    @Column(nullable = false)
-    private Boolean status;
+    @Builder.Default
+    @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecruitTechStack> recruitTechStacks = new ArrayList<>();
 
-    private int viewCount;
+    @Builder.Default
+    @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecruitPosition> recruitPositions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "recruit")
-    @JsonBackReference
-    private List<RecruitPosition> positions;
+    public enum Category {PROJECT_RECRUIT, STUDY;}
+    public enum ProceedWay {ONLINE, OFFLINE, ON_OFFLINE;}
+    public enum ContactWay {OPENTALK, EMAIL, GOOGLE_FORM;}
+    public enum RecruitmentStatus {RECRUITING, COMPLETED}
+    //== 연관관계 메서드 ==//
 
-    @OneToMany(mappedBy = "recruit")
-    @JsonBackReference
-    private List<RecruitTechStack> techStacks;
+    public void addRecruitImage(RecruitImage recruitImage){
+        recruitImages.add(recruitImage);
+        recruitImage.setRecruit(this);
+    }
+    public void addRecruitTechStack(RecruitTechStack recruitTechStack){
+        recruitTechStacks.add(recruitTechStack);
+        recruitTechStack.setRecruit(this);
+    }
 
-    @OneToMany(mappedBy = "recruit")
-    @JsonBackReference
-    private List<RecruitComment> comments;
+    public void addRecruitPosition(RecruitPosition recruitPosition){
+        recruitPositions.add(recruitPosition);
+        recruitPosition.setRecruit(this);
+    }
 
-    @OneToMany(mappedBy = "recruit")
-    @JsonBackReference
-    private List<RecruitBookmark> bookmarks;
+    public static Recruit createRecruit(RecruitRequestDto dto, Member member, List<RecruitImage> recruitImages, List<RecruitTechStack> recruitTechStacks, List<RecruitPosition> recruitPositions) {
+        // 모집 생성
+        Recruit recruit = Recruit.builder()
+                .category(dto.getCategory())
+                .amount(dto.getAmount())
+                .proceedWay(dto.getProceedWay())
+                .workDay(dto.getWorkDay())
+                .end(TimeUtil.getRecruitEnd(dto.getEnd(), dto.getEndFormat()))
+                .contactWay(dto.getContactWay())
+                .contact(dto.getContact())
+                .build();
+        // 게시글 공통정보 추가
+        recruit.setup(PostType.RECRUIT, member, dto.getTitle(), dto.getContent(), null, null);
+        // 모집 이미지 추가
+        for(RecruitImage recruitImage : recruitImages){
+            recruit.addRecruitImage(recruitImage);
+        }
+        // 모집 포지션 추가
+        for(RecruitPosition recruitPosition : recruitPositions){
+            recruit.addRecruitPosition(recruitPosition);
+        }
+        // 모집 기술스택 추가
+        for(RecruitTechStack recruitTechStack : recruitTechStacks){
+            recruit.addRecruitTechStack(recruitTechStack);
+        }
+        return recruit;
+    }
 
-    public void modify(RecruitRequestDto dto){
-        this.category = CustomValueOf.valueOf(RecruitCategory.class, dto.getCategory(), GlobalErrorCode.NOT_FOUND_RECRUIT_CATEGORY);
+    public void update(RecruitRequestDto dto) {
+        this.changeTitleAndContentAndThumbnailAndBannerContent(dto.getTitle(), dto.getContent(),null,null);
+        this.category = dto.getCategory();
         this.amount = dto.getAmount();
         this.workDay = dto.getWorkDay();
         this.contact = dto.getContact();
-        this.contactWay = CustomValueOf.valueOf(RecruitContactWay.class, dto.getContactWay(), GlobalErrorCode.NOT_FOUND_RECRUIT_CONTACTWAY);
-        this.proceedWay = CustomValueOf.valueOf(RecruitProceedWay.class, dto.getProceedWay(), GlobalErrorCode.NOT_FOUND_RECRUIT_PROCEEDWAY);
+        this.contactWay = dto.getContactWay();
+        this.proceedWay = dto.getProceedWay();
         this.end = TimeUtil.getRecruitEnd(dto.getEnd(), dto.getEndFormat());
-        this.title = dto.getTitle();
-        this.content = dto.getContent();
     }
 
-    public boolean disable(){
-        this.status = !status;
-        return status;
-    }
-
-    public void plusViewCount(){
-        this.viewCount++;
-    }
 }

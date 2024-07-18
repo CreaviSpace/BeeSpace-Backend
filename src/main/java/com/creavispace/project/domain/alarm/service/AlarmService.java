@@ -11,9 +11,9 @@ public interface AlarmService {
 
     public SuccessResponseDto<List<AlarmResponseDto>> readAlarmList(String memberId);
 
-    public SuccessResponseDto<Void> modifyAlarm(String memberId, Long alarmId);
+    public SuccessResponseDto<Long> modifyAlarm(String memberId, Long alarmId);
 
-    SuccessResponseDto<Void> modifyAllAlarm(String memberId);
+    SuccessResponseDto<Integer> modifyAllAlarm(String memberId);
 
     SuccessResponseDto<Void> deleteAlarm(String memberId, Long alarmId);
 

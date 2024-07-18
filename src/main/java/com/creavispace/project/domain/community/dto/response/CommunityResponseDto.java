@@ -1,6 +1,5 @@
 package com.creavispace.project.domain.community.dto.response;
 
-import com.creavispace.project.domain.search.dto.response.SearchListReadResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommunityResponseDto implements SearchListReadResponseDto{
+public class CommunityResponseDto{
     private Long id;
     private String postType;
     private String category;

@@ -1,6 +1,5 @@
 package com.creavispace.project.domain.community.dto.response;
 
-import com.creavispace.project.common.DeleteResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommunityDeleteResponseDto extends DeleteResponseDto {
+public class CommunityDeleteResponseDto {
     private Long communityId;
     private String postType;
 }

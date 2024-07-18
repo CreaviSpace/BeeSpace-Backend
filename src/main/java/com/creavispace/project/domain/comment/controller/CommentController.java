@@ -1,14 +1,11 @@
 package com.creavispace.project.domain.comment.controller;
 
-import com.creavispace.project.domain.alarm.service.AlarmService;
-import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
-import com.creavispace.project.domain.comment.dto.response.CommentDeleteResponseDto;
-import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
-import com.creavispace.project.domain.comment.service.CommentService;
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.common.dto.type.PostType;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
+import com.creavispace.project.domain.alarm.service.AlarmService;
+import com.creavispace.project.domain.comment.dto.request.CommentRequestDto;
+import com.creavispace.project.domain.comment.dto.response.CommentResponseDto;
+import com.creavispace.project.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +33,10 @@ public class CommentController {
     @Operation(summary = "댓글 리스트 조회")
     public ResponseEntity<SuccessResponseDto<List<CommentResponseDto>>> readCommentList(
         @RequestParam("postId") Long postId,
-        @RequestParam("postType") String postType
+        @RequestParam("postType") PostType postType
     ){
         log.info("/comment/controller : 댓글 리스트 조회");
-        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
-        return ResponseEntity.ok().body(commentService.readCommentList(postId, postTypeEnum));
+        return ResponseEntity.ok().body(commentService.readCommentList(postId, postType));
     }
 
     @PostMapping(CREATE_COMMENT)
@@ -48,13 +44,12 @@ public class CommentController {
     public ResponseEntity<SuccessResponseDto<CommentResponseDto>> createComment(
         @AuthenticationPrincipal String memberId,
         @RequestParam("postId") Long postId,
-        @RequestParam("postType") String postType,
+        @RequestParam("postType") PostType postType,
         @RequestBody CommentRequestDto requestBody
     ) {
         log.info("/comment/controller : 댓글 등록");
-        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
-        SuccessResponseDto<CommentResponseDto> response = commentService.createComment(memberId, postId, postTypeEnum, requestBody);
-        alarmService.createAlarm(memberId,"댓글", postTypeEnum, postId);
+        SuccessResponseDto<CommentResponseDto> response = commentService.createComment(memberId, postId, postType, requestBody);
+        alarmService.createAlarm(memberId,"댓글", postType, postId);
         return ResponseEntity.ok().body(response);
     }
 
@@ -63,24 +58,22 @@ public class CommentController {
     public ResponseEntity<SuccessResponseDto<CommentResponseDto>> modifyComment(
         @AuthenticationPrincipal String memberId,
         @PathVariable("commentId") Long commentId,
-        @RequestParam("postType") String postType,
+        @RequestParam("postType") PostType postType,
         @RequestBody CommentRequestDto requestBody
     ) {
         log.info("/comment/controller : 댓글 수정");
-        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
-        return ResponseEntity.ok().body(commentService.modifyComment(memberId, commentId, postTypeEnum, requestBody));
+        return ResponseEntity.ok().body(commentService.modifyComment(memberId, commentId, postType, requestBody));
     }
 
     @DeleteMapping(DELETE_COMMENT)
     @Operation(summary = "댓글 삭제")
-    public ResponseEntity<SuccessResponseDto<CommentDeleteResponseDto>> deleteComment(
+    public ResponseEntity<SuccessResponseDto<Long>> deleteComment(
         @AuthenticationPrincipal String memberId,
         @PathVariable("commentId") Long commentId,
-        @RequestParam("postType") String postType
+        @RequestParam("postType") PostType postType
     ){
         log.info("/comment/controller : 댓글 삭제");
-        PostType postTypeEnum = CustomValueOf.valueOf(PostType.class, postType, GlobalErrorCode.NOT_FOUND_POST_TYPE);
-        return ResponseEntity.ok().body(commentService.deleteComment(memberId, commentId, postTypeEnum));
+        return ResponseEntity.ok().body(commentService.deleteComment(memberId, commentId, postType));
     }
 
 }

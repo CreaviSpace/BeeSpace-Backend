@@ -6,8 +6,6 @@ import com.creavispace.project.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
-import static com.creavispace.project.domain.alarm.entity.Alarm.readStatus.READ;
-
 @Getter
 @Builder
 @Entity
@@ -34,8 +32,8 @@ public class Alarm extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private readStatus readStatus;
 
-    public void updateViewed() {
-        this.readStatus = READ;
+    public void changeStatus(readStatus status) {
+        this.readStatus = status;
     }
     public enum readStatus {READ, UNREAD}
 

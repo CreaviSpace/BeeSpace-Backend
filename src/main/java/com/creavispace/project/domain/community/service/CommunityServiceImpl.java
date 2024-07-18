@@ -1,51 +1,33 @@
 package com.creavispace.project.domain.community.service;
 
-import com.creavispace.project.domain.admin.dto.DailySummary;
-import com.creavispace.project.domain.admin.dto.MonthlySummary;
-import com.creavispace.project.domain.admin.dto.YearlySummary;
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.common.dto.type.CommunityCategory;
 import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.common.exception.CreaviCodeException;
+import com.creavispace.project.common.exception.GlobalErrorCode;
+import com.creavispace.project.common.post.entity.Post;
 import com.creavispace.project.domain.community.dto.request.CommunityRequestDto;
-import com.creavispace.project.domain.community.dto.response.CommunityDeleteResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityHashTagDto;
 import com.creavispace.project.domain.community.dto.response.CommunityReadResponseDto;
 import com.creavispace.project.domain.community.dto.response.CommunityResponseDto;
 import com.creavispace.project.domain.community.entity.Community;
+import com.creavispace.project.domain.community.entity.CommunityCategory;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.file.entity.CommunityImage;
 import com.creavispace.project.domain.file.entity.Image;
-import com.creavispace.project.domain.file.repository.CommunityImageRepository;
-import com.creavispace.project.domain.file.service.FileService;
+import com.creavispace.project.domain.file.service.ImageManager;
 import com.creavispace.project.domain.hashTag.entity.CommunityHashTag;
-import com.creavispace.project.domain.hashTag.entity.HashTag;
-import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
-import com.creavispace.project.domain.hashTag.repository.HashTagRepository;
-import com.creavispace.project.domain.member.Role;
 import com.creavispace.project.domain.member.entity.Member;
+import com.creavispace.project.domain.member.entity.Role;
 import com.creavispace.project.domain.member.repository.MemberRepository;
-import com.creavispace.project.common.exception.CreaviCodeException;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
-import com.creavispace.project.common.utils.UsableConst;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -54,269 +36,132 @@ public class CommunityServiceImpl implements CommunityService {
 
     private final MemberRepository memberRepository;
     private final CommunityRepository communityRepository;
-    private final HashTagRepository hashTagRepository;
-    private final CommunityHashTagRepository communityHashTagRepository;
-    private final CommunityImageRepository communityImageRepository;
-    private final FileService fileService;
+    private final ImageManager imageManager;
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommunityResponseDto> createCommunity(String memberId, CommunityRequestDto dto) {
-        CommunityResponseDto data = null;
-        // JWT에 저장된 회원이 존재하는지
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
-
-        CommunityCategory category = CustomValueOf.valueOf(CommunityCategory.class, dto.getCategory(),
-                GlobalErrorCode.NOT_FOUND_COMMUNITY_CATEGORY);
-
-        // 커뮤니티 게시글 생성
-        Community community = Community.builder()
-                .member(member)
-                .category(category)
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .viewCount(0)
-                .status(Boolean.TRUE)
-                .build();
-
+    public SuccessResponseDto<Long> createCommunity(String memberId, CommunityRequestDto dto) {
+        // 맴버 엔티티 조회
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("로그인 회원 아이디가 존재하지 않습니다."));
+        // 커뮤니티 이미지 필터(게시글에 사용되지 않는 이미지 삭제)
+        List<String> filteredImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
+        // 커뮤니티 이미지 생성
+        List<CommunityImage> communityImages = filteredImages.stream()
+                .map(CommunityImage::new)
+                .toList();
+        // 커뮤니티 해시태그 생성
+        List<CommunityHashTag> communityHashTags = dto.getHashTags().stream()
+                .map(hashTag -> CommunityHashTag.builder().hashTag(hashTag).build())
+                .toList();
+        // 커뮤니티 생성
+        Community community = Community.createCommunity(dto, member, communityImages, communityHashTags);
         // 커뮤니티 게시글 저장
         communityRepository.save(community);
-
-        List<String> images = dto.getImages();
-
-        if (images != null && !images.isEmpty()) {
-            List<String> contentImages = new ArrayList<>();
-
-            Document doc = Jsoup.parse(dto.getContent());
-            Elements imageElements = doc.select("img");
-
-            for (Element imageElement : imageElements) {
-                String imageUrl = imageElement.attr("src");
-                contentImages.add(imageUrl);
-            }
-
-            List<String> deletedImg = new ArrayList<>(images);
-            deletedImg.removeAll(contentImages);
-
-            fileService.deleteImages(deletedImg);
-
-            List<String> saveImg = new ArrayList<>(images);
-            saveImg.removeAll(deletedImg);
-
-            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community, img)).toList();
-
-            communityImageRepository.saveAll(saveProjectImages);
-        }
-
-        dto.getHashTags()
-                .forEach(hashTagDto -> {
-                    HashTag hashTag = hashTagRepository.findByHashTag(hashTagDto).orElse(HashTag.builder().hashTag(hashTagDto).build());
-                    hashTag.plusUsageCount();
-                    hashTagRepository.save(hashTag);
-
-                    CommunityHashTag communityHashTag = CommunityHashTag.builder().community(community).hashTag(hashTag).build();
-                    communityHashTagRepository.save(communityHashTag);
-                });
-
-        // 저장한 커뮤니티 해시태그 정보 가져오기
-        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityId(community.getId());
-
-        // 가져온 커뮤니티 해시태그 정보 DTO 변환
-        List<CommunityHashTagDto> communityHashTagDtos = communityHashTags.stream()
-                .map(communityHashTag -> CommunityHashTagDto.builder()
-                        .hashTag(communityHashTag.getHashTag().getHashTag())
-                        .build())
-                .collect(Collectors.toList());
-
-        List<CommunityImage> communityImages = communityImageRepository.findByCommunityId(community.getId());
-
-        // 커뮤니티 게시글 생성 DTO
-        data = CommunityResponseDto.builder()
-                .id(community.getId())
-                .postType(PostType.COMMUNITY.name())
-                .category(community.getCategory().name())
-                .memberId(community.getMember().getId())
-                .memberNickName(community.getMember().getMemberNickname())
-                .memberProfile(community.getMember().getProfileUrl())
-                .viewCount(community.getViewCount())
-                .createdDate(community.getCreatedDate())
-                .modifiedDate(community.getModifiedDate())
-                .title(community.getTitle())
-                .content(community.getContent())
-                .hashTags(communityHashTagDtos)
-                .images(communityImages.stream().map(Image::getUrl).toList())
-                .build();
-
-        log.info("/community/service : createCommunity success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 생성이 완료되었습니다.", data);
-
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 생성이 완료되었습니다.", community.getId());
     }
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommunityResponseDto> modifyCommunity(String memberId, Long communityId,
-                                                                    CommunityRequestDto dto) {
+    public SuccessResponseDto<Long> modifyCommunity(String memberId, Long communityId,
+                                                    CommunityRequestDto dto) {
+        // 커뮤니티 엔티티 조회
+        Community community = communityRepository.findById(communityId).orElseThrow(()-> new NoSuchElementException("커뮤니티 id("+communityId+")가 존재하지 않습니다."));
 
-        CommunityResponseDto data = null;
-
-        // 수정할 커뮤니티 게시글이 존재하는지
-        Community community = communityRepository.findByIdAndMemberId(communityId, memberId)
-                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION));
-
-        // 커뮤니티 게시글 수정 및 저장
-        community.modify(dto);
-        communityRepository.save(community);
-
-        List<String> images = dto.getImages();
-
-        if (images != null && !images.isEmpty()) {
-            List<String> contentImages = new ArrayList<>();
-
-            Document doc = Jsoup.parse(dto.getContent());
-            Elements imageElements = doc.select("img");
-
-            for (Element imageElement : imageElements) {
-                String imageUrl = imageElement.attr("src");
-                contentImages.add(imageUrl);
-            }
-
-            List<String> deletedImg = new ArrayList<>(images);
-            deletedImg.removeAll(contentImages);
-
-            fileService.deleteImages(deletedImg);
-
-            List<String> saveImg = new ArrayList<>(images);
-            saveImg.removeAll(deletedImg);
-
-            List<CommunityImage> saveProjectImages = saveImg.stream().map(img -> new CommunityImage(community, img)).toList();
-
-            communityImageRepository.deleteByCommunityId(communityId);
-            communityImageRepository.saveAll(saveProjectImages);
-
-        }
-
-        // 기존 커뮤니티 해시태그 삭제
-        communityHashTagRepository.deleteByCommunityId(communityId);
-
-        List<CommunityHashTag> communityHashTags = dto.getHashTags().stream()
-                .map(hashTagDto -> {
-                    HashTag hashTag = hashTagRepository.findByHashTag(hashTagDto).orElse(HashTag.builder().hashTag(hashTagDto).build());
-                    hashTagRepository.save(hashTag);
-
-                    return CommunityHashTag.builder()
-                            .community(community)
-                            .hashTag(hashTag)
-                            .build();
-                }).toList();
-
-        // 수정 DTO의 해시태그 정보 저장
-        communityHashTagRepository.saveAll(communityHashTags);
-
-        // 가져온 커뮤니티 해시태그 정보를 DTO 변환
-        List<CommunityHashTagDto> hashTags = communityHashTags.stream()
-                .map(communityHashTag -> CommunityHashTagDto.builder()
-                        .hashTag(communityHashTag.getHashTag().getHashTag())
-                        .build())
-                .collect(Collectors.toList());
-
-        List<CommunityImage> communityImages = communityImageRepository.findByCommunityId(communityId);
-
-        // 커뮤니티 수정 DTO
-        data = CommunityResponseDto.builder()
-                .id(community.getId())
-                .postType(PostType.COMMUNITY.name())
-                .category(community.getCategory().name())
-                .memberId(community.getMember().getId())
-                .memberNickName(community.getMember().getMemberNickname())
-                .memberProfile(community.getMember().getProfileUrl())
-                .viewCount(community.getViewCount())
-                .createdDate(community.getCreatedDate())
-                .modifiedDate(community.getModifiedDate())
-                .title(community.getTitle())
-                .content(community.getContent())
-                .hashTags(hashTags)
-                .images(communityImages.stream().map(Image::getUrl).toList())
-                .build();
-
-        log.info("/community/service : modifyCommunity success data = {}", data);
-        // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 수정이 완료되었습니다.", data);
-
-    }
-
-    @Override
-    @Transactional
-    public SuccessResponseDto<CommunityDeleteResponseDto> deleteCommunity(String memberId, Long communityId) {
-        CommunityDeleteResponseDto data = null;
-
-        // JWT에 저장된 회원이 존재하는지
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
-
-        // 삭제할 커뮤니티 게시글이 존재하는지
-        Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
-
-        // 삭제할 권한이 있는지
-        if (!memberId.equals(community.getMember().getId()) && !member.getRole().equals(Role.ADMIN)) {
+        // 수정 권한 조회
+        if(!community.getMember().getId().equals(memberId))
             throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
-        }
 
-        // 커뮤니티 비활성화 및 저장
-        boolean toggle = community.disable();
-        communityRepository.save(community);
+        // 커뮤니티 업데이트
+        community.update(dto);
 
-        // 커뮤니티 삭제 결과 DTO변환
-        data = CommunityDeleteResponseDto.builder()
-                .communityId(community.getId())
-                .postType(PostType.COMMUNITY.name())
-                .build();
+        // 커뮤니티 해시태그 업데이트
+        updateCommunityHashTag(community, dto.getHashTags());
 
-        log.info("/community/service : deleteCommunity success data = {}", data);
+        // 커뮤니티 이미지 필터(게시글에 사용되지 않는 이미지 삭제)
+        List<String> filteredNewImages = imageManager.deleteUnusedImagesAndFilterUsedImages(dto.getImages(), dto.getContent());
+
+        // 커뮤니티 이미지 업데이트
+        updateCommunityImages(community, filteredNewImages);
 
         // 성공 응답 반환
-        if (toggle) {
-            return new SuccessResponseDto<>(true, "커뮤니티 게시글 복구가 완료되었습니다.", data);
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 수정이 완료되었습니다.", communityId);
+
+    }
+
+    private void updateCommunityImages(Community community, List<String> newImages) {
+        // 기존 커뮤니티 이미지 삭제
+        community.getCommunityImages().clear();
+
+        // new 커뮤니티 이미지 생성
+        List<CommunityImage> communityImages = newImages.stream()
+                .map(CommunityImage::new)
+                .toList();
+
+        // new 커뮤니티 이미지 저장
+        for (CommunityImage communityImage : communityImages) {
+            community.addCommunityImages(communityImage);
         }
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 삭제가 완료되었습니다.", data);
+    }
+
+    private void updateCommunityHashTag(Community community, List<String> hashTags) {
+        // 기존 커뮤니티 해시태그 삭제
+        community.getCommunityHashTags().clear();
+
+        // new 커뮤니티 해시태그 생성
+        List<CommunityHashTag> newCommunityHashTags = hashTags.stream()
+                .map(newHashTag -> CommunityHashTag.builder().hashTag(newHashTag).build())
+                .toList();
+
+        // new 커뮤니티 해시태그 저장
+        for(CommunityHashTag newHashTag : newCommunityHashTags){
+            community.addCommunityHashTag(newHashTag);
+        }
     }
 
     @Override
     @Transactional
-    public SuccessResponseDto<CommunityReadResponseDto> readCommunity(String memberId, Long communityId,
-                                                                      HttpServletRequest request) {
+    public SuccessResponseDto<Long> deleteCommunity(String memberId, Long communityId) {
+        // 커뮤니티 엔티티 조회
+        Community community = communityRepository.findById(communityId).orElseThrow(() -> new NoSuchElementException("커뮤니티 id(" + communityId + ")가 존재하지 않습니다."));
+
+        // 삭제 권한 조회
+        Member member = community.getMember();
+        if(!member.getId().equals(memberId) && !member.getRole().equals(Role.ADMIN))
+            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
+
+        // 커뮤니티 상태 변경(DELETE)
+        community.changeStatus(Post.Status.DELETE);
+
+        // 성공 응답 반환
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 삭제가 완료되었습니다.", communityId);
+    }
+
+    @Override
+    @Transactional
+    public SuccessResponseDto<CommunityReadResponseDto> readCommunity(String memberId, Long communityId) {
         CommunityReadResponseDto data = null;
 
-        Community community = communityRepository.findById(communityId).orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND));
-        if (!community.isStatus() && !community.getMember().getId().equals(memberId)) {
+        // 맴버 엔티티 조회
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NoSuchElementException("로그인 회원 아이디가 존재하지 않습니다."));
+
+        // 커뮤니티 엔티티 조회
+        Community community = communityRepository.findById(communityId).orElseThrow(() -> new NoSuchElementException("커뮤니티 id(" + communityId + ")가 존재하지 않습니다."));
+
+        // 권한 조회
+        if (!community.getStatus().equals(Post.Status.PUBLIC) && !community.getMember().getId().equals(memberId) && !member.getRole().equals(Role.ADMIN)) {
             throw new CreaviCodeException(GlobalErrorCode.COMMUNITY_NOT_FOUND);
         }
 
-        // 조회수 증가
-        String communityViewLogHeader = request.getHeader("communityViewLog");
-        // 헤더에 communityViewLog 값이 없으면
-        if (communityViewLogHeader == null) {
-            community.plusViewCount();
-            communityRepository.save(community);
-            communityViewLogHeader = "[" + communityId + "]";
-        }
-        // 헤더에 communityViewLog 값이 있으면
-        else {
-            // 조회한적이 없는 커뮤니티일 경우
-            if (!communityViewLogHeader.contains("[" + communityId + "]")) {
-                community.plusViewCount();
-                communityRepository.save(community);
-                communityViewLogHeader += "_[" + communityId + "]";
-            }
-        }
+        // 커뮤니티 엔티티 toDto
+        data = toCommunityReadResponseDto(community);
 
-        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityId(communityId);
-        List<CommunityImage> communityImages = communityImageRepository.findByCommunityId(communityId);
+        // 성공 응답 반환
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 디테일 조회가 완료되었습니다.", data);
+    }
 
-        // 커뮤니티 디테일 DTO변환
-        data = CommunityReadResponseDto.builder()
+    private CommunityReadResponseDto toCommunityReadResponseDto(Community community) {
+        return CommunityReadResponseDto.builder()
                 .id(community.getId())
                 .postType(PostType.COMMUNITY.name())
                 .category(community.getCategory().name())
@@ -328,203 +173,100 @@ public class CommunityServiceImpl implements CommunityService {
                 .modifiedDate(community.getModifiedDate())
                 .title(community.getTitle())
                 .content(community.getContent())
-                .hashTags(communityHashTags.stream()
+                .hashTags(community.getCommunityHashTags().stream()
                         .map(hashTag -> CommunityHashTagDto.builder()
-                                .hashTag(hashTag.getHashTag().getHashTag())
+                                .hashTag(hashTag.getHashTag())
                                 .build())
-                        .collect(Collectors.toList()))
-                .communityViewLog(communityViewLogHeader)
-                .images(communityImages.stream().map(Image::getUrl).toList())
+                        .toList())
+                .images(community.getCommunityImages().stream().map(Image::getUrl).toList())
                 .build();
-
-        log.info("/community/service : readCommunity success data = {}", data);
-        // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 디테일 조회가 완료되었습니다.", data);
     }
 
     @Override
     public SuccessResponseDto<List<CommunityResponseDto>> readCommunityList(CommunityCategory category, String hashTag, Pageable pageRequest) {
         List<CommunityResponseDto> data = null;
-        Page<Community> pageable;
 
-        String categoryStr = category == null ? null : category.name();
-        try {
-            pageable = communityRepository.findByCategoryAndHashTagAndStatusTrue(categoryStr, hashTag, pageRequest);
-        } catch (InvalidDataAccessResourceUsageException e) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_FOUND_SORT_INVALID_DATA);
-        }
+        // 커뮤니티 엔티티 조회
+        Page<Community> pageable = communityRepository.findByStatusAndCategory(Post.Status.PUBLIC, category, pageRequest);
 
-        // 조건에 맞는 커뮤니티 게시글이 존재하는지
-        if (!pageable.hasContent()) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_COMMUNITY_CONTENT);
-        }
-        List<Community> communities = pageable.getContent();
+        // 결과값이 없으면 204 반환
+        if(!pageable.hasContent()) throw new CreaviCodeException(GlobalErrorCode.NOT_COMMUNITY_CONTENT);
 
-        // 조건에 맞는 게시글 리스트 DTO 변환
-        data = buildDto(communities);
-
-        log.info("/community/service : readCommunityList success data = {}", data);
-        // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
-
-    }
-
-    @Override
-    public SuccessResponseDto<List<CommunityResponseDto>> readCommunityListForAdmin(
-            Integer size, Integer page, String status, String sortType) {
-        System.out.println("CommunityServiceImpl.readCommunityListForAdmin");
-
-        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
-        Page<Community> pageable = getCommunity(status, pageRequest);
-
-        if (!pageable.hasContent()) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_COMMUNITY_CONTENT);
-        }
-
-        List<Community> communities = pageable.getContent();
-        List<CommunityResponseDto> data = buildDto(communities);
-
-        log.info("/community/service : readCommunityList success data = {}", data);
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
-    }
-
-    @Override
-    public SuccessResponseDto<List<MonthlySummary>> countMonthlySummary(int year) {
-        return new SuccessResponseDto(true, "월별 커뮤니티 게시물 통계 조회 완료", communityRepository.countMonthlySummary(year));
-    }
-
-    @Override
-    public SuccessResponseDto<List<YearlySummary>> countYearlySummary() {
-        return new SuccessResponseDto(true, "연간 커뮤니티 게시물 통계 조회 완료", communityRepository.countYearlySummary());
-    }
-
-    @Override
-    public SuccessResponseDto<List<DailySummary>> countDailySummary(int year, int month) {
-        return new SuccessResponseDto(true, "일간 커뮤니티 게시물 통계 조회 완료", communityRepository.countDailySummary(year, month));
-    }
-
-    @Override
-    public SuccessResponseDto<CommunityDeleteResponseDto> deleteMemberCommunity(String memberId) {
-        CommunityDeleteResponseDto data = null;
-
-        // JWT에 저장된 회원이 존재하는지
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CreaviCodeException(GlobalErrorCode.MEMBER_NOT_FOUND));
-
-        // 삭제할 커뮤니티 게시글이 존재하는지
-        List<Community> community = communityRepository.findByMemberId(memberId);
-        boolean toggle = member.isExpired();
-        // 삭제할 권한이 있는지
-        if (!memberId.equals(member.getId()) && !member.getRole().equals(Role.ADMIN)) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_PERMISSMISSION);
-        }
-
-        community.stream().map(Community::disable);
-
-        // 커뮤니티 비활성화 및 저장
-        communityRepository.saveAll(community);
-
-        // 커뮤니티 삭제 결과 DTO변환
-        data = CommunityDeleteResponseDto.builder()
-                .communityId(9999L)
-                .postType(PostType.COMMUNITY.name())
-                .build();
-
-        log.info("/community/service : deleteCommunity success data = {}", data);
-
-        // 성공 응답 반환
-        if (toggle) {
-            return new SuccessResponseDto<>(true, "커뮤니티 게시글 복구가 완료되었습니다.", data);
-        }
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 삭제가 완료되었습니다.", data);
-
-    }
-
-    @Override
-    public SuccessResponseDto<List<CommunityResponseDto>> readMyCommunityList(
-            String memberId, Integer size, Integer page, String sortType) {
-        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
-        Page<Community> pageable = getCommunities(memberId, pageRequest);
-
-        // 조건에 맞는 커뮤니티 게시글이 존재하는지
-        if (!pageable.hasContent()) {
-            throw new CreaviCodeException(GlobalErrorCode.NOT_COMMUNITY_CONTENT);
-        }
-
-        List<Community> communities = pageable.getContent();
-        List<CommunityResponseDto> data = buildDto(communities);
-
-        // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
-
-    }
-
-    private Page<Community> getCommunities(String memberId, Pageable pageRequest) {
-        Page<Community> pageable;
-        pageable = communityRepository.findByMemberIdAndStatusTrue(memberId, pageRequest);
-        return pageable;
-    }
-
-    private Page<Community> getCommunity(String status, Pageable pageRequest) {
-        if (status.equalsIgnoreCase("true")) {
-            return communityRepository.findAllByStatusTrue(pageRequest);
-        }
-        if (status.equalsIgnoreCase("false")) {
-            return communityRepository.findByStatusFalse(pageRequest);
-        }
-        if (status.equalsIgnoreCase("all")) {
-            return communityRepository.findAll(pageRequest);
-        }
-        return communityRepository.findAll(pageRequest);
-    }
-
-    private Map<Long, List<CommunityHashTagDto>> hashTags(List<CommunityHashTag> communityHashTags) {
-        System.out.println("CommunityServiceImpl.hashTags");
-        Map<Long, List<CommunityHashTagDto>> hashTags = new HashMap<>();
-        List<String> collect = communityHashTags.stream().map(hashTag -> hashTag.getHashTag().getHashTag()).distinct()
-                .toList();
-        hashTagRepository.findByHashTagIn(collect);
-        for (int i = 0; i < communityHashTags.size(); i++) {
-            CommunityHashTag communityHashTag = communityHashTags.get(i);
-            List<CommunityHashTagDto> hashTag = hashTags.getOrDefault(communityHashTag.getCommunity().getId(),
-                    new ArrayList<>());
-            CommunityHashTagDto communityHashTagDto = CommunityHashTagDto.builder()
-                    .hashTag(communityHashTag.getHashTag().getHashTag())
-                    .build();
-            hashTag.add(communityHashTagDto);
-            hashTags.put(communityHashTag.getCommunity().getId(), hashTag);
-        }
-        return hashTags;
-    }
-
-    private List<CommunityResponseDto> buildDto(
-            List<Community> communities) {
-        System.out.println("CommunityServiceImpl.buildDto");
-        List<Long> communityIds = communities.stream().map(Community::getId).toList();
-        List<CommunityHashTag> communityHashTags = communityHashTagRepository.findByCommunityIdIn(communityIds);
-        List<String> collect = communities.stream().map(community -> community.getMember().getId())
-                .toList();
-
-        memberRepository.findByIdIn(collect);
-        Map<Long, List<CommunityHashTagDto>> hashTags = hashTags(communityHashTags);
-
-        return communities.stream()
+        // 커뮤니티 리스트 결과 toDto
+        data = pageable.getContent().stream()
                 .map(community -> CommunityResponseDto.builder()
                         .id(community.getId())
-                        .memberProfile(community.getMember().getProfileUrl())
-                        .memberNickName(community.getMember().getMemberNickname())
                         .postType(PostType.COMMUNITY.name())
                         .category(community.getCategory().name())
                         .memberId(community.getMember().getId())
+                        .memberNickName(community.getMember().getMemberNickname())
+                        .memberProfile(community.getMember().getProfileUrl())
                         .viewCount(community.getViewCount())
                         .createdDate(community.getCreatedDate())
                         .modifiedDate(community.getModifiedDate())
                         .title(community.getTitle())
                         .content(community.getContent())
-                        .hashTags(hashTags.get(community.getId()))
+                        .hashTags(community.getCommunityHashTags().stream()
+                                .map(communityHashTag -> CommunityHashTagDto.builder().hashTag(communityHashTag.getHashTag()).build())
+                                .toList())
+                        .images(community.getCommunityImages().stream()
+                                .map(Image::getUrl)
+                                .toList())
+                        .build())
+                .toList();
+
+        // 성공 응답 반환
+        return new SuccessResponseDto<>(true, "커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
+
+    }
+
+    @Override
+    public SuccessResponseDto<List<CommunityResponseDto>> mypageCommunityList(Pageable pageable, CommunityCategory category, String memberId, String memberId_param) {
+        List<CommunityResponseDto> data = null;
+
+        Page<Community> communityPage;
+
+        // 맴버 엔티티 조회
+        memberRepository.findById(memberId_param).orElseThrow(() -> new NoSuchElementException("회원 id("+memberId_param+")가 존재하지 않습니다."));
+
+        // 로그인 사용자의 마이페이지면
+        if(memberId.equals(memberId_param)) {
+            // 커뮤니티 엔티티 조회 (비공개 포함)
+            communityPage = communityRepository.findByMemberId(memberId_param, pageable);
+        }else{ // 로그인 사용자의 마이페이지가 아니면
+            // 커뮤니티 엔티티 조회 (공개만)
+            communityPage = communityRepository.findByMemberIdAndStatus(memberId_param, Post.Status.PUBLIC, pageable);
+        }
+
+        // 결과값이 없으면 204 반환
+        if (!communityPage.hasContent()) {
+            throw new CreaviCodeException(GlobalErrorCode.NOT_RECRUIT_CONTENT);
+        }
+
+        // 커뮤니티 리스트 결과 toDto
+        data = communityPage.getContent().stream()
+                .map(community -> CommunityResponseDto.builder()
+                        .id(community.getId())
+                        .postType(PostType.COMMUNITY.name())
+                        .category(community.getCategory().name())
+                        .memberId(community.getMember().getId())
+                        .memberNickName(community.getMember().getMemberNickname())
+                        .memberProfile(community.getMember().getProfileUrl())
+                        .viewCount(community.getViewCount())
                         .createdDate(community.getCreatedDate())
                         .modifiedDate(community.getModifiedDate())
+                        .title(community.getTitle())
+                        .content(community.getContent())
+                        .hashTags(community.getCommunityHashTags().stream()
+                                .map(communityHashTag -> CommunityHashTagDto.builder().hashTag(communityHashTag.getHashTag()).build())
+                                .toList())
+                        .images(community.getCommunityImages().stream()
+                                .map(Image::getUrl)
+                                .toList())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
+
+        // 성공 응답 반환
+        return new SuccessResponseDto<>(true, "마이페이지 커뮤니티 게시글 리스트 조회가 완료되었습니다.", data);
     }
 }

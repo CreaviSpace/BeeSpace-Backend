@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.like.service;
 
+import com.creavispace.project.common.post.entity.Post;
 import com.creavispace.project.domain.like.dto.response.LikeCountResponseDto;
 import com.creavispace.project.domain.like.dto.response.LikeResponseDto;
 import com.creavispace.project.domain.like.entity.ProjectLike;
@@ -12,6 +13,8 @@ import com.creavispace.project.common.exception.GlobalErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.NoSuchElementException;
+
 @Component
 @RequiredArgsConstructor
 public class ProjectLikeStrategy implements LikeStrategy {
@@ -23,7 +26,9 @@ public class ProjectLikeStrategy implements LikeStrategy {
     @Override
     public LikeResponseDto likeToggle(Member member, Long postId) {
         LikeResponseDto data = null;
-        Project project = projectRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+        Project project = projectRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("프로젝트 id("+postId+")가 존재하지 않습니다."));
+
+        if(!project.getStatus().equals(Post.Status.PUBLIC)) throw new CreaviCodeException(GlobalErrorCode.NOT_PUBLIC_CONTENT);
 
         ProjectLike projectLike = projectLikeRepository.findByProjectIdAndMemberId(postId, member.getId());
 
@@ -33,21 +38,20 @@ public class ProjectLikeStrategy implements LikeStrategy {
                     .project(project)
                     .build();
             projectLikeRepository.save(saveLike);
-            project.pulsLikeCount();
             data = new LikeResponseDto(true);
         }else{
             projectLikeRepository.deleteById(projectLike.getId());
-            project.minusLikeCount();
             data = new LikeResponseDto(false);
         }
-        projectRepository.save(project);
         return data;
     }
 
     @Override
     public LikeResponseDto readLike(String memberId, Long postId) {
-        projectRepository.findByIdAndStatusTrue(postId).orElseThrow(()-> new CreaviCodeException(GlobalErrorCode.PROJECT_NOT_FOUND));
+        projectRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("프로젝트 id("+postId+")가 존재하지 않습니다."));
+
         boolean isProjectLike = projectLikeRepository.existsByProjectIdAndMemberId(postId, memberId);
+
         return new LikeResponseDto(isProjectLike);
     }
 

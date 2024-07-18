@@ -1,17 +1,16 @@
 package com.creavispace.project.domain.project.controller;
 
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.common.dto.type.ProjectCategory;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
-import com.creavispace.project.domain.project.dto.response.*;
+import com.creavispace.project.domain.project.dto.response.PopularProjectReadResponseDto;
+import com.creavispace.project.domain.project.dto.response.ProjectListReadResponseDto;
+import com.creavispace.project.domain.project.dto.response.ProjectReadResponseDto;
+import com.creavispace.project.domain.project.entity.Project;
 import com.creavispace.project.domain.project.service.ProjectService;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -24,21 +23,21 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/project")
 public class ProjectController {
 
     private final ProjectService projectService;
     
-    private static final String CREATE_PROJECT = "";
-    private static final String MODIFY_PROJECT = "/{projectId}";
-    private static final String DELETE_PROJECT = "/{projectId}";
-    private static final String READ_POPULAR_PROJECT = "/popular";
-    private static final String READ_PROJECT_LIST = "";
-    private static final String READ_PROJECT = "/{projectId}";
+    private static final String CREATE_PROJECT = "/project";
+    private static final String MODIFY_PROJECT = "/project/{projectId}";
+    private static final String DELETE_PROJECT = "/project/{projectId}";
+    private static final String READ_POPULAR_PROJECT = "/project/popular";
+    private static final String READ_PROJECT_LIST = "/project";
+    private static final String READ_PROJECT = "/project/{projectId}";
+    private static final String MYPAGE_READ_PROJECT_LIST = "/mypage/project/{projectId}";
 
     @PostMapping(CREATE_PROJECT)
     @Operation(summary = "프로젝트 게시글 생성")
-    public ResponseEntity<SuccessResponseDto<ProjectResponseDto>> createProject(
+    public ResponseEntity<SuccessResponseDto<Long>> createProject(
         @AuthenticationPrincipal String memberId,
         @RequestBody ProjectRequestDto dto
     ) {
@@ -48,7 +47,7 @@ public class ProjectController {
 
     @PutMapping(MODIFY_PROJECT)
     @Operation(summary = "프로젝트 게시글 수정")
-    public ResponseEntity<SuccessResponseDto<ProjectResponseDto>> modifyProject(
+    public ResponseEntity<SuccessResponseDto<Long>> modifyProject(
         @AuthenticationPrincipal String memberId,
         @PathVariable("projectId") Long projectId, 
         @RequestBody ProjectRequestDto dto
@@ -59,7 +58,7 @@ public class ProjectController {
     
     @DeleteMapping(DELETE_PROJECT)
     @Operation(summary = "프로젝트 게시글 삭제")
-    public ResponseEntity<SuccessResponseDto<ProjectDeleteResponseDto>> deleteProject(
+    public ResponseEntity<SuccessResponseDto<Long>> deleteProject(
         @AuthenticationPrincipal String memberId,
         @PathVariable("projectId") Long projectId
     ) {
@@ -77,12 +76,11 @@ public class ProjectController {
     @GetMapping(READ_PROJECT_LIST)
     @Operation(summary = "프로젝트 게시글 리스트 조회")
     public ResponseEntity<SuccessResponseDto<List<ProjectListReadResponseDto>>> readProjectList(
-        @ParameterObject @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
-        @RequestParam(value = "category", required = false) String category
+        @SortDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageRequest,
+        @RequestParam(value = "category", required = false) Project.Category category
     ) {
-        log.info("/project/controller : 프로젝트 게시글 리스트 조회");
-        ProjectCategory projectCategory = CustomValueOf.valueOf(ProjectCategory.class, category, GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
-        return ResponseEntity.ok().body(projectService.readProjectList(pageRequest, projectCategory));
+        log.info("/project/controller : 프로젝트 게시글 리스트 조회 request - pageable: {}, category: {}", pageRequest, category);
+        return ResponseEntity.ok().body(projectService.readProjectList(pageRequest, category));
     }
 
     @GetMapping(READ_PROJECT)
@@ -93,7 +91,8 @@ public class ProjectController {
         HttpServletRequest request
     ) {
         log.info("/project/controller : 프로젝트 게시글 디테일");
-        return ResponseEntity.ok().body(projectService.readProject(memberId, projectId, request));
+        // todo : 조회수 증가 서비스 추가 필요(프로젝트 조회 서비스에서 분리)
+        return ResponseEntity.ok().body(projectService.readProject(memberId, projectId));
     }
     
 }

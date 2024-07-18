@@ -11,14 +11,6 @@ import java.util.Optional;
 @Repository
 public interface CommunityBookmarkRepository extends JpaRepository<CommunityBookmark, Long>{
     Optional<CommunityBookmark> findByCommunityIdAndMemberId(Long communityId, String memberId);
+    public boolean existsByCommunityIdAndMemberId(Long communityId, String memberId);
 
-    List<CommunityBookmark> findByMemberId(String memberId, Pageable pageable);
-
-    List<CommunityBookmark> findByMemberIdOrderByContentsCreatedDateAsc(String memberId, Pageable pageRequest);
-
-    List<CommunityBookmark> findByMemberIdOrderByContentsCreatedDateDesc(String memberId, Pageable pageRequest);
-
-    List<CommunityBookmark> findByMemberIdAndEnableTrue(String memberId, Pageable pageRequest);
-
-    Optional<CommunityBookmark> findByCommunityId(Long id);
 }

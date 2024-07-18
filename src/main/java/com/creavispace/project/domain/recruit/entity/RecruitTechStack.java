@@ -2,8 +2,6 @@ package com.creavispace.project.domain.recruit.entity;
 
 import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.techStack.entity.TechStack;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +22,9 @@ public class RecruitTechStack extends BaseTimeEntity {
 
     @ManyToOne(targetEntity = Recruit.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "recruit_id", nullable = false)
-    @JsonBackReference
     private Recruit recruit;
+
+    public void setRecruit(Recruit recruit) {
+        this.recruit = recruit;
+    }
 }

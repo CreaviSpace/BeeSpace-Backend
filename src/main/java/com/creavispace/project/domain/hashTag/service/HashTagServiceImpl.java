@@ -1,15 +1,13 @@
 package com.creavispace.project.domain.hashTag.service;
 
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
-import com.creavispace.project.domain.hashTag.dto.response.PopularHashTagReadResponseDto;
-import com.creavispace.project.domain.hashTag.entity.CommunityHashTagResult;
 import com.creavispace.project.domain.hashTag.repository.CommunityHashTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -17,24 +15,15 @@ import java.util.stream.Collectors;
 public class HashTagServiceImpl implements HashTagService {
 
     private final CommunityHashTagRepository communityHashTagRepository;
-    
+
+    @Transactional(readOnly = true)
     @Override
-    public SuccessResponseDto<List<PopularHashTagReadResponseDto>> readPopularHashTagList() {
-        List<PopularHashTagReadResponseDto> data = null;
-
+    public SuccessResponseDto<List<String>> readPopularHashTagList() {
         // 해시태그 가져오기
-        List<CommunityHashTagResult> communityHashTags = communityHashTagRepository.findTop10HashTag();
-        
-        // 해시태그 DTO
-        data = communityHashTags.stream()
-            .map(communityHashTag -> PopularHashTagReadResponseDto.builder()
-                .hashTag(communityHashTag.getHashTag())
-                .build())
-            .collect(Collectors.toList());
+        List<String> top3HashTags = communityHashTagRepository.findTop3HashTagsByCount();
 
-        log.info("/feedback/service : analysisFeedback success data = {}", data);
         // 성공 응답 반환
-        return new SuccessResponseDto<>(true, "인기 해시태크 10개 조회가 완료되었습니다.", data);
+        return new SuccessResponseDto<>(true, "인기 해시태크 10개 조회가 완료되었습니다.", top3HashTags);
     }
     
 }

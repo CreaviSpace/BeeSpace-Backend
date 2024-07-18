@@ -2,8 +2,6 @@ package com.creavispace.project.domain.bookmark.service;
 
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.common.dto.type.PostType;
-import com.creavispace.project.common.utils.UsableConst;
-import com.creavispace.project.domain.bookmark.dto.response.BookmarkContentsResponseDto;
 import com.creavispace.project.domain.bookmark.dto.response.BookmarkResponseDto;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
@@ -11,10 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -42,12 +37,12 @@ public class BookmarkServiceImpl implements BookmarkService {
         return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", data);
     }
 
-    @Override
-    public SuccessResponseDto<List<BookmarkContentsResponseDto>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType) {
-        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
-        BookmarkStrategy strategy = bookmarkStrategyFactory.getStrategy(PostType.valueOf(postType.toUpperCase()));
-        List<BookmarkContentsResponseDto> data = strategy.readMyBookmark(memberId, pageRequest);
-
-        return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", data);
-    }
+//    @Override
+//    public SuccessResponseDto<List<BookmarkContentsResponseDto>> readMyBookmark(String memberId, Integer page, Integer size, String postType, String sortType) {
+//        Pageable pageRequest = UsableConst.getPageRequest(size, page, sortType);
+//        BookmarkStrategy strategy = bookmarkStrategyFactory.getStrategy(PostType.valueOf(postType.toUpperCase()));
+//        List<BookmarkContentsResponseDto> data = strategy.readMyBookmark(memberId, pageRequest);
+//
+//        return new SuccessResponseDto<>(true, "북마크 조회가 완료되었습니다.", data);
+//    }
 }

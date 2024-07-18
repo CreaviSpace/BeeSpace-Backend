@@ -1,15 +1,20 @@
 package com.creavispace.project.domain.feedback.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Getter
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeedbackAnalysisResponseDto {
+    private Long questionId;
     private String questionType;
-    private String question;
+    private String questionText;
+    private List<OptionAnalysisDto> selectedOptions;
+    private List<String> answers;
 }

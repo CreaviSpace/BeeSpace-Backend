@@ -1,30 +1,13 @@
 package com.creavispace.project.domain.bookmark.repository;
 
 import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
-import com.creavispace.project.domain.project.entity.Project;
-import java.util.Optional;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectBookmarkRepository extends JpaRepository<ProjectBookmark, Long>{
     public Boolean existsByProjectIdAndMemberId(Long projectId, String memberId);
-    public ProjectBookmark findByProjectIdAndMemberId(Long projectId, String memberId);
-
-
-    //ky
-    List<ProjectBookmark> findByMemberId(String memberId, Pageable pageable);
-
-    List<ProjectBookmark> findByMemberIdOrderByContentsCreatedDateAsc(Long memberId, Pageable pageRequest);
-    List<ProjectBookmark> findByMemberIdOrderByContentsCreatedDateDesc(Long memberId, Pageable pageRequest);
-
-
-    List<ProjectBookmark> findByProjectIdIn(List<Long> projectIds);
-
-    List<ProjectBookmark> findByMemberIdAndEnableTrue(String memberId, Pageable pageRequest);
-
-    Optional<ProjectBookmark> findByProjectId(Long id);
+    public Optional<ProjectBookmark> findByProjectIdAndMemberId(Long projectId, String memberId);
 }

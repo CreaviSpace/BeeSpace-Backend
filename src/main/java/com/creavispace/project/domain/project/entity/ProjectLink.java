@@ -11,15 +11,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Builder
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class ProjectLink extends BaseTimeEntity {
     @Id
@@ -37,4 +34,8 @@ public class ProjectLink extends BaseTimeEntity {
     
     @Column(nullable = false)
     private String url;
+
+    public void setProject(Project project){
+        this.project = project;
+    }
 }

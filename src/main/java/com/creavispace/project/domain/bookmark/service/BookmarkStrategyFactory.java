@@ -23,7 +23,7 @@ public class BookmarkStrategyFactory {
             case PROJECT -> projectBookmarkStrategy;
             case RECRUIT -> recruitBookmarkStrategy;
             case COMMUNITY -> communityBookmarkStrategy;
-            default -> throw new IllegalArgumentException("Unknown bookmark strategy type : " + type);
+            default -> throw new IllegalArgumentException("bookmark strategy type("+type+")이 존재하지 않습니다.");
         };
     }
 }

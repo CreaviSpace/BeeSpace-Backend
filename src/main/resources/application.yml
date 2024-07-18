@@ -44,6 +44,12 @@ spring:
 server:
   port: 8080
   serverAddress: 3.38.77.146
+  servlet:
+    session:
+      cookie:
+        domain: beespace.vercel.app
+        same-site: none
+        secure: true
 
 serverName: blue_server
 
@@ -73,3 +79,10 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
+  jpa:
+    properties:
+      hibernate:
+#        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 1000
+

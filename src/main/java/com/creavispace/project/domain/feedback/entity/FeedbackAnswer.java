@@ -1,22 +1,8 @@
 package com.creavispace.project.domain.feedback.entity;
 
-import java.util.List;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.creavispace.project.common.entity.BaseTimeEntity;
 import com.creavispace.project.domain.member.entity.Member;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,16 +20,20 @@ public class FeedbackAnswer extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feedback_question_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private FeedbackQuestion feedbackQuestion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    private String answer;
+    private String answerText; // 주관식 답변
 
-    @OneToMany(mappedBy = "feedbackAnswer", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<SelectedItem> selectedItems;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "selected_option_id")
+    private QuestionOption selectedOption; // 객관식 답변
+
+    public void setFeedbackQuestion(FeedbackQuestion feedbackQuestion){
+        this.feedbackQuestion = feedbackQuestion;
+    }
+
 }

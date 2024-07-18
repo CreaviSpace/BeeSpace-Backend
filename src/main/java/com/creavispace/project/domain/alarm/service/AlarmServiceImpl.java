@@ -5,7 +5,7 @@ import com.creavispace.project.domain.alarm.entity.Alarm;
 import com.creavispace.project.domain.alarm.repository.AlarmRepository;
 import com.creavispace.project.common.dto.response.SuccessResponseDto;
 import com.creavispace.project.common.dto.type.PostType;
-import com.creavispace.project.common.Post;
+import com.creavispace.project.common.post.entity.Post;
 import com.creavispace.project.domain.community.repository.CommunityRepository;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.member.repository.MemberRepository;
@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -86,22 +87,24 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Transactional
     @Override
-    public SuccessResponseDto<Void> modifyAlarm(String memberId, Long alarmId) {
+    public SuccessResponseDto<Long> modifyAlarm(String memberId, Long alarmId) {
 
-        int count = alarmRepository.updateReadStatusToReadByIdAndMemberId(alarmId,memberId);
+        Alarm alarm = alarmRepository.findById(alarmId).orElseThrow(() -> new NoSuchElementException("알람 id(" + alarmId + ")가 존재하지 않습니다."));
+        alarm.changeStatus(Alarm.readStatus.READ);
 
-        log.info("/alarm/service : 알림 읽음 Service - alarmId = {}", alarmId);
-        return new SuccessResponseDto<>(true, "알림 읽음 처리가 완료되었습니다.", null);
+        return new SuccessResponseDto<>(true, "알림 읽음 처리가 완료되었습니다.", alarmId);
     }
 
     @Transactional
     @Override
-    public SuccessResponseDto<Void> modifyAllAlarm(String memberId) {
+    public SuccessResponseDto<Integer> modifyAllAlarm(String memberId) {
 
-        int count = alarmRepository.updateReadStatusToReadByMemberId(memberId);
+        List<Alarm> alarms = alarmRepository.findByMemberId(memberId);
+        for (Alarm alarm : alarms) {
+            alarm.changeStatus(Alarm.readStatus.READ);
+        }
 
-        log.info("/alarm/service : 알림 전체 읽음 Service - {}개의 알림 읽음 처리", count);
-        return new SuccessResponseDto<>(true, "알림 전체 읽음 처리가 완료되었습니다.", null);
+        return new SuccessResponseDto<>(true, "알림 전체 읽음 처리가 완료되었습니다.", alarms.size());
     }
 
     @Override

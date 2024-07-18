@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.community.dto.request;
 
+import com.creavispace.project.domain.community.entity.CommunityCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommunityRequestDto {
-    private String category;
+    private CommunityCategory category;
     private String title;
     private String content;
     private List<String> hashTags;

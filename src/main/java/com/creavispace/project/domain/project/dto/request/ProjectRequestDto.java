@@ -1,5 +1,6 @@
 package com.creavispace.project.domain.project.dto.request;
 
+import com.creavispace.project.domain.project.entity.Project;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectRequestDto {
-    private String category;
+    private Project.Category category;
     private List<ProjectMemberRequestDto> memberDtos;
     private String title;
     private String content;
@@ -22,4 +23,7 @@ public class ProjectRequestDto {
     private String thumbnail;
     private String bannerContent;
     private List<String> images;
+
+
+
 }

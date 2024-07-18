@@ -1,131 +1,115 @@
 package com.creavispace.project.domain.project.entity;
 
-import com.creavispace.project.domain.bookmark.entity.ProjectBookmark;
-import com.creavispace.project.domain.comment.entity.ProjectComment;
-import com.creavispace.project.common.dto.type.ProjectCategory;
-import com.creavispace.project.common.entity.BaseTimeEntity;
-import com.creavispace.project.common.Post;
-import com.creavispace.project.domain.like.entity.ProjectLike;
+import com.creavispace.project.common.dto.type.PostType;
+import com.creavispace.project.common.post.entity.Post;
+import com.creavispace.project.domain.feedback.entity.FeedbackQuestion;
+import com.creavispace.project.domain.file.entity.ProjectImage;
 import com.creavispace.project.domain.member.entity.Member;
 import com.creavispace.project.domain.project.dto.request.ProjectRequestDto;
-import com.creavispace.project.common.exception.GlobalErrorCode;
-import com.creavispace.project.common.utils.CustomValueOf;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Builder
 @Entity
-@NoArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Project extends BaseTimeEntity implements Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+@ToString(exclude = {"projectLinks", "projectMembers", "projectTechStacks", "projectImages", "feedbackQuestions"})
+public class Project extends Post {
 
     private String field;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProjectCategory category;
-
-    @Column(length = 200, nullable = false)
-    private String title;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
-
-    @Column(nullable = false)
-    private String thumbnail;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String bannerContent;
-
-    private int likeCount;
-
-    private int viewCount;
+    private Category category;
 
     private int weekViewCount;
 
-    private boolean status;
+    @Builder.Default
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectLink> projectLinks = new ArrayList<>();
 
-    private boolean feedback;
-    @JsonBackReference
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectLink> links;
-    @JsonBackReference
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectComment> comments;
-    @JsonBackReference
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectBookmark> bookmarks;
-    @JsonBackReference
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectLike> likes;
-    @JsonBackReference
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectMember> members;
-    @JsonBackReference
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectTechStack> techStacks;
+    @Builder.Default
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectMember> projectMembers = new ArrayList<>();
 
-    public void modify(ProjectRequestDto dto) {
-        this.category = CustomValueOf.valueOf(ProjectCategory.class, dto.getCategory(), GlobalErrorCode.NOT_FOUND_PROJECT_CATEGORY);
-        this.title = dto.getTitle();
-        this.content = dto.getContent();
+    @Builder.Default
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectTechStack> projectTechStacks = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectImage> projectImages = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<FeedbackQuestion> feedbackQuestions = new ArrayList<>();
+
+    public enum Category {TEAM, INDIVIDUAL}
+
+    //== 연관관계 메서드 ==//
+
+    public void addProjectLink(ProjectLink projectLink){
+        projectLinks.add(projectLink);
+        projectLink.setProject(this);
+    }
+    public void addProjectMember(ProjectMember projectMember){
+        projectMembers.add(projectMember);
+        projectMember.setProject(this);
+    }
+    public void addProjectTechStack(ProjectTechStack projectTechStack){
+        projectTechStacks.add(projectTechStack);
+        projectTechStack.setProject(this);
+    }
+
+    public void addProjectImage(ProjectImage projectImage){
+        projectImages.add(projectImage);
+        projectImage.setProject(this);
+    }
+
+    public void addFeedbackQuestion(FeedbackQuestion feedbackQuestion){
+        feedbackQuestions.add(feedbackQuestion);
+        feedbackQuestion.setProject(this);
+    }
+
+    //== 생성 메서드 ==//
+
+    public static Project createProject(ProjectRequestDto dto, Member member, List<ProjectMember> projectMembers, List<ProjectLink> projectLinks, List<ProjectTechStack> projectTechStacks, List<ProjectImage> projectImages){
+        // 프로젝트 생성
+        Project project = Project.builder()
+                .field(dto.getField())
+                .category(dto.getCategory())
+                .weekViewCount(0)
+                .build();
+        // 프로젝트 공통정보 추가
+        project.setup(PostType.PROJECT, member, dto.getTitle(), dto.getContent(), dto.getThumbnail(), dto.getContent());
+        // 프로젝트 맴버 추가
+        for(ProjectMember projectMember : projectMembers){
+            project.addProjectMember(projectMember);
+        }
+        // 프로젝트 링크 추가
+        for(ProjectLink projectLink : projectLinks){
+            project.addProjectLink(projectLink);
+        }
+        // 프로젝트 기술스택 추가
+        for(ProjectTechStack projectTechStack : projectTechStacks){
+            project.addProjectTechStack(projectTechStack);
+        }
+        // 프로젝트 이미지 추가
+        for(ProjectImage projectImage : projectImages){
+            project.addProjectImage(projectImage);
+        }
+        return project;
+    }
+    //== 수정 메서드 ==//
+
+    public void update(ProjectRequestDto dto) {
+        this.changeTitleAndContentAndThumbnailAndBannerContent(dto.getTitle(), dto.getContent(), dto.getThumbnail(), dto.getBannerContent());
         this.field = dto.getField();
-        this.thumbnail = dto.getThumbnail();
-        this.bannerContent = dto.getBannerContent();
-    }
-
-    public boolean disable() {
-        this.status = !status;
-        return status;
-    }
-
-    public boolean disableAll() {
-        this.status = false;
-        return status;
-    }
-
-    public boolean enableAll() {
-        this.status = true;
-        return status;
-    }
-
-    public void plusViewCount() {
-        this.viewCount++;
-        this.weekViewCount++;
-    }
-
-    public void feedbackTrue() {
-        this.feedback = true;
-    }
-
-    public void feedbackFalse() {
-        this.feedback = false;
-    }
-
-    public void resetWeekViewCount() {
-        this.weekViewCount = 0;
-    }
-
-    public void pulsLikeCount() {
-        this.likeCount++;
-    }
-
-    public void minusLikeCount() {
-        this.likeCount--;
+        this.category = dto.getCategory();
     }
 
 }
