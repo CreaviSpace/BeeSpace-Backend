@@ -16,6 +16,12 @@
 
 더불어, 개발자들이 서로의 작업물에 대한 솔직한 피드백을 주고받을 수 있는 피드백 기능을 강화하고 있습니다. 이를 통해 실력 향상과 성장을 위한 소중한 장소로 사용할 수 있습니다.
 
+## 프로젝트 배포 주소 및 홈페이지 이미지
+
+https://beespace.vercel.app/
+
+![image](https://github.com/user-attachments/assets/202da9f8-fae8-4080-8ec3-379b161dbfa9)
+
 ## 멤버
 
 | FE | FE |
