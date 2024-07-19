@@ -63,7 +63,7 @@ ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
 ![image](https://github.com/user-attachments/assets/c2ae3ffd-9259-4796-a7f3-54791a813314)
 
 ## 프로젝트 아키텍쳐
-![image](https://github.com/user-attachments/assets/6ea5d407-7ace-4d5c-b4d1-1fdfbba029e3)
+![image](https://github.com/user-attachments/assets/a4f92ef4-dbc1-4c78-a243-b18b86789c1a)
 
 ## API 문서
 
