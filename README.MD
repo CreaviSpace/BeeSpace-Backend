@@ -22,6 +22,51 @@ https://beespace.vercel.app/
 
 ![image](https://github.com/user-attachments/assets/202da9f8-fae8-4080-8ec3-379b161dbfa9)
 
+## 주요 기능
+
+⭐ Oauth2Login(소셜 로그인) + JWT발급
+
+- Oauth2Login 동작을 백엔드에서 모든 책임을 갖도록 구현했습니다.
+- 로그인 페이지 요청 -> 코드 발급 -> Access토큰 -> 유저 정보 획득-> JWT(Access, Refresh) 발급
+
+⭐ 게시글, 댓글 CRUD + Spring Data JPA
+
+- 로그인 사용자의 권한에 따라 게시글 및 댓글 CRUD를 사용할 수 있도록 구현했습니다.
+- Spring Data JPA의 영속성 컨텍스트를 활용하여 save 및 update 코드 길이를 축소할 수 있었습니다.
+- fetch join 및 batch size를 활용하여 조회 쿼리의 N+1 문제에 대해 해결할 수 있었습니다.
+
+⭐ S3 파일 업로드
+
+- 게시글 작성시 AWS S3를 활용한 이미지 업로드를 가능하도록 구현했습니다.
+- 주기적으로 사용되지 않는 이미지 파일을 삭제하도록 구현했습니다.
+
+⭐ 북마크, 좋아요 기능
+
+- 로그인 사용자의 권한에 따라 북마크, 좋아요 기능을 사용 할 수 있도록 구현했습니다.
+
+⭐ 통합검색 기능
+
+- 다양한 종류의 게시글을 검색 조건에 따라 통합 검색할 수 있습니다.
+- QueryDSL을 활용해서 타입 세이프한 코드로 작성하였고, 검색조건에 따른 동적 쿼리를 구현했습니다.
+
+⭐ 배포 CI/CD
+
+- 팀 리포지토리의 develop 브런치에 push 상태가 일어나면 docker image가 저장되고 AWS EC2에 배포됩니다.
+
+
+
+## 기술스택
+`JAVA 17`, `Gradle`, `SpringBoot 3.2.1` , `Spring Data JPA`, `Spring Secruity 6.2.1`, `MySQL`, `AWS`, `S3`, `JWT`, `QueryDsl`
+
+## ERD
+ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
+![image](https://github.com/user-attachments/assets/c2ae3ffd-9259-4796-a7f3-54791a813314)
+
+## 프로젝트 아키텍쳐
+![image](https://github.com/user-attachments/assets/6ea5d407-7ace-4d5c-b4d1-1fdfbba029e3)
+
+## API 문서
+
 ## 멤버
 
 | FE | FE |
@@ -35,18 +80,6 @@ https://beespace.vercel.app/
 | [유호성](https://github.com/YuHoSeong) | [김규영](https://github.com/K-KY) | 
 
 ---
-
-## 기술스택
-`JAVA 17`, `Gradle`, `SpringBoot 3.2.1` , `Spring Data JPA`, `Spring Secruity 6.2.1`, `MySQL`, `AWS`, `S3`, `JWT`, `QueryDsl`
-
-## ERD
-ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
-![image](https://github.com/user-attachments/assets/c2ae3ffd-9259-4796-a7f3-54791a813314)
-
-## 프로젝트 아키텍쳐
-![image](https://github.com/user-attachments/assets/6ea5d407-7ace-4d5c-b4d1-1fdfbba029e3)
-
-## API 문서
 
 ### 커밋 컨벤션
 
