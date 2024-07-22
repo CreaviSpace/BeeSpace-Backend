@@ -67,6 +67,8 @@ ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
 
 ## API 문서
 
+https://planet-freon-06b.notion.site/BeeSpace-BackEnd-7bf9e3c9edb8460e88092d11f7fd9318?pvs=4
+
 ## 멤버
 
 | FE | FE |
