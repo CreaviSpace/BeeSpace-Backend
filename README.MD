@@ -65,7 +65,7 @@ ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
 ## 프로젝트 아키텍쳐
 ![image](https://github.com/user-attachments/assets/a4f92ef4-dbc1-4c78-a243-b18b86789c1a)
 
-## API 문서
+## API 문서 & 개발 문서
 
 https://planet-freon-06b.notion.site/BeeSpace-BackEnd-7bf9e3c9edb8460e88092d11f7fd9318?pvs=4
 
