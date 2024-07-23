@@ -19,6 +19,8 @@
 ## 프로젝트 배포 주소 및 홈페이지 이미지
 
 https://beespace.vercel.app/
+(현재 상용버전으로는 네이버 로그인만 사용 가능합니다.)
+
 
 ![image](https://github.com/user-attachments/assets/202da9f8-fae8-4080-8ec3-379b161dbfa9)
 
@@ -63,9 +65,13 @@ ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
 ![image](https://github.com/user-attachments/assets/c2ae3ffd-9259-4796-a7f3-54791a813314)
 
 ## 프로젝트 아키텍쳐
-![image](https://github.com/user-attachments/assets/6ea5d407-7ace-4d5c-b4d1-1fdfbba029e3)
 
-## API 문서
+![image](https://github.com/user-attachments/assets/a4f92ef4-dbc1-4c78-a243-b18b86789c1a)
+
+## API 문서 & 개발 문서
+
+https://planet-freon-06b.notion.site/BeeSpace-BackEnd-7bf9e3c9edb8460e88092d11f7fd9318?pvs=4
+
 
 ## 멤버
 
