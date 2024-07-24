@@ -1,18 +1,20 @@
 package com.creavispace.project.domain.auth.oauth2;
 
-import com.creavispace.project.domain.auth.jwt.JWTUtil;
 import com.creavispace.project.domain.auth.jwt.JWTService;
+import com.creavispace.project.domain.auth.jwt.JWTUtil;
 import com.creavispace.project.domain.auth.oauth2.dto.CustomOAuth2User;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -43,19 +45,25 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         // refresh 토큰 저장
         jwtService.addRefreshToken(memberId, refresh, 24 * 60 * 60 * 1000L);
 
-        response.addCookie(createCookie("refresh", refresh, 24*60*60));
+        response.addHeader("Set-Cookie", createCookie("refresh", refresh, Duration.ofHours(1)));
         response.sendRedirect("https://beespace.vercel.app/login");
     }
 
-    private Cookie createCookie(String key, String value, int expiry) {
+    private String createCookie(String key, String value, Duration duration) {
 
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(expiry);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
+        Instant now = Instant.now();
+        Instant expiresRefresh = now.plus(duration);
 
-        return cookie;
+        ResponseCookie cookie = ResponseCookie.from(key, value)
+                .httpOnly(true)
+                .maxAge(Duration.between(now, expiresRefresh))
+                .secure(true)
+                .domain("beespace.vercel.app")
+                .path("/")
+                .sameSite("None")
+                .build();
+
+        return cookie.toString();
     }
 
 }
