@@ -16,6 +16,10 @@
 
 더불어, 개발자들이 서로의 작업물에 대한 솔직한 피드백을 주고받을 수 있는 피드백 기능을 강화하고 있습니다. 이를 통해 실력 향상과 성장을 위한 소중한 장소로 사용할 수 있습니다.
 
+## API 문서 & 개발 문서
+
+https://planet-freon-06b.notion.site/BeeSpace-BackEnd-7bf9e3c9edb8460e88092d11f7fd9318?pvs=4
+
 ## 프로젝트 배포 주소 및 홈페이지 이미지
 
 https://beespace.vercel.app/
@@ -55,8 +59,6 @@ https://beespace.vercel.app/
 
 - 팀 리포지토리의 develop 브런치에 push 상태가 일어나면 docker image가 저장되고 AWS EC2에 배포됩니다.
 
-
-
 ## 기술스택
 `JAVA 17`, `Gradle`, `SpringBoot 3.2.1` , `Spring Data JPA`, `Spring Secruity 6.2.1`, `MySQL`, `AWS`, `S3`, `JWT`, `QueryDsl`
 
@@ -67,10 +69,6 @@ ERD사이트 주소 : https://www.erdcloud.com/d/YYHSkLxLQYCqEvQsT
 ## 프로젝트 아키텍쳐
 
 ![image](https://github.com/user-attachments/assets/a4f92ef4-dbc1-4c78-a243-b18b86789c1a)
-
-## API 문서 & 개발 문서
-
-https://planet-freon-06b.notion.site/BeeSpace-BackEnd-7bf9e3c9edb8460e88092d11f7fd9318?pvs=4
 
 
 ## 멤버
